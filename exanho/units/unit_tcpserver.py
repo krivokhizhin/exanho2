@@ -1,11 +1,14 @@
 import importlib
-from socketserver import TCPServer
-
+import logging
 import time
+
+from socketserver import TCPServer
 
 from . import ExanhoUnitBase, RPCHandler
 
 class TCPServerUnit(ExanhoUnitBase):
+
+    logger = logging.getLogger(__name__)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -27,6 +30,8 @@ class TCPServerUnit(ExanhoUnitBase):
         if not self.service_class:
             raise Exception('{}: No services'.format(self.config.name))
 
+        self.log.info(f'The unit "{self.config.name}" has been initialized.')
+
     def run(self, *args, **kwargs):
         TCPServer.allow_reuse_address = True
         self.serv = TCPServer((self.config.host, self.config.port), self.service_class)
@@ -46,6 +51,8 @@ class TCPServerUnit(ExanhoUnitBase):
                     t.start()
             else:
                 raise Exception(f'The concurrency_type is "{self.config.concurrency_type}". There must be either "Thread" or "Process".')
+
+        self.log.info(f'The unit "{self.config.name}" has been started.')
 
         self.serv.serve_forever()
 

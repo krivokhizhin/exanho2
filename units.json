@@ -1,0 +1,17 @@
+{
+    "exanho_units": [
+        {
+            "name": "SampleService",
+            "kind": "TCPServerUnit",
+            "address": {
+                "host": "",
+                "port": 3120
+            },
+            "concurrency": {
+                "degree": 2,
+                "type": "Thread"
+            },
+            "handler_module": "services.sample"
+        }
+    ]
+}

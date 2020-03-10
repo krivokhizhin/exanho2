@@ -30,11 +30,13 @@ class TCPServerUnit(ExanhoUnitBase):
         if not self.service_class:
             raise Exception('{}: No services'.format(self.config.name))
 
+        TCPServer.allow_reuse_address = True
+        self.serv = TCPServer((self.config.host, self.config.port), self.service_class)
+        self.serv.handle_error = self._handle_error
+
         self.log.info(f'The unit "{self.config.name}" has been initialized.')
 
     def run(self, *args, **kwargs):
-        TCPServer.allow_reuse_address = True
-        self.serv = TCPServer((self.config.host, self.config.port), self.service_class)
 
         if self.config.concurrency_degree > 0:
             if self.config.concurrency_type == 'process':
@@ -58,3 +60,7 @@ class TCPServerUnit(ExanhoUnitBase):
 
     def shutdown(self, *args, **kwargs):
         pass
+
+    def _handle_error(self, request, client_address):
+        log = logging.getLogger(TCPServerUnit.__module__)
+        log.error(f'An exception occurred while processing the request from the address: {client_address}')

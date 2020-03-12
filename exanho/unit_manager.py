@@ -5,8 +5,9 @@ import multiprocessing
 from .common import ExitException
 from . import WorkerRun, run_worker_wrapper
 from .units.creators.get_creator import get_creator
+from .units import RPCHandler
 
-class UnitManager:
+class UnitManager(RPCHandler):
 
     def __init__(self, log_queue):
         self.units = collections.defaultdict(WorkerRun)

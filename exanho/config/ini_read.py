@@ -31,7 +31,7 @@ def read_sys_config():
 
     main_cfg = AppCfg(
         cfg.get(main_section, host_option),
-        cfg.get(main_section, port_option),
+        int(cfg.get(main_section, port_option)),
         cfg.get(main_section, units_config_option),
         cfg.get(main_section, logging_pub_bind_option),
         int(cfg.get(main_section, logging_maxsize_option)),

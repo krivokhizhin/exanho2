@@ -11,7 +11,7 @@ template = 'exanho-service.ini'
 service_name = template.split('.')[0] + '.service'
 template_dir = 'etc'
 service_dir = '/etc/systemd/system'
-venv_dir = '/env/bin'
+venv_dir = '/venv/bin'
 
 fullpath = service_dir + '/' + service_name
 temp_fullpath = '/tmp/' + service_name
@@ -19,14 +19,17 @@ temp_fullpath = '/tmp/' + service_name
 def install():
     filename = getframeinfo(currentframe()).filename
     resolver = Path(filename).resolve()
-    parent, fullpath_venv = resolver.parents[0], resolver.parents[2]
+    parent, fullpath_venv = resolver.parents[0], resolver.parents[1]
+    print(parent, fullpath_venv)
     
     content = ''
     with open('{}/{}/{}'.format(parent, template_dir, template), 'r') as t:
         content = t.read()
-        
+    
+    print(content)
     content = re.sub(r'\{VENV_DIR\}', '{}{}/'.format(fullpath_venv, venv_dir), content)
     content = re.sub(r'\{APP_DIR\}', '{}/'.format(fullpath_venv), content)
+    print(content)
     
     with open(temp_fullpath, 'w') as unit_file:
         unit_file.write(content)

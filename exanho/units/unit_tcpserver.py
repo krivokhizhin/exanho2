@@ -4,7 +4,7 @@ import time
 
 from socketserver import TCPServer
 
-from . import ExanhoUnitBase, RPCHandler
+from . import ExanhoUnitBase, ServiceBase
 
 class TCPServerUnit(ExanhoUnitBase):
 
@@ -23,8 +23,8 @@ class TCPServerUnit(ExanhoUnitBase):
         mod = importlib.import_module(self.config.handler)
         for service_name, service_class in vars(mod).items():
             if (type(service_class) == type
-            and issubclass(service_class, RPCHandler)
-            and service_name != RPCHandler.__name__):
+            and issubclass(service_class, ServiceBase)
+            and service_name != ServiceBase.__name__):
                 self.service_class = service_class
                     
         if not self.service_class:

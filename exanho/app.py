@@ -1,34 +1,34 @@
 import argparse
 import logging
 
-from . import server
+from . import ExanhoServer
 from . import installer
-from .config import read_sys_config, read_unit_configs
+from .config import read_sys_config
 from .config import start_log_listener
 
 def run():
     args = parse_arguments()
 
+    if args.install:
+        installer.install()
+        return
+
+    if args.uninstall:
+        installer.uninstall()
+        return
+
     # 1. read config file 
     main_cfg = read_sys_config()
 
     # 2. start logging
-    log_listener, log_queue = start_log_listener(main_cfg.logging_config, main_cfg.logging_maxsize)
+    log_thread, log_queue = start_log_listener(main_cfg.logging_config, main_cfg.logging_maxsize)
 
     log = logging.getLogger(__name__)
     log.info("Logging has been configured.")
 
-    # 3. read service configurations 
-    unit_configs = read_unit_configs(main_cfg.units_config)
-    log.info("The unit configurations has been read.")
+    exanho = ExanhoServer(main_cfg, log_thread, log_queue)
 
-    exanho = server.ExanhoServer(main_cfg, unit_configs, log_listener, log_queue)
-
-    if args.install:
-        installer.install()
-    elif args.uninstall:
-        installer.uninstall()
-    elif args.validate:
+    if args.validate:
         exanho.validate()
     else:
         exanho.start()

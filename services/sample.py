@@ -2,9 +2,9 @@ import logging
 import time
 
 from exanho.common import try_logged, Timer
-from exanho.units import RPCHandler
+from exanho.units import ServiceBase
 
-class SampleService(RPCHandler):
+class SampleService(ServiceBase):
 
     logger = logging.getLogger(__name__)
 

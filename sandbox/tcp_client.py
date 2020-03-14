@@ -3,8 +3,7 @@ import sys
 import json
 
 HOST, PORT = sys.argv[1], int(sys.argv[2])
-method = sys.argv[3]
-params = sys.argv[4:]
+method, params = sys.argv[3], sys.argv[4:]
 data = json.dumps((method, params, {})).encode("ascii")
 data = len(data).to_bytes(10, byteorder='big') + data
 

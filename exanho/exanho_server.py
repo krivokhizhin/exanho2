@@ -2,14 +2,13 @@ import collections
 import logging
 import multiprocessing
 import time
-
 from socketserver import TCPServer
 from threading import Thread
 
+from . import ExanhoService, run_unit_wrapper
 from .config import read_unit_configs
-from . import ExanhoService
-from . import run_unit_wrapper
 from .units.creators.get_creator import get_creator
+
 
 class ExanhoServer:
     

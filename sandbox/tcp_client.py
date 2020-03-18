@@ -1,20 +1,28 @@
-import socket
+# import socket
 import sys
-import json
+# import json
+import operator
 
-HOST, PORT = sys.argv[1], int(sys.argv[2])
-method, params = sys.argv[3], sys.argv[4:]
-data = json.dumps((method, params, {})).encode("ascii")
-data = len(data).to_bytes(10, byteorder='big') + data
+from exanho.common import implement_rpc_client
+from exanho.contract import IExanhoService, ISampleService
 
-# Create a socket (SOCK_STREAM means a TCP socket)
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-    # Connect to server and send data
-    sock.connect((HOST, PORT))
-    sock.sendall(data)
+@implement_rpc_client('localhost', 3110)
+class ExanhoClient(IExanhoService):
+    pass
 
-    # Receive data from the server and shut down
-    received = str(sock.recv(1024), "utf-8")
+@implement_rpc_client('localhost', 3120)
+class SampleClient(ISampleService):
+    pass
 
-print("Sent:     {}({})".format(method, params))
-print("Received: {}".format(received))
+clients = {
+    'exanho': ExanhoClient(),
+    'sample': SampleClient()
+}
+
+def send():
+    client = ExanhoClient()
+
+    client, method, params = clients[sys.argv[1]], sys.argv[2], sys.argv[3:]
+    print("Will be sent:     {}.{}({})".format(client.__class__.__name__, method, params))
+    received = operator.methodcaller(method, *params)(client)
+    print("Received: {}".format(received))

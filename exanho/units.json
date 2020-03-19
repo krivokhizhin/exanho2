@@ -11,7 +11,7 @@
                 "degree": 2,
                 "type": "Thread"
             },
-            "handler_module": "services.sample"
+            "handler_module": "exanho.services.sample"
         }
     ]
 }

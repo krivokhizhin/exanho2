@@ -17,7 +17,7 @@ def start_log_listener(logging_config, logging_maxsize):
 
     return log_listener, log_queue
 
-def logger_thread(queue): 
+def logger_thread(queue):
     while True:
         try:
             record = queue.get()

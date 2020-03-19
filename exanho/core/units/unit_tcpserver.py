@@ -3,6 +3,7 @@ import logging
 import time
 
 from socketserver import TCPServer
+from abc import ABCMeta
 
 from . import ExanhoUnitBase, ServiceBase
 
@@ -22,7 +23,8 @@ class TCPServerUnit(ExanhoUnitBase):
             
         mod = importlib.import_module(self.config.handler)
         for service_name, service_class in vars(mod).items():
-            if (type(service_class) == type
+            self.log.debug(f'check initialize: service_name={service_name}, service_class={service_class}, type()=f{type(service_class)}')
+            if ((type(service_class) == type or type(service_class) == ABCMeta)
             and issubclass(service_class, ServiceBase)
             and service_name != ServiceBase.__name__):
                 self.service_class = service_class

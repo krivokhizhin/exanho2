@@ -1,10 +1,11 @@
 import logging
 import time
 
-from exanho.common import try_logged, Timer
-from exanho.units import ServiceBase
+from exanho.core.common import try_logged, Timer
+from exanho.core.units import ServiceBase
+from exanho.interfaces import ISampleService
 
-class SampleService(ServiceBase):
+class SampleService(ISampleService, ServiceBase):
 
     logger = logging.getLogger(__name__)
 

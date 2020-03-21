@@ -2,7 +2,7 @@
     "exanho_units": [
         {
             "name": "SampleService",
-            "kind": "TCPServerUnit",
+            "kind": "RpcServer",
             "address": {
                 "host": "",
                 "port": 3120

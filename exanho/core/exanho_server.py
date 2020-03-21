@@ -5,6 +5,7 @@ import time
 from socketserver import TCPServer
 from threading import Thread
 
+from .units import actor_factory
 from . import ExanhoService, run_unit_wrapper
 from .config import read_unit_configs
 from .units.creators.get_creator import get_creator
@@ -32,7 +33,7 @@ class ExanhoServer:
         manage_thread.daemon = True
         manage_thread.start()
 
-        self.log.info('The UnitManager thread has been started.')
+        self.log.info('The ExanhoService thread has been started.')
 
         # 2. read unit configurations 
         self._install_from_config(self.main_cfg.unit_config_path, self.log_queue)
@@ -63,9 +64,7 @@ class ExanhoServer:
     def _install_from_config(self, config_path, log_queue):
         unit_configs = read_unit_configs(config_path)
         for unit_config in unit_configs:
-            creator = get_creator(unit_config.kind)
+            actor = actor_factory.create(unit_config, log_queue)
             # creator.validate()(config)
 
-            process = multiprocessing.Process(target=run_unit_wrapper, args=(creator, ), kwargs={'config':unit_config, 'log_queue':log_queue}, name=unit_config.name)
-            process.daemon = True
-            process.start()
+            actor.start()

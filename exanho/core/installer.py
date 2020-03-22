@@ -19,7 +19,7 @@ temp_fullpath = '/tmp/' + service_name
 def install():
     filename = getframeinfo(currentframe()).filename
     resolver = Path(filename).resolve()
-    parent, fullpath_venv = resolver.parents[0], resolver.parents[1]
+    parent, fullpath_venv = resolver.parents[0], resolver.parents[2]
     print(parent, fullpath_venv)
     
     content = ''

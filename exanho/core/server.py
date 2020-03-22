@@ -15,7 +15,7 @@ class ExanhoServer:
     def __init__(self, main_cfg, log_listener, log_queue):
         self.log = logging.getLogger(__name__)
 
-        self.service = ExanhoService(main_cfg.unit_config_path, log_queue)
+        self.service = ExanhoService(main_cfg.actors_config_path, log_queue)
 
         self.service_host = main_cfg.host
         self.service_port = main_cfg.port

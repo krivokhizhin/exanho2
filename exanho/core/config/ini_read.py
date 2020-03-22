@@ -4,7 +4,7 @@ import os
 from inspect import currentframe, getframeinfo
 from pathlib import Path
 
-from .ini_options import *
+from .ini_options import config_filename, main_section, host_option, port_option, actors_config_option, logging_pub_bind_option, logging_maxsize_option, logging_config_option
 from . import AppCfg
 from ..common import JsonObject
 from ..actors.configs import create_actor_config
@@ -24,15 +24,10 @@ def read_sys_config():
     if main_section not in cfg.sections():
         raise Exception('There is "{}" section not in {} .'.format(main_section, config_path))
 
-    # clients = {}
-    # clients_section_names = [section_name for section_name in cfg.sections() if str(section_name).lower().endswith(client_section_posfix)]
-    # for section_name in clients_section_names:
-    #     clients[cfg.get(section_name, client_token_option)] = cfg.get(section_name, client_name_option)
-
     main_cfg = AppCfg(
         cfg.get(main_section, host_option),
         int(cfg.get(main_section, port_option)),
-        cfg.get(main_section, units_config_option),
+        cfg.get(main_section, actors_config_option),
         cfg.get(main_section, logging_pub_bind_option),
         int(cfg.get(main_section, logging_maxsize_option)),
         cfg.get(main_section, logging_config_option)
@@ -41,6 +36,6 @@ def read_sys_config():
     return main_cfg
 
 def read_actor_configs(actor_config_file):
-    units_cfg = JsonObject.create_from_file(actor_config_file)
-    unit_configs = list(map(create_actor_config, units_cfg.exanho_units))
-    return unit_configs
+    actors_cfg = JsonObject.create_from_file(actor_config_file)
+    actor_configs = list(map(create_actor_config, actors_cfg.exanho_actors))
+    return actor_configs

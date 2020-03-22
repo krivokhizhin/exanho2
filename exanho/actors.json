@@ -1,5 +1,5 @@
 {
-    "exanho_units": [
+    "exanho_actors": [
         {
             "name": "SampleService",
             "kind": "RpcServer",

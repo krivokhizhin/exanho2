@@ -1,6 +1,6 @@
 from ..common import JsonObject
 
-class UnitConfig():
+class ActorConfig():
 
     def __init__(self, json_obj: JsonObject):
         self._name = json_obj.name

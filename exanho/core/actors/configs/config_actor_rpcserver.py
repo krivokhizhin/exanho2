@@ -1,7 +1,7 @@
 from ...common import JsonObject
 from ...contract import HasDbConnect, HasHandler, UnitConfig
 
-class TCPServerUnitConfig(HasDbConnect, HasHandler, UnitConfig):  
+class RpcServerActorConfig(HasDbConnect, HasHandler, UnitConfig):  
     
     def __init__(self, json_obj: JsonObject):
         super().__init__(json_obj)

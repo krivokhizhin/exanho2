@@ -6,9 +6,8 @@ import time
 from queue import Queue
 from threading import Thread
 
-from . import ExanhoExit, ExanhoService, run_unit_wrapper
+from . import ExanhoExit, ExanhoService
 from .common import receive_rpc_data, send_rpc_data
-from .units.creators.get_creator import get_creator
 
 
 class ExanhoServer:

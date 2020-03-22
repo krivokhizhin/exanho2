@@ -2,7 +2,7 @@ import logging
 import time
 
 from exanho.core.common import try_logged, Timer
-from exanho.core.units import ServiceBase
+from exanho.core.actors import ServiceBase
 from exanho.interfaces import ISampleService
 
 class SampleService(ISampleService, ServiceBase):

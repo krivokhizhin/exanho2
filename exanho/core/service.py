@@ -1,10 +1,11 @@
 import logging
 from collections import defaultdict
 
-from .contract import IExanhoService
 from .common import try_logged
-from .units import Actor, actor_factory
-from .config import read_unit_configs
+from .config import read_actor_configs
+from .contract import IExanhoService
+from .actors import Actor, actor_factory
+
 
 class ExanhoExit(Exception):
     pass
@@ -32,7 +33,7 @@ class ExanhoService(IExanhoService):
 
     @try_logged
     def install_config(self):
-        actor_configs = read_unit_configs(self.config_path)
+        actor_configs = read_actor_configs(self.config_path)
         for actor_config in actor_configs:
             self.install_actor(actor_config, save=False)
 

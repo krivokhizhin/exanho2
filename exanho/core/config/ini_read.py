@@ -7,7 +7,7 @@ from pathlib import Path
 from .ini_options import *
 from . import AppCfg
 from ..common import JsonObject
-from ..units.configs import create_unit_config
+from ..actors.configs import create_actor_config
 
 def read_sys_config():
     filename = getframeinfo(currentframe()).filename
@@ -40,7 +40,7 @@ def read_sys_config():
 
     return main_cfg
 
-def read_unit_configs(unit_config_file):
-    units_cfg = JsonObject.create_from_file(unit_config_file)
-    unit_configs = list(map(create_unit_config, units_cfg.exanho_units))
+def read_actor_configs(actor_config_file):
+    units_cfg = JsonObject.create_from_file(actor_config_file)
+    unit_configs = list(map(create_actor_config, units_cfg.exanho_units))
     return unit_configs

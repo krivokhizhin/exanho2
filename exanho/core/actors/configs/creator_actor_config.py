@@ -1,7 +1,7 @@
-from . import TCPServerUnitConfig
+from . import RpcServerActorConfig
 
-def create_unit_config(config):
+def create_actor_config(config):
     if config.kind.lower() == 'RpcServer'.lower():
-        return TCPServerUnitConfig.create_instance(config)
+        return RpcServerActorConfig.create_instance(config)
     
     raise Exception('Unknown type of unit configuration: {}.'.format(config.kind)) 

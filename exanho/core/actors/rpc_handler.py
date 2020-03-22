@@ -1,7 +1,6 @@
 import logging
 from socketserver import BaseRequestHandler
 
-from ..common import ExitException
 from ..common import rpc_utilities as util
 
 
@@ -13,9 +12,6 @@ class RPCHandler(BaseRequestHandler):
             func_name, *args = args
             result = getattr(self, func_name)(*args,**kwargs)            
             util.send_rpc_data(self.request, result)
-        except ExitException:
-            util.send_rpc_data(self.request, 'OK')
-            self.server.shutdown()
         except Exception as ex:
             util.send_rpc_data(self.request, ex.args)
             raise        

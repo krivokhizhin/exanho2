@@ -1,4 +1,3 @@
-from .exceptions import ExitException
 from .json_object import JsonObject
 from .rpc_utilities import receive_rpc_data, send_rpc_data
 from .singleton import Singleton

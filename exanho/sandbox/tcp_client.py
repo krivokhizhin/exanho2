@@ -21,8 +21,6 @@ clients = {
 }
 
 def send():
-    client = ExanhoClient()
-
     client, method, params = clients[sys.argv[1]], sys.argv[2], sys.argv[3:]
     print("Will be sent:     {}.{}({})".format(client.__class__.__name__, method, params))
     received = operator.methodcaller(method, *params)(client)

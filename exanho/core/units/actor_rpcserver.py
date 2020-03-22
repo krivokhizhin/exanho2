@@ -15,7 +15,6 @@ class RpcServer(Actor):
 
         mod = importlib.import_module(config.handler)
         for service_name, service_class in vars(mod).items():
-            # log.debug(f'check initialize: service_name={service_name}, service_class={service_class}, type()=f{type(service_class)}')
             if ((type(service_class) == type or type(service_class) == ABCMeta)
             and issubclass(service_class, ServiceBase)
             and service_name != ServiceBase.__name__):
@@ -36,14 +35,14 @@ class RpcServer(Actor):
             if config.concurrency_type == 'process':
                 from multiprocessing import Process
                 for n in range(config.concurrency_degree):
-                    p = Process(target=self.serv.serve_forever, name=f'Process{n}')
+                    p = Process(target=self.serv.serve_forever, name=f'Process#{n}')
                     p.daemon = True
                     p.start()
                     self.handlers.append(p)
             elif config.concurrency_type == 'thread':
                 from threading import Thread
                 for n in range(config.concurrency_degree):
-                    t = Thread(target=self.serv.serve_forever, name=f'Thread{n}')
+                    t = Thread(target=self.serv.serve_forever, name=f'Thread#{n}')
                     t.daemon = True
                     t.start()
                     self.handlers.append(t)
@@ -55,6 +54,7 @@ class RpcServer(Actor):
     def finalize(self):
         log = logging.getLogger(RpcServer.__module__)
         self.serv.shutdown()
+        self.serv.server_close()
         for handler in self.handlers:
             handler.join(JOIN_TIMEOUT)
             if handler.is_alive():

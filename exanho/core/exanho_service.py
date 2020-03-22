@@ -1,22 +1,53 @@
+import logging
+from collections import defaultdict
+
 from .contract import IExanhoService
-from .units import ServiceBase
+from .common import try_logged
+from .units import Actor, actor_factory
+from .config import read_unit_configs
 
-class ExanhoService(IExanhoService, ServiceBase):
-    
-    def install_unit(self, config, log_queue, save=True):
+class ExanhoExit(Exception):
+    pass
+
+class ExanhoService(IExanhoService):
+
+    def __init__(self, config_path, log_queue):
+        self.log = logging.getLogger(__name__)
+
+        self.config_path = config_path
+        self.log_queue = log_queue
+
+        self.actors = defaultdict(Actor)
+   
+    @try_logged 
+    def install_actor(self, config, save=True):
+        actor = actor_factory.create(config, self.log_queue)
+        # creator.validate()(config)
+        self.actors[config.name] = actor
+        actor.start()
+
+    @try_logged
+    def unistall_actor(self, actor_name, save=True):
         pass
 
-    def unistall_unit(self, unit_name, save=True):
-        pass
+    @try_logged
+    def install_config(self):
+        actor_configs = read_unit_configs(self.config_path)
+        for actor_config in actor_configs:
+            self.install_actor(actor_config, save=False)
 
-    def install_config(self, config):
-        pass
-
+    @try_logged
     def get_config(self):
         pass
 
-    def get_unit_config(self, unit_name):
+    @try_logged
+    def get_actor_config(self, actor_name):
         pass
 
-    def get_unit_list(self):
+    @try_logged
+    def get_actor_list(self):
         pass
+
+    @try_logged
+    def shutdown(self):
+        return ExanhoExit

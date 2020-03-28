@@ -8,3 +8,5 @@ actors_config_option = 'actors_config'
 logging_pub_bind_option = 'logging_pub_bind'
 logging_maxsize_option = 'logging_maxsize'
 logging_config_option = 'logging_config'
+
+json_root_option = 'exanho_actors'

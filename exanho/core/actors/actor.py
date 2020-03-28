@@ -12,6 +12,10 @@ class Actor:
         self._log_queue = log_queue
         self._mailbox = Queue()
 
+    @property
+    def config(self):
+        return self._config
+
     def send(self, msg):
         '''
         Sends a message to the actor

@@ -9,7 +9,7 @@
             },
             "concurrency": {
                 "degree": 2,
-                "type": "Thread"
+                "kind": "thread"
             },
             "handler_module": "exanho.services.sample"
         }

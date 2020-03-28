@@ -4,7 +4,7 @@ import logging
 from . import ExanhoServer
 from . import installer
 from .config import read_sys_config
-from .config import start_log_listener
+from .log_listener import start_log_listener
 
 def run():
     args = parse_arguments()

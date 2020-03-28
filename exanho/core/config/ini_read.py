@@ -6,8 +6,6 @@ from pathlib import Path
 
 from .ini_options import config_filename, main_section, host_option, port_option, actors_config_option, logging_pub_bind_option, logging_maxsize_option, logging_config_option
 from . import AppCfg
-from ..common import JsonObject
-from ..actors.configs import create_actor_config
 
 def read_sys_config():
     filename = getframeinfo(currentframe()).filename
@@ -34,8 +32,3 @@ def read_sys_config():
         )    
 
     return main_cfg
-
-def read_actor_configs(actor_config_file):
-    actors_cfg = JsonObject.create_from_file(actor_config_file)
-    actor_configs = list(map(create_actor_config, actors_cfg.exanho_actors))
-    return actor_configs

@@ -29,8 +29,7 @@ class ExanhoServer:
     def start(self):
         self.log.info('Exanho is starting...')   
 
-        # 1. Hosting and start ExanhoService        
-
+        # 1. Hosting and start ExanhoService
         t = Thread(target=self.host_service, args=(self.service_host, self.service_port, ))
         t.daemon = True
         t.start()

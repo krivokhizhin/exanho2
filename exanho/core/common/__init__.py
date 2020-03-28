@@ -1,4 +1,3 @@
-from .json_object import JsonObject
 from .rpc_utilities import receive_rpc_data, send_rpc_data
 from .structure import Sctructure
 from .timer import Timer

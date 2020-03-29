@@ -23,3 +23,6 @@ def get_actor_configs_from_file(actors_file : str, indent=4):
     with open(actors_file, 'r') as f:
         content = json.load(f)
         return json.dumps(content, indent=indent)
+
+def convert_config_to_dict(config: str):
+    return json.loads(config)

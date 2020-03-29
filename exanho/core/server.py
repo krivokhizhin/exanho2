@@ -6,7 +6,7 @@ import time
 from queue import Queue
 from threading import Thread
 
-from . import ExanhoExit, ExanhoService
+from . import ActorManager, ExanhoExit, ExanhoService
 from .common import receive_rpc_data, send_rpc_data
 
 
@@ -15,7 +15,9 @@ class ExanhoServer:
     def __init__(self, main_cfg, log_listener, log_queue):
         self.log = logging.getLogger(__name__)
 
-        self.service = ExanhoService(main_cfg.actors_config_path, log_queue)
+        # self.service = ExanhoService(main_cfg.actors_config_path, log_queue)
+        self.manager = ActorManager(main_cfg.actors_config_path, log_queue)
+        self.service = ExanhoService(self.manager, main_cfg.actors_config_path)
 
         self.service_host = main_cfg.host
         self.service_port = main_cfg.port
@@ -37,7 +39,7 @@ class ExanhoServer:
         self.log.info('The ExanhoService has been hosted..')
 
         # 2. Install actors from configuration file
-        self.service.install_config()
+        self.manager.install_config()
         self.log.info('All actors have been configured.')
         
         while True:
@@ -60,7 +62,7 @@ class ExanhoServer:
     def stop(self):
         self.log.info('Exanho is stopping ...')
 
-        for name, actor in self.service.actors.items():
+        for name, actor in self.manager.actors.items():
             actor.close()
             actor.join()
             self.log.info(f'Actor "{name}" has been stopped.')
@@ -70,17 +72,14 @@ class ExanhoServer:
 
         self.log.info('Exanho server has been stopped.')
 
-    def validate(self):
-        pass
-
-    def host_service(self, host, port):
+    def host_service(self, host, port):        
         serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         serversocket.bind((host, port))
         serversocket.listen(5)
 
         while True:
-            (clientsocket, address) = serversocket.accept() 
-            result = receive_rpc_data(clientsocket)
+            (clientsocket, address) = serversocket.accept()
+            result = receive_rpc_data(clientsocket)            
             self.mailbox.put(result)
             self.mailbox.join()
             result = self.mailbox.get()

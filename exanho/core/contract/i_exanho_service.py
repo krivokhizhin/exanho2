@@ -3,15 +3,11 @@ from abc import ABC, abstractmethod
 class IExanhoService(ABC):
     
     @abstractmethod
-    def install_actor(self, config, save=True):
+    def install_actor(self, config: str, save=True):
         pass
 
     @abstractmethod
-    def unistall_actor(self, save=True):
-        pass
-
-    @abstractmethod
-    def install_config(self, config):
+    def uninstall_actor(self, save=True):
         pass
 
     @abstractmethod
@@ -19,11 +15,11 @@ class IExanhoService(ABC):
         pass
 
     @abstractmethod
-    def get_actor_config(self, actor_name):
+    def get_actor_list(self):
         pass
 
     @abstractmethod
-    def get_actor_list(self):
+    def get_actor_config(self, actor_name: str):
         pass
 
     @abstractmethod

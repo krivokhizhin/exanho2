@@ -1,6 +1,6 @@
 from . import RpcServerActorConfig
 
-def create_actor_config(config):
+def create_actor_config(config: dict):
     if config['kind'].lower() == 'RpcServer'.lower():
         return RpcServerActorConfig.create_instance(config)
     

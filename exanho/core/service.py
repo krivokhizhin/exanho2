@@ -23,13 +23,14 @@ class ExanhoService(IExanhoService):
    
     @try_logged 
     def install_actor(self, config, save=True):
-        actor = actor_factory.create(config, self.log_queue)
-        # creator.validate()(config)
-        self.actors[config.name] = actor
+        actor_config = actor_config_factory(config)
+        actor = actor_factory.create(actor_config, self.log_queue)
+        # creator.validate()(actor_config)
+        self.actors[actor_config.name] = actor
         actor.start()
 
         if save:
-            configs = [ actor.config.json_obj for name, actor in self.actors.items()]
+            configs = [ actor.config.serialize() for name, actor in self.actors.items()]
             json_actors.write_actor_configs(configs, self.config_path)
 
     @try_logged
@@ -42,22 +43,24 @@ class ExanhoService(IExanhoService):
         if not configs:
             raise RuntimeError(f'No configuration for actors found in the specified file.')
         
-        for config in configs:
-            actor_config = actor_config_factory(config)
-            self.install_actor(actor_config, save=False)
+        for config in configs:            
+            self.install_actor.__wrapped__(self, config, save=False)
 
     @try_logged
-    def get_config(self):
-        pass
+    def get_config(self, indent=4, saved=False):
+        if saved:
+            return json_actors.get_actor_configs_from_file(indent)
+        else:
+            configs = [ actor.config.serialize() for name, actor in self.actors.items()]
+            return json_actors.get_actor_configs(configs, indent)
 
     @try_logged
-    def get_actor_config(self, actor_name):
+    def get_actor_config(self, actor_name, indent=4):
         if actor_name not in self.actors:
             raise RuntimeError(f'No actor named {actor_name} was found.')
 
-        config = self.actors[actor_name].config.json_obj
-        self.log.debug(config.__dict__)
-        return json_actors.get_config_str(config)
+        config = self.actors[actor_name].config.serialize()
+        return json_actors.get_actor_config(config)
 
     @try_logged
     def get_actor_list(self):

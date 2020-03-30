@@ -3,8 +3,8 @@ import sys
 # import json
 import operator
 
+from core import IExanhoService
 from core.common import implement_rpc_client
-from core.contract import IExanhoService
 from interfaces import ISampleService
 
 @implement_rpc_client('localhost', 3110)

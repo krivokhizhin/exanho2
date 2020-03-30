@@ -1,11 +1,9 @@
 import logging
 from collections import defaultdict
 
-from . import ActorManager
+from . import IExanhoService, ActorManager
 from .common import try_logged
 from .config import json_actors
-from .contract import IExanhoService
-
 
 class ExanhoExit(Exception):
     pass
@@ -18,7 +16,7 @@ class ExanhoService(IExanhoService):
         self.config_path = config_path
    
     @try_logged 
-    def install_actor(self, config: str, save=True):
+    def install_actor(self, config: str, save=False):
         config_dict = json_actors.convert_config_to_dict(config)
         actor_config = self.manager.create_actor_config(config_dict)
         actor = self.manager.install_actor(actor_config)

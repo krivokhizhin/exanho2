@@ -44,14 +44,14 @@ class Actor:
         Starts competitive execution
         '''
         self._terminated = Event()
-        t = Process(target=self._bootstrap, name=self._config.name, args=(self._config, self._log_queue))
-        t.daemon = True
+        t = Process(target=self._bootstrap, name=self._config.name, args=(self._log_queue, ))
+        t.daemon = self._config.daemon
         t.start()
 
-    def _bootstrap(self, config, log_queue):
+    def _bootstrap(self, log_queue):
         try:
             self._configurer_logging(log_queue)
-            self.run(config)
+            self.run()
             self.pool()
         except ActorExit:
             self.finalize()

@@ -1,7 +1,4 @@
-from ...common.descriptors import String
-from . import ActorConfig, ReadOnlyConfigBaseDerived, TCPaddress, Concurrency
+from . import ActorConfig, ListConfigBaseDerived, Service
 
 class RpcServerActorConfig(ActorConfig):
-    address = ReadOnlyConfigBaseDerived(TCPaddress)
-    concurrency = ReadOnlyConfigBaseDerived(Concurrency)
-    handler_module = String()
+    services = ListConfigBaseDerived(Service)

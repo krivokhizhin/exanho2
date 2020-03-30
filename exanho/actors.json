@@ -3,15 +3,21 @@
         {
             "name": "SampleService",
             "kind": "RpcServer",
-            "address": {
-                "host": "",
-                "port": 3120
-            },
-            "concurrency": {
-                "degree": 2,
-                "kind": "thread"
-            },
-            "handler_module": "exanho.services.sample"
+            "daemon": false,
+            "services":[
+                {
+                    "handler_module": "exanho.services.sample",
+                    "address": {
+                        "host": "",
+                        "port": 3120
+                    },
+                    "concurrency": {
+                        "degree": 2,
+                        "kind": "thread"
+                    }
+                }
+            ]
+            
         }
     ]
 }

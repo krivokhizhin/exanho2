@@ -8,6 +8,7 @@ from threading import Thread
 
 from . import ActorManager, ExanhoExit, ExanhoService
 from .common import receive_rpc_data, send_rpc_data
+from .common.authenticate import server_authenticate
 
 
 class ExanhoServer:
@@ -21,6 +22,7 @@ class ExanhoServer:
 
         self.service_host = main_cfg.host
         self.service_port = main_cfg.port
+        self.secret_key = main_cfg.secret_key.encode('utf-8')
 
         self.log_listener = log_listener
         self.log_queue = log_queue
@@ -79,6 +81,11 @@ class ExanhoServer:
 
         while True:
             (clientsocket, address) = serversocket.accept()
+            if not server_authenticate(clientsocket, self.secret_key):
+                clientsocket.close()
+                self.log.warning(f'{address}: identification error')
+                continue
+
             result = receive_rpc_data(clientsocket)            
             self.mailbox.put(result)
             self.mailbox.join()

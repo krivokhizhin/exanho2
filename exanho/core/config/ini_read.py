@@ -4,7 +4,7 @@ import os
 from inspect import currentframe, getframeinfo
 from pathlib import Path
 
-from .ini_options import config_filename, main_section, host_option, port_option, actors_config_option, logging_pub_bind_option, logging_maxsize_option, logging_config_option
+from .ini_options import config_filename, main_section, host_option, port_option, actors_config_option, secret_key_option, logging_pub_bind_option, logging_maxsize_option, logging_config_option
 from . import AppCfg
 
 def read_sys_config():
@@ -26,6 +26,7 @@ def read_sys_config():
         cfg.get(main_section, host_option),
         int(cfg.get(main_section, port_option)),
         cfg.get(main_section, actors_config_option),
+        cfg.get(main_section, secret_key_option),
         cfg.get(main_section, logging_pub_bind_option),
         int(cfg.get(main_section, logging_maxsize_option)),
         cfg.get(main_section, logging_config_option)

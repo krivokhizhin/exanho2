@@ -1,4 +1,4 @@
-from . import ActorConfig, ListConfigBaseDerived, Service
+from . import ActorConfig, ListConfigBaseDerived, RpcService
 
 class RpcServerActorConfig(ActorConfig):
-    services = ListConfigBaseDerived(Service)
+    services = ListConfigBaseDerived(RpcService)

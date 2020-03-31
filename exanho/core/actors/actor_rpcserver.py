@@ -61,7 +61,7 @@ class RpcServer(Actor):
         log.info(f'The actor "{self.config.name}" has been installed.')
 
     def finalize(self):
-        log = logging.getLogger(RpcServer.__module__)
+        # log = logging.getLogger(RpcServer.__module__)
         # self.serv.shutdown()
         self.serv.server_close()
 

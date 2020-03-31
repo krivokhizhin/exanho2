@@ -11,14 +11,24 @@
                         "host": "",
                         "port": 3120
                     },
-                    "secret_key": "peekaboo2",
+                    "secret_key": "qwerty",
                     "concurrency": {
                         "degree": 2,
                         "kind": "thread"
                     }
                 }
+            ]            
+        },
+        {
+            "name": "SampleWorker",
+            "kind": "SleepWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.workers.sample",
+                    "sleep": 5
+                }
             ]
-            
         }
     ]
 }

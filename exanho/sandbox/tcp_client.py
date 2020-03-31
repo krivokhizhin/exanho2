@@ -11,7 +11,7 @@ from interfaces import ISampleService
 class ExanhoClient(IExanhoService):
     pass
 
-@implement_rpc_client('localhost', 3120)
+@implement_rpc_client('localhost', 3120, b'qwerty')
 class SampleClient(ISampleService):
     pass
 

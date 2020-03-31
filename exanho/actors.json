@@ -11,6 +11,7 @@
                         "host": "",
                         "port": 3120
                     },
+                    "secret_key": "peekaboo2",
                     "concurrency": {
                         "degree": 2,
                         "kind": "thread"

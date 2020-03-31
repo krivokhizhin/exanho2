@@ -65,6 +65,7 @@ class ExanhoServer:
         self.log.info('Exanho is stopping ...')
 
         for name, actor in self.manager.actors.items():
+            self.log.info(f'Actor "{name}" is stopping ...')
             actor.close()
             actor.join()
             self.log.info(f'Actor "{name}" has been stopped.')

@@ -1,6 +1,7 @@
-from .rpc_handler import RPCHandler
+from .rpc_handler import RpcHandler
 
-class ServiceBase(RPCHandler):
+class ServiceBase(RpcHandler):
+    secret_key = None
 
     def validate(self):
         return True

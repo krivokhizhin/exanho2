@@ -29,6 +29,9 @@ class RpcServer(Actor):
             if not hosting_service:
                 raise Exception('{}: No services'.format(self.config.name))
 
+            if service_config.secret_key:
+                hosting_service.secret_key = service_config.secret_key.encode('utf-8')
+
             TCPServer.allow_reuse_address = True
             self.serv = TCPServer((service_config.address.host, service_config.address.port), hosting_service)
             self.serv.handle_error = self._handle_error

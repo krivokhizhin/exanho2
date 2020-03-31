@@ -7,7 +7,7 @@ from core import IExanhoService
 from core.common import implement_rpc_client
 from interfaces import ISampleService
 
-@implement_rpc_client('localhost', 3110, b'peekaboo1')
+@implement_rpc_client('localhost', 3110, b'peekaboo')
 class ExanhoClient(IExanhoService):
     pass
 

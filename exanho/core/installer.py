@@ -8,7 +8,7 @@ from pathlib import Path
 
     
 template = 'exanho-service.ini'
-service_name = template.split('.')[0] + '.service'
+service_name = 'exanho' + '.service'
 template_dir = 'etc'
 service_dir = '/etc/systemd/system'
 venv_dir = '/venv/bin'

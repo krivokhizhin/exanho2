@@ -1,7 +1,8 @@
 import logging
 from collections import defaultdict
 
-from . import IExanhoService, ActorManager
+from .actor_manager import ActorManager
+from .i_service import IExanhoService
 from .common import try_logged
 from .config import json_actors
 

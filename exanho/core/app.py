@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from . import ExanhoServer
+from .server import ExanhoServer
 from . import installer
 from .config import read_sys_config
 from .log_listener import start_log_listener

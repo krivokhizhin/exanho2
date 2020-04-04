@@ -6,7 +6,8 @@ import time
 from queue import Queue
 from threading import Thread
 
-from . import ActorManager, ExanhoExit, ExanhoService
+from .actor_manager import ActorManager
+from .service import ExanhoExit, ExanhoService
 from .common import receive_rpc_data, send_rpc_data
 from .common.authenticate import server_authenticate
 

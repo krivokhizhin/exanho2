@@ -42,6 +42,8 @@ class ConfigBaseDerived:
         self.name = name   
 
     def __get__(self, obj, type=None):
+        if self.name not in obj.__dict__:
+            return None
         return obj.__dict__[self.name]
 
     def __set__(self, obj, value):

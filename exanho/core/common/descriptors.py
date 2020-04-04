@@ -1,10 +1,15 @@
 class Typed:
     expected_type = type(None)
 
+    def __init__(self, default=None):
+        self.default = default
+
     def __set_name__(self, owner, name):
         self.name = name    
 
     def __get__(self, obj, type=None):
+        if self.name not in obj.__dict__:
+            return self.default
         return obj.__dict__[self.name]
 
     def __set__(self, obj, value):

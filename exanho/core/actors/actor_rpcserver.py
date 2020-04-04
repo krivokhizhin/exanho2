@@ -18,8 +18,9 @@ class RpcServer(Actor):
 
         for service_config in self.config.services:
 
-            hosting_service = None
-            mod = importlib.import_module(service_config.handler_module)            
+            mod = importlib.import_module(service_config.handler_module)  
+
+            hosting_service = None   
             for service_name, service_class in vars(mod).items():
                 if ((type(service_class) == type or type(service_class) == ABCMeta)
                 and issubclass(service_class, ServiceBase)
@@ -30,13 +31,23 @@ class RpcServer(Actor):
                 raise Exception('{}: No services'.format(self.config.name))
 
             if service_config.secret_key:
-                hosting_service.secret_key = service_config.secret_key.encode('utf-8')
+                hosting_service.secret_key = service_config.secret_key.encode('utf-8')          
+
+            if service_config.db_domain:                
+                mod.domain.configure(service_config.db_domain.url)
+                log.info(f'The actor "{self.config.name}", service "{hosting_service.__name__}: domain has been configured')
+
+                if service_config.db_domain.validate:
+                    #TODO: move to a separate process
+                    if not mod.domain.validate(service_config.db_domain.url):
+                        raise RuntimeError(f'The database schema does not match the ORM model')
+                    log.info(f'The actor "{self.config.name}", service "{hosting_service.__name__}: domain is valid')   
 
             TCPServer.allow_reuse_address = True
             self.serv = TCPServer((service_config.address.host, service_config.address.port), hosting_service)
             self.serv.handle_error = self._handle_error
 
-            log.info(f'The actor "{self.config.name}": service "{hosting_service.__name__}" has been initialized.')
+            log.info(f'The actor "{self.config.name}": service "{hosting_service.__name__}" has been initialized')
 
             if service_config.concurrency.degree > 0:
                 if service_config.concurrency.kind == 'process':
@@ -54,11 +65,11 @@ class RpcServer(Actor):
                         t.start()
                         self.handlers[hosting_service.__name__].append(t)
                 else:
-                    raise Exception(f'The concurrency_type is "{service_config.concurrency.kind}". There must be either "Thread" or "Process".')
+                    raise Exception(f'The concurrency_type is "{service_config.concurrency.kind}". There must be either "Thread" or "Process"')
 
-            log.info(f'The actor "{self.config.name}": "{hosting_service.__name__}" has been started.')
+            log.info(f'The actor "{self.config.name}": "{hosting_service.__name__}" has been started')
 
-        log.info(f'The actor "{self.config.name}" has been installed.')
+        log.info(f'The actor "{self.config.name}" has been installed')
 
     def finalize(self):
         # log = logging.getLogger(RpcServer.__module__)

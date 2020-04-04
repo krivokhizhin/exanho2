@@ -20,6 +20,30 @@
             ]            
         },
         {
+            "name": "NsiOrgTypeService",
+            "kind": "RpcServer",
+            "daemon": true,
+            "services":[
+                {
+                    "handler_module": "exanho.services.nsi.organization_type",
+                    "address": {
+                        "host": "",
+                        "port": 3121
+                    },
+                    "secret_key": "password",
+                    "concurrency": {
+                        "degree": 2,
+                        "kind": "thread"
+                    },
+                    "db_domain": {
+                        "module": "exanho.orm.sqlalchemy",
+                        "url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",
+                        "validate": false
+                    }                    
+                }
+            ]            
+        },
+        {
             "name": "SampleWorker",
             "kind": "SleepWorker",
             "daemon": true,

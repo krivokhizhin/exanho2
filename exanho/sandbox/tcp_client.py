@@ -3,9 +3,9 @@ import sys
 # import json
 import operator
 
-from core import IExanhoService
+from core.i_service import IExanhoService
 from core.common import implement_rpc_client
-from interfaces import ISampleService
+from interfaces import ISampleService, INsiOrgTypeService
 
 @implement_rpc_client('localhost', 3110, b'peekaboo')
 class ExanhoClient(IExanhoService):
@@ -15,9 +15,14 @@ class ExanhoClient(IExanhoService):
 class SampleClient(ISampleService):
     pass
 
+@implement_rpc_client('localhost', 3121, b'password')
+class NsiOrgTypeClient(INsiOrgTypeService):
+    pass
+
 clients = {
     'exanho': ExanhoClient(),
-    'sample': SampleClient()
+    'sample': SampleClient(),
+    'nsi_org_type': NsiOrgTypeClient()
 }
 
 def send():

@@ -13,6 +13,14 @@ class Validator():
             self.is_valid = False
             return
         
+        self.validate_tables(full)
+        
+        if (len(self.error_messages) > 0):
+            self.is_valid = False
+        else:
+            self.is_valid = True
+
+    def validate_tables(self, full=False):
         md_table_names = set(self._md.tables.keys())
         db_table_names = set(self._insp.get_table_names())
         
@@ -24,8 +32,9 @@ class Validator():
                 if db_miss_table_name in Validator.excluding_tables:
                     continue
                 self.error_messages.append("There is no '{}' table in the domain.".format(db_miss_table_name))
-        
-        if (len(self.error_messages) > 0):
-            self.is_valid = False
-        else:
-            self.is_valid = True
+
+        for table_name in md_table_names.intersection(db_table_names):
+            self.validate_table(table_name)
+
+    def validate_table(self, table_name):
+        pass

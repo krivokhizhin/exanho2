@@ -20,11 +20,15 @@ class NsiOrgTypeService(INsiOrgTypeService, ServiceBase):
     @try_logged
     @domain.sessional
     def get(self, id):
-        org_type = self.session.query(NsiOrganizationType).filter_by(id=id).first()
-        return org_type
+        org_type = self.session.query(NsiOrganizationType).filter_by(id=id).one_or_none()
+        if org_type:
+            return org_type.serialize()
+        return None
 
     @try_logged
     @domain.sessional
     def get_by_code(self, code):
-        org_type = self.session.query(NsiOrganizationType).filter_by(code=code).first()
-        return org_type
+        org_type = self.session.query(NsiOrganizationType).filter_by(code=code).one_or_none()
+        if org_type:
+            return org_type.serialize()
+        return None

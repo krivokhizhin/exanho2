@@ -100,3 +100,32 @@ class ExanhoServer:
                 send_rpc_data(clientsocket, result)
 
         self.log.info('The ExanhoService has been stopped.')
+
+    def validate(self):
+        has_db_model_configs = self.manager.get_has_db_model_configs()
+
+        if not has_db_model_configs:
+            print(f'There is nothing to validate from a actors file')
+            return
+
+        from . import db_validate as db
+        results, canceled = db.validate(has_db_model_configs)
+        
+        if canceled:
+            print('Validation canceled')
+            return 
+
+        for result in results:
+            module, valid, errors, warnings = result
+            if valid:
+                print(f'{module} is valid')
+            else:
+                print(f'{module} is not valid')
+            if errors:
+                print('Errors:')
+                for error in errors:
+                    print(error)
+            if warnings:
+                print('Warnings:')
+                for warning in warnings:
+                    print(warning)

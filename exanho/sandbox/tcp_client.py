@@ -3,7 +3,7 @@ import sys
 # import json
 import operator
 
-from core import IExanhoService
+from core.i_service import IExanhoService
 from core.common import implement_rpc_client
 from interfaces import ISampleService
 

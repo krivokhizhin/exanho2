@@ -36,9 +36,8 @@
                         "kind": "thread"
                     },
                     "db_domain": {
-                        "module": "exanho.orm.sqlalchemy",
                         "url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",
-                        "validate": false
+                        "validate": true
                     }                    
                 }
             ]            

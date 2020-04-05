@@ -39,7 +39,11 @@ class RpcServer(Actor):
 
                 if service_config.db_domain.validate:
                     #TODO: move to a separate process
-                    if not mod.domain.validate(service_config.db_domain.url):
+                    valid, errors, warnings = mod.domain.validate(service_config.db_domain.url)
+                    if not valid:
+                        log.error(errors)
+                        if warnings:
+                            log.warning(warnings)
                         raise RuntimeError(f'The database schema does not match the ORM model')
                     log.info(f'The actor "{self.config.name}", service "{hosting_service.__name__}: domain is valid')   
 

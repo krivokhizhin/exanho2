@@ -50,7 +50,7 @@
             "workers": [
                 {
                     "module": "exanho.workers.sample",
-                    "sleep": 5
+                    "sleep": 5.0
                 }
             ]
         }

@@ -1,6 +1,7 @@
-from ...common.descriptors import Integer, String
-from . import ConfigBase
+from ...common.descriptors import Float, String
+from . import ConfigBase, ConfigBaseDerived, DbDomain
 
 class SleepWorker(ConfigBase):
     module = String()
-    sleep = Integer()
+    sleep = Float()
+    db_domain = ConfigBaseDerived(DbDomain)

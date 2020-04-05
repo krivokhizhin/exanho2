@@ -26,3 +26,6 @@ class String(Typed):
 
 class Integer(Typed):
     expected_type = int
+
+class Float(Typed):
+    expected_type = float

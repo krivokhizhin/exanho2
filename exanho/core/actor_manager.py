@@ -63,3 +63,26 @@ class ActorManager:
 
         config = actor.config.serialize()
         return json_actors.get_actor_config(config, indent)
+
+    def get_has_db_model_configs(self):
+
+        configs = json_actors.read_actors_file(self.config_path)
+        if not configs:
+            raise RuntimeError(f'No configuration for actors found in the specified file.')
+        
+        has_db_model_configs = []
+
+        for config in configs:  
+            actor_config = actor_config_factory(config)
+
+            if hasattr(actor_config, 'services'):
+                for service in  actor_config.services:
+                    if service.db_domain:
+                        has_db_model_configs.append({'module':service.handler_module, 'url':service.db_domain.url})
+
+            if hasattr(actor_config, 'workers'):
+                for worker in  actor_config.workers:
+                    if worker.db_domain:
+                        has_db_model_configs.append({'module':worker.module, 'url':worker.db_domain.url})
+
+        return has_db_model_configs

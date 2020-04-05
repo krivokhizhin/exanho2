@@ -35,14 +35,15 @@ def sessional(func):
 
 def validate(url):
     from sqlalchemy import inspect
+    from exanho.orm.validators.sqlalchemy import Validator
 
     engine = create_engine(url)
-    insp = inspect(engine)
+    inspector = inspect(engine)
+    
+    validator = Validator(Base.metadata, inspector)
+    validator.validate()
 
-    return validator(Base.metadata, insp)
-
-def validator(*args):
-    return False
+    return validator.is_valid, validator.error_messages, validator.warning_messages
     
 def upgrade(self):
     pass

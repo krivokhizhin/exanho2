@@ -1,6 +1,7 @@
 import concurrent.futures as f
 
 def validate(has_db_model_configs):
+    futures = []
     results = []
     canceled = False
     with f.ProcessPoolExecutor(len(has_db_model_configs)) as executor:

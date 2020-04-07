@@ -53,10 +53,15 @@ class Validator():
             #     pass
 
             db_type = str(db_column['type'])
-            if str(md_column.type) != db_type:
+            md_type = str(md_column.type)
+            if (md_type != db_type) and (type_matching.get(md_type, '') != db_type):
                 self.error_messages.append(f'Type mismatch for {md_column.key} column of the {table_name} table: {md_column.type} != {db_type}.')
 
             del db_columns[md_column.key]
 
         if db_columns:
             self.error_messages.extend([f'There is no "{name}" column in "{table_name}" table from domain.' for name in db_columns.keys()])
+
+type_matching = {
+    'DATETIME': 'TIMESTAMP WITHOUT TIME ZONE'
+}

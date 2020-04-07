@@ -43,13 +43,17 @@
             ]            
         },
         {
-            "name": "SampleWorker",
+            "name": "FtpLoadWorker",
             "kind": "SleepWorker",
             "daemon": true,
             "workers": [
                 {
-                    "module": "exanho.workers.sample",
-                    "sleep": 5.0
+                    "module": "exanho.workers.loading",
+                    "sleep": 5.0,
+                    "db_domain": {
+                        "url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",
+                        "validate": true
+                    } 
                 }
             ]
         }

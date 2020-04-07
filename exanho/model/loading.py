@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 
 from ..orm.sqlalchemy import Base
 from .i_serialize import ISerializeToDict

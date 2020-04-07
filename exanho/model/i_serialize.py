@@ -1,4 +1,4 @@
 class ISerializeToDict():
 
     def serialize(self):
-        raise NotImplementedError('NotImplementedError: serialization of a domain object is not implemented')
+        return {'class': self.__class__.__name__}

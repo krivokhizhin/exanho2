@@ -37,7 +37,10 @@ class SleepWorker(Actor):
         mod.initialize(db_url=db_url, db_validate=db_validate)
 
         while not self.worker_terminated.wait(timeout):
-            mod.work()
+            try:
+                mod.work()
+            except Exception as ex:
+                logging.getLogger(worker_module).exception(ex)
 
         mod.finalize()
 

@@ -4,7 +4,7 @@ from ..orm.sqlalchemy import Base
 from .i_serialize import ISerializeToDict
 
 class NsiOrganizationType(Base, ISerializeToDict):
-    __tablename__ = 'nsiOrganizationType'
+    __tablename__ = 'nsi_organization_type'
     
     id = Column(Integer, primary_key=True)
     code = Column(String(2), index=True, nullable=False, unique=True)

@@ -2,7 +2,7 @@ import logging
 
 import exanho.orm.sqlalchemy as domain
 
-from exanho.model.loading import LoadStatus, FtpArchive, FtpFile
+from exanho.model.loading import LoadStatus, LoadTask, LoadArchive, LoadFile
 
 log = logging.getLogger(__name__)
 

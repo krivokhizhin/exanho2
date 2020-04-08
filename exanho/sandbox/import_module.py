@@ -4,7 +4,7 @@ import importlib
 # from exanho.core.actors import ServiceBase
 
 
-module_path = 'exanho.workers.loading' # 'exanho.orm.sqlalchemy'
+module_path = 'exanho.services.nsi.organization_type' # 'exanho.workers.loading' # 'exanho.orm.sqlalchemy'
 url = 'postgresql+psycopg2://kks:Nata1311@localhost/eis44'
 
 

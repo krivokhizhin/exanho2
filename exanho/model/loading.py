@@ -7,8 +7,9 @@ from .i_serialize import ISerializeToDict
 
 class LoadStatus(Enum):
     NEW = 'NEW'
-    DIRTY = 'DIRTY'
+    EXECUTION = 'EXECUTION'
     COMPLETE = 'COMPLETE'
+    DIRTY = 'DIRTY'
 
 
 class LoadTask(Base, ISerializeToDict):

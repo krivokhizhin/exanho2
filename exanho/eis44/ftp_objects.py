@@ -1,12 +1,19 @@
+import datetime
+
 class FtpFile:
 
-    def __init__(self, name, size = None):
+    def __init__(self, name:str, date:datetime.datetime, size = None):
         self._name = name
+        self._date = date
         self._size = size
 
     @property
     def name(self):
         return self._name
+
+    @property
+    def date(self):
+        return self._date
 
     @property
     def size(self):

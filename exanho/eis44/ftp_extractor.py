@@ -12,8 +12,8 @@ class FtpExtractor:
         self.port = kwargs['port']
         self.user = kwargs['user']
         self.password = kwargs['password']
-
         self.location = kwargs['location']
+        self.archive_queue = kwargs['archive_queue']
 
         self.begin_date = kwargs.get('begin_date', datetime.date(datetime.MINYEAR, 1, 1))
         self.end_date = kwargs.get('end_date', datetime.date(datetime.MAXYEAR, 12, 31))
@@ -71,7 +71,14 @@ class FtpExtractor:
         if permission.startswith('d'):
             self.ftp_objects.append(FtpDirectory(filename, size))
         else:
-            self.ftp_objects.append(FtpFile(filename, size))
+            create_dt = datetime.datetime(datetime.MINYEAR, 1, 1, 0, 0, 0, 0)
+            if len(date) == 3:
+                if date[2].isdigit(): # ['Apr', '08', '2018']
+                    create_dt = datetime.datetime.strptime(''.join(date), '%b%d%Y')
+                elif ':' in date[2]: # ['Apr', '08', '00:03']
+                    current_year = datetime.date.today().year
+                    create_dt = datetime.datetime.strptime('{}{}'.format(current_year, ''.join(date)), '%Y%b%d%H:%M')
+            self.ftp_objects.append(FtpFile(filename, create_dt, size))
 
         # create_dt = None
         # if len(date) == 3:
@@ -96,6 +103,11 @@ class FtpExtractor:
             
             ftp_client.cwd(self.location)            
             list_cmd = ftp_client.retrlines('LIST', callback=self._parse_retrline)
+
+            archives = [ftp_object for ftp_object in self.ftp_objects if isinstance(ftp_object, FtpFile)]
+
+            for archive in sorted(archives, key=lambda archive: archive.date):
+                self.archive_queue.put((self.location, archive.name))
 
             # with open('output.txt', 'wt') as f:
             #     for archive_name in self.archive_names:

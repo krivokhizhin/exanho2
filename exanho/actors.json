@@ -43,12 +43,27 @@
             ]            
         },
         {
-            "name": "FtpLoadWorker",
+            "name": "LoadTaskWorker",
             "kind": "SleepWorker",
             "daemon": true,
             "workers": [
                 {
-                    "module": "exanho.workers.loading",
+                    "module": "exanho.workers.load_task_run",
+                    "sleep": 5.0,
+                    "db_domain": {
+                        "url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",
+                        "validate": true
+                    } 
+                }
+            ]
+        },
+        {
+            "name": "LoadArchiveWorker",
+            "kind": "SleepWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.workers.load_archive_run",
                     "sleep": 5.0,
                     "db_domain": {
                         "url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",

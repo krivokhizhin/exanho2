@@ -19,6 +19,9 @@ class FtpFile:
     def size(self):
         return self._size
 
+    def __str__(self):
+        return 'FtpFile: name={0.name}, date={0.date}, size={0.size}'.format(self)
+
 class FtpDirectory:
 
     def __init__(self, directory, size = None):

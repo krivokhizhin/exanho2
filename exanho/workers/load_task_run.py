@@ -4,7 +4,7 @@ import datetime
 import time
 import zipfile
 
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from ftplib import FTP
 from threading import Thread
 from queue import Queue
@@ -44,6 +44,7 @@ def work():
         if load_task:
             load_task.status = TaskStatus.SCANNING
             session.flush()
+            log.info(f'load_task({load_task.id}): {load_task.status}')
 
             archives = []
             try:
@@ -77,7 +78,29 @@ def work():
             elif load_task.status == TaskStatus.SCANNING:
                 load_task.status = TaskStatus.DONE
 
-    log.info(f'work')
+            session.flush()
+            log.info(f'load_task({load_task.id}): {load_task.status}')
+
+        archive_statuses = session.query(LoadArchive.task_id, LoadArchive.status).\
+            filter(LoadArchive.task_id.in_(session.query(LoadTask.id).filter(LoadTask.status == TaskStatus.RUNNING))).all()
+        statuses_by_task = defaultdict(list)
+        for task_id, archive_status in archive_statuses:
+            statuses_by_task[task_id].append(archive_status)
+
+        for task_id, statuses in statuses_by_task.items():
+            statuses_set = set(statuses)
+            if (len(statuses_set) == 1) and (ArchiveStatus.PERFORMED in statuses_set):
+                complete_task = session.query(LoadTask).get(task_id)
+                complete_task.status = TaskStatus.DONE
+                complete_task.err_desc = None
+                log.info(f'load_task({complete_task.id}): {complete_task.status}')
+            elif ArchiveStatus.FAILED in statuses_set:
+                complete_task = session.query(LoadTask).get(task_id)
+                complete_task.status = TaskStatus.ERROR
+                complete_task.err_desc = f'{statuses.count(ArchiveStatus.FAILED)} archives have failed status'
+                log.info(f'load_task({complete_task.id}): {complete_task.status}')
+
+            
 
 def finalize():
     log.info(f'finalize')

@@ -5,3 +5,4 @@ ftp_password = 'free'
 
 queue_max_size = -1
 load_archive_max_workers = 20
+parse_file_max_workers = 4

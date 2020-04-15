@@ -3,3 +3,4 @@ from .structure import Sctructure
 from .timer import Timer
 from .try_logged_method import try_logged
 from .rpc_client_dec import implement_rpc_client
+from .exceptions import Error

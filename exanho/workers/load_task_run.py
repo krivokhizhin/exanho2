@@ -48,8 +48,18 @@ def work():
 
             archives = []
             try:
-                viewer = FtpConsider(host=config.ftp_host, port=config.ftp_port, user=config.ftp_user, password=config.ftp_password, location=load_task.location)
-                viewer.consider()
+                viewer = FtpConsider(
+                    host=config.ftp_host,
+                    port=config.ftp_port,
+                    user=config.ftp_user,
+                    password=config.ftp_password,
+                    location=load_task.location,
+                    min_date=load_task.min_date,
+                    max_date=load_task.max_date,
+                    excluded_folders=load_task.excluded_folders
+                    delimiter=load_task.delimiter)
+                viewer.prepare()
+                viewer.inspect()
                 archives = [ftp_object for ftp_object in viewer.ftp_objects if isinstance(ftp_object, FtpFile)]
             except Exception as ex:
                 load_task.status = TaskStatus.ERROR

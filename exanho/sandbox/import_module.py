@@ -4,7 +4,7 @@ import importlib
 # from exanho.core.actors import ServiceBase
 
 
-module_path = 'exanho.workers.load_task_run' # 'exanho.services.nsi.organization_type' # 'exanho.orm.sqlalchemy'
+module_path = 'exanho.workers.ftp_task_run' # 'exanho.services.nsi.organization_type' # 'exanho.orm.sqlalchemy'
 url = 'postgresql+psycopg2://kks:Nata1311@localhost/eis44'
 
 
@@ -24,6 +24,6 @@ def run():
     # print(service.put('Dd', 'ddddd'))
 
     mod.domain.configure(url)
-    # print(mod.domain.validate(url))
+    print(mod.domain.validate(url))
     mod.domain.recreate(url)
     print('complete')

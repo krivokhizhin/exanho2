@@ -1,11 +1,11 @@
 import datetime
 import os.path
 
-class FtpFile:
+class InspFile:
 
     def __init__(self, name:str, date:datetime.datetime, size = None):
         self._name = name
-        self._directory = None
+        self._fullpath = None
         self._date = date
         self._size = size
 
@@ -13,12 +13,12 @@ class FtpFile:
     def name(self):
         return self._name
 
-    def set_directory(self, directory):
-        self._directory = directory
+    def set_fullpath(self, fullpath):
+        self._fullpath = fullpath
 
     @property
-    def directory(self):
-        return self._directory
+    def fullpath(self):
+        return self._fullpath
 
     @property
     def date(self):
@@ -29,9 +29,9 @@ class FtpFile:
         return self._size
 
     def __str__(self):
-        return 'FtpFile: name={0.name}, directory={0.directory}, date={0.date}, size={0.size}'.format(self)
+        return 'InspFile: name={0.name}, fullpath={0.fullpath}, date={0.date}, size={0.size}'.format(self)
 
-class FtpDirectory:
+class InspDirectory:
 
     def __init__(self, path, only_inspect = False):
         self._path = path

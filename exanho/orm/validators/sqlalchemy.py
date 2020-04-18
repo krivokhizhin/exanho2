@@ -55,7 +55,7 @@ class Validator():
             db_type = str(db_column['type'])
             md_type = str(md_column.type)
             if (md_type != db_type) and (type_matching.get(md_type, '') != db_type) and (type_matching_rev.get(db_type, '') != md_type):
-                self.error_messages.append(f'Type mismatch for {md_column.key} column of the {table_name} table: {md_column.type} != {db_type}.')
+                self.error_messages.append(f'Type mismatch for {md_column.key} column of the {table_name} table: {md_type} != {db_type}.')
 
             del db_columns[md_column.key]
 
@@ -63,13 +63,13 @@ class Validator():
             self.error_messages.extend([f'There is no "{name}" column in "{table_name}" table from domain.' for name in db_columns.keys()])
 
 type_matching = {
-    
+    'BIGINT': 'INTEGER'
 }
 
 type_matching_rev = {
     'taskstatus': 'VARCHAR(9)',
-    'archivestatus': 'VARCHAR(9)',
-    'filestatus': 'VARCHAR(11)',
+    'filestatus': 'VARCHAR(7)',
+    'contentstatus': 'VARCHAR(11)',
     'TIMESTAMP WITH TIME ZONE': 'DATETIME',
     'TIMESTAMP WITHOUT TIME ZONE': 'DATETIME'
 }

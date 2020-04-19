@@ -10,7 +10,6 @@ from multiprocessing import shared_memory
 from threading import Thread
 from queue import Queue
 
-import exanho.eis44.config as config
 import exanho.orm.sqlalchemy as domain
 
 from exanho.core.common import Error
@@ -18,8 +17,12 @@ from exanho.model.loading import ContentStatus, FtpContent
 
 log = logging.getLogger(__name__)
 
-Context = namedtuple('Context', ['db_url', 'db_validate'])
-executor = concurrent.futures.ThreadPoolExecutor(config.load_archive_max_workers)
+Context = namedtuple('Context', [
+    'db_url', 
+    'db_validate',
+    'max_pool_workers',
+    'executor'
+    ], defaults = [4, None])
 
 def initialize(appsettings):
     context = Context(**appsettings)
@@ -34,6 +37,9 @@ def initialize(appsettings):
             
     domain.configure(context.db_url)
 
+    executor = concurrent.futures.ThreadPoolExecutor(context.max_pool_workers)    
+    context = context._replace(executor=executor)
+
     log.info(f'initialize')
     return context
 
@@ -42,9 +48,9 @@ def work(context):
         futures = set()
 
         with domain.session_scope() as session:
-            for file_to_parse in session.query(FtpContent).filter(FtpContent.status == ContentStatus.PREPARED).order_by(FtpContent.last_modify).limit(config.parse_file_max_workers):
+            for file_to_parse in session.query(FtpContent).filter(FtpContent.status == ContentStatus.PREPARED).order_by(FtpContent.last_modify).limit(context.max_pool_workers):
                 file_to_parse.status = ContentStatus.PARSING
-                future = executor.submit(send_to_parse, file_to_parse.id, file_to_parse.name, file_to_parse.size, file_to_parse.message)
+                future = context.executor.submit(send_to_parse, file_to_parse.id, file_to_parse.name, file_to_parse.size, file_to_parse.message)
                 futures.add(future) 
                 log.debug(f'load_content({file_to_parse.id}): {file_to_parse.status}')
         if futures:
@@ -56,7 +62,7 @@ def work(context):
     return context 
 
 def finalize(context):
-    executor.shutdown(True)
+    context.executor.shutdown(True)
     log.info(f'finalize')
 
 def send_to_parse(id, filename, size, message):

@@ -6,7 +6,6 @@ from collections import namedtuple, defaultdict
 from threading import Thread
 from queue import Queue
 
-import exanho.eis44.config as config
 import exanho.orm.sqlalchemy as domain
 
 from exanho.model.loading import TaskStatus, FtpTask, FileStatus, FtpFile
@@ -14,11 +13,18 @@ from exanho.eis44.ftp_consider import FtpConsider
 
 log = logging.getLogger(__name__)
 
-Context = namedtuple('Context', ['db_url', 'db_validate'])
-InspFile = namedtuple('InspFile', 'task_id name directory date size')
-
-insp_file_queue = Queue()
-w_thread = None
+Context = namedtuple('Context', [
+    'db_url', 
+    'db_validate', 
+    'ftp_host', 
+    'ftp_port', 
+    'ftp_user', 
+    'ftp_password',
+    'insp_file_queue',
+    'w_thread'
+    ], defaults=[None, None])
+    
+InspFile = namedtuple('InspFile', ['task_id', 'name', 'directory', 'date', 'size'])
 
 def initialize(appsettings):
     context = Context(**appsettings)
@@ -33,10 +39,12 @@ def initialize(appsettings):
             
     domain.configure(context.db_url)
     
-    global w_thread
-    w_thread = Thread(target=write_ftp_files)
+    insp_file_queue=Queue()
+    w_thread = Thread(target=write_ftp_files, args=(insp_file_queue, ))
     w_thread.daemon = True
     w_thread.start()
+
+    context = context._replace(insp_file_queue=insp_file_queue, w_thread=w_thread)
 
     log.info(f'initialize')
     return context
@@ -55,11 +63,11 @@ def work(context):
             try:
                 viewer = FtpConsider(
                     task_id=load_task.id,
-                    insp_q=insp_file_queue,
-                    host=config.ftp_host,
-                    port=config.ftp_port,
-                    user=config.ftp_user,
-                    password=config.ftp_password,
+                    insp_q=context.insp_file_queue,
+                    host=context.ftp_host,
+                    port=context.ftp_port,
+                    user=context.ftp_user,
+                    password=context.ftp_password,
                     location=load_task.location,
                     min_date=load_task.min_date,
                     max_date=load_task.max_date,
@@ -100,11 +108,11 @@ def work(context):
     return context
 
 def finalize(context):
-    insp_file_queue.put(None)
-    w_thread.join()
+    context.insp_file_queue.put(None)
+    context.w_thread.join()
     log.info(f'finalize')
 
-def write_ftp_files():
+def write_ftp_files(insp_file_queue):
     while True:
         try:
             insp_file = insp_file_queue.get()

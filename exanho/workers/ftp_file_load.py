@@ -10,7 +10,6 @@ from collections import namedtuple, defaultdict
 from multiprocessing import shared_memory
 from ftplib import FTP
 
-import exanho.eis44.config as config
 import exanho.orm.sqlalchemy as domain
 
 from exanho.core.common import Error
@@ -18,9 +17,18 @@ from exanho.model.loading import FileStatus, FtpFile, ContentStatus, FtpContent
 
 log = logging.getLogger(__name__)
 
-Context = namedtuple('Context', ['db_url', 'db_validate'])
+Context = namedtuple('Context', [
+    'db_url', 
+    'db_validate', 
+    'ftp_host', 
+    'ftp_port', 
+    'ftp_user', 
+    'ftp_password', 
+    'max_pool_workers',
+    'executor'
+    ], defaults=[20, None])
+
 ContentData = namedtuple('ContentData', ['name', 'crc', 'size', 'last_modify', 'message'])
-executor = concurrent.futures.ThreadPoolExecutor(config.load_archive_max_workers)
 
 def initialize(appsettings):
     context = Context(**appsettings)
@@ -35,6 +43,9 @@ def initialize(appsettings):
             
     domain.configure(context.db_url)
 
+    executor = concurrent.futures.ThreadPoolExecutor(context.max_pool_workers)
+    context = context._replace(executor=executor)
+
     log.info(f'initialize')
     return context
 
@@ -43,9 +54,9 @@ def work(context):
         futures = set()
         with domain.session_scope() as session:
             load_file_ids = []
-            for load_file in session.query(FtpFile).filter(FtpFile.status == FileStatus.READY).order_by(FtpFile.date).limit(config.load_archive_max_workers):
+            for load_file in session.query(FtpFile).filter(FtpFile.status == FileStatus.READY).order_by(FtpFile.date).limit(context.max_pool_workers):
                 load_file.status = FileStatus.LOADING
-                future = executor.submit(ftp_loading, config.ftp_host, config.ftp_port, config.ftp_user, config.ftp_password, load_file.id, load_file.filename, load_file.directory)
+                future = context.executor.submit(ftp_loading, context.ftp_host, context.ftp_port, context.ftp_user, context.ftp_password, load_file.id, load_file.filename, load_file.directory)
                 futures.add(future)
                 log.info(f'load_file({load_file.id}): {load_file.status}')
                 load_file_ids.append(load_file.id)
@@ -83,7 +94,7 @@ def work(context):
     return context 
 
 def finalize(context):
-    executor.shutdown(True)
+    context.executor.shutdown(True)
     log.info(f'finalize')
 
 def ftp_loading(host, port, user, password, load_file_id, filename, location):
@@ -106,7 +117,6 @@ def ftp_loading(host, port, user, password, load_file_id, filename, location):
 def download_extract_zip(ftp_client, zipfilename, ext_file='.xml'):
     """
     Download a ZIP file from FTP and extract its contents in memory
-    yields (filename, file-like object) pairs
     """
     with io.BytesIO() as buffer:
         
@@ -152,7 +162,7 @@ def wait_for(futures):
                                     one_or_none()
                         if exists_content is None:
                             session.add(FtpContent(file_id=load_file_id, status=ContentStatus.PREPARED, name=file_data.name, crc=file_data.crc, size=file_data.size, last_modify=file_data.last_modify, message=file_data.message))
-                        elif (exists_content.status in [ContentStatus.PROCESSED, ContentStatus.FAULT, ContentStatus.PREPARED]) and (exists_content.crc != file_data.crc) and (exists_content.last_modify <= file_data.last_modify):
+                        elif (exists_content.status == ContentStatus.FAULT) or ((exists_content.status in [ContentStatus.PROCESSED, ContentStatus.PREPARED]) and (exists_content.crc != file_data.crc) and (exists_content.last_modify <= file_data.last_modify)):
                             exists_content.crc = file_data.crc
                             exists_content.size = file_data.size
                             exists_content.last_modify = file_data.last_modify

@@ -52,7 +52,12 @@
                     "sleep": 5.0,
                     "appsettings":{
                         "db_url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",
-                        "db_validate": true
+                        "db_validate": true,
+                        "ftp_host": "ftp.zakupki.gov.ru",
+                        "ftp_port": 21,
+                        "ftp_user": "free",
+                        "ftp_password": "free"
+
                     }
                 }
             ]
@@ -67,7 +72,12 @@
                     "sleep": 5.0,
                     "appsettings":{
                         "db_url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",
-                        "db_validate": true
+                        "db_validate": true,
+                        "ftp_host": "ftp.zakupki.gov.ru",
+                        "ftp_port": 21,
+                        "ftp_user": "free",
+                        "ftp_password": "free",
+                        "max_pool_workers": 20
                     }
                 }
             ]
@@ -82,7 +92,8 @@
                     "sleep": 5.0,
                     "appsettings":{
                         "db_url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",
-                        "db_validate": true
+                        "db_validate": true,
+                        "max_pool_workers": 4
                     }
                 }
             ]

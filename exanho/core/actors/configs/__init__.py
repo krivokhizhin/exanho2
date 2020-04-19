@@ -1,4 +1,4 @@
-from .base_config import ConfigBase, ConfigBaseDerived, ListConfigBaseDerived
+from .base_config import ConfigBase, ConfigBaseDerived, ListConfigBaseDerived, List
 from .actor_config import ActorConfig
 from .tcp_address import TCPaddress
 from .concurrency import Concurrency

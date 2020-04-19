@@ -14,24 +14,24 @@ from exanho.eis44.ftp_consider import FtpConsider
 
 log = logging.getLogger(__name__)
 
+Context = namedtuple('Context', ['db_url', 'db_validate'])
 InspFile = namedtuple('InspFile', 'task_id name directory date size')
 
 insp_file_queue = Queue()
 w_thread = None
 
-def initialize(*args, **kwargs):
-    db_url = kwargs['db_url']
+def initialize(appsettings):
+    context = Context(**appsettings)
 
-    db_validate = kwargs.get('db_validate', False)
-    if db_validate:
-        is_valid, errors, warnings = domain.validate(db_url)
+    if context.db_validate:
+        is_valid, errors, warnings = domain.validate(context.db_url)
         if not is_valid:
             log.error(errors)
             if warnings:
                 log.warning(warnings)
             raise RuntimeError(f'The database schema does not match the ORM model')
             
-    domain.configure(db_url)
+    domain.configure(context.db_url)
     
     global w_thread
     w_thread = Thread(target=write_ftp_files)
@@ -39,9 +39,9 @@ def initialize(*args, **kwargs):
     w_thread.start()
 
     log.info(f'initialize')
+    return context
 
-def work():
-    
+def work(context):
 
     with domain.session_scope() as session:
         now = datetime.datetime.now()
@@ -97,7 +97,9 @@ def work():
                 task_done.err_desc = f'{statuses.count(FileStatus.FAILED)} files have failed status'
                 log.info(f'load_task({task_done.id}): {task_done.status}')
 
-def finalize():
+    return context
+
+def finalize(context):
     insp_file_queue.put(None)
     w_thread.join()
     log.info(f'finalize')

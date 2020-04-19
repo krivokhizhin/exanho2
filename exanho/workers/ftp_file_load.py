@@ -18,26 +18,27 @@ from exanho.model.loading import FileStatus, FtpFile, ContentStatus, FtpContent
 
 log = logging.getLogger(__name__)
 
+Context = namedtuple('Context', ['db_url', 'db_validate'])
 ContentData = namedtuple('ContentData', ['name', 'crc', 'size', 'last_modify', 'message'])
 executor = concurrent.futures.ThreadPoolExecutor(config.load_archive_max_workers)
 
-def initialize(*args, **kwargs):
-    db_url = kwargs['db_url']
+def initialize(appsettings):
+    context = Context(**appsettings)
 
-    db_validate = kwargs.get('db_validate', False)
-    if db_validate:
-        is_valid, errors, warnings = domain.validate(db_url)
+    if context.db_validate:
+        is_valid, errors, warnings = domain.validate(context.db_url)
         if not is_valid:
             log.error(errors)
             if warnings:
                 log.warning(warnings)
             raise RuntimeError(f'The database schema does not match the ORM model')
             
-    domain.configure(db_url)
+    domain.configure(context.db_url)
 
     log.info(f'initialize')
+    return context
 
-def work():
+def work(context):
     while True:
         futures = set()
         with domain.session_scope() as session:
@@ -77,9 +78,11 @@ def work():
 
         with domain.session_scope() as session:
             if session.query(FtpFile).filter(FtpFile.status == FileStatus.READY).count() == 0:
-                break   
+                break  
 
-def finalize():
+    return context 
+
+def finalize(context):
     executor.shutdown(True)
     log.info(f'finalize')
 

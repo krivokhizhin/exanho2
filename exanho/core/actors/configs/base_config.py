@@ -60,3 +60,6 @@ class ListConfigBaseDerived(ConfigBaseDerived):
         for item in value:
             item_list.append(self.config_class.create_instance(item))
         obj.__dict__[self.name] = item_list
+
+class List(ConfigBase):
+    pass

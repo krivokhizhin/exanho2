@@ -14,7 +14,7 @@ class RpcServer(Actor):
     def run(self):
         log = logging.getLogger(__name__)
 
-        self.handlers = defaultdict(list)
+        self.servers = list()
 
         for service_config in self.config.services:
 
@@ -48,8 +48,9 @@ class RpcServer(Actor):
                     log.info(f'The actor "{self.config.name}", service "{hosting_service.__name__}: domain is valid')   
 
             TCPServer.allow_reuse_address = True
-            self.serv = TCPServer((service_config.address.host, service_config.address.port), hosting_service)
-            self.serv.handle_error = self._handle_error
+            serv = TCPServer((service_config.address.host, service_config.address.port), hosting_service)
+            serv.handle_error = self._handle_error
+            self.servers.append(serv)
 
             log.info(f'The actor "{self.config.name}": service "{hosting_service.__name__}" has been initialized')
 
@@ -57,17 +58,15 @@ class RpcServer(Actor):
                 if service_config.concurrency.kind == 'process':
                     from multiprocessing import Process
                     for n in range(service_config.concurrency.degree):
-                        p = Process(target=self.serv.serve_forever, name=f'Process#{n}')
+                        p = Process(target=serv.serve_forever, name=f'Process#{n}')
                         p.daemon = True
                         p.start()
-                        self.handlers[hosting_service.__name__].append(p)
                 elif service_config.concurrency.kind == 'thread':
                     from threading import Thread
                     for n in range(service_config.concurrency.degree):
-                        t = Thread(target=self.serv.serve_forever, name=f'Thread#{n}')
+                        t = Thread(target=serv.serve_forever, name=f'Thread#{n}')
                         t.daemon = True
                         t.start()
-                        self.handlers[hosting_service.__name__].append(t)
                 else:
                     raise Exception(f'The concurrency_type is "{service_config.concurrency.kind}". There must be either "Thread" or "Process"')
 
@@ -76,16 +75,8 @@ class RpcServer(Actor):
         log.info(f'The actor "{self.config.name}" has been installed')
 
     def finalize(self):
-        # log = logging.getLogger(RpcServer.__module__)
-        # self.serv.shutdown()
-        self.serv.server_close()
-
-        # for service_name, handlers in self.handlers.items():
-        #     for handler in handlers:
-        #         handler.join(JOIN_TIMEOUT)
-        #         if handler.is_alive():
-        #             log.warning(f'The {handler.name} was not completed in the allotted time interval ({JOIN_TIMEOUT} sec.).')  
-        #         log.info(f'The service "{service_name}" has been stopped.')          
+        for serv in self.servers:
+            serv.server_close()       
 
     def handle(msg):
         pass

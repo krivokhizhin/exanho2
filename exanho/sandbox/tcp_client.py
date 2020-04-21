@@ -15,7 +15,7 @@ class ExanhoClient(IExanhoService):
 class SampleClient(ISampleService):
     pass
 
-@implement_rpc_client('localhost', 3121, b'password')
+@implement_rpc_client('localhost', 3131, b'pa$$word')
 class NsiOrgTypeClient(INsiOrgTypeService):
     pass
 

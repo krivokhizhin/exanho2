@@ -24,4 +24,5 @@ class NsiOrganizationType(Base, ISerializeToDict):
 
     def serialize(self):
         dto = super().serialize()
-        return dto.update({'id': self.id, 'code':self.code, 'name':self.name, 'description':self.description})
+        dto.update({'id': self.id, 'code':self.code, 'name':self.name, 'description':self.description})
+        return dto

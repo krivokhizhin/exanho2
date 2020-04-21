@@ -12,17 +12,22 @@ from queue import Queue
 
 import exanho.orm.sqlalchemy as domain
 
+from exanho.core.common import create_client_class
 from exanho.core.common import Error
 from exanho.model.loading import ContentStatus, FtpContent
+from exanho.interfaces import IParse
 
 log = logging.getLogger(__name__)
 
 Context = namedtuple('Context', [
     'db_url', 
     'db_validate',
+    'rpc_port',
+    'rpc_secretkey',
     'max_pool_workers',
-    'executor'
-    ], defaults = [4, None])
+    'executor',
+    'like_expression'
+    ], defaults = [None, 4, None, None])
 
 def initialize(appsettings):
     context = Context(**appsettings)
@@ -37,8 +42,14 @@ def initialize(appsettings):
             
     domain.configure(context.db_url)
 
-    executor = concurrent.futures.ThreadPoolExecutor(context.max_pool_workers)    
-    context = context._replace(executor=executor)
+    secretkey = context.rpc_secretkey.encode('utf-8') if context.rpc_secretkey else None
+    
+    global RpcClient
+    RpcClient = create_client_class(IParse, 'localhost', context.rpc_port, secretkey)
+
+    executor = concurrent.futures.ThreadPoolExecutor(context.max_pool_workers)
+
+    context = context._replace(rpc_secretkey=secretkey, executor=executor)
 
     log.info(f'initialize')
     return context
@@ -48,11 +59,14 @@ def work(context):
         futures = set()
 
         with domain.session_scope() as session:
-            for file_to_parse in session.query(FtpContent).filter(FtpContent.status == ContentStatus.PREPARED).order_by(FtpContent.last_modify).limit(context.max_pool_workers):
+            q = session.query(FtpContent).filter(FtpContent.status == ContentStatus.PREPARED)
+            if context.like_expression:
+                q = q.filter(FtpContent.name.like(context.like_expression))
+            for file_to_parse in q.order_by(FtpContent.last_modify).limit(context.max_pool_workers):
                 file_to_parse.status = ContentStatus.PARSING
                 future = context.executor.submit(send_to_parse, file_to_parse.id, file_to_parse.name, file_to_parse.size, file_to_parse.message)
                 futures.add(future) 
-                log.debug(f'load_content({file_to_parse.id}): {file_to_parse.status}')
+                log.info(f'load_content({file_to_parse.id}): {file_to_parse.status}')
         if futures:
             wait_for(futures)
 
@@ -68,10 +82,11 @@ def finalize(context):
 def send_to_parse(id, filename, size, message):
     try:
         shm = shared_memory.SharedMemory(message)
-        buffer = shm.buf[:size]
-        doc = buffer.tobytes().decode(encoding="utf-8", errors="strict")
-        log.debug(f'{doc[:50]}...')
-        buffer.release()
+
+        client = RpcClient()
+        new_counter, update_counter = client.parse(filename, size, message)
+        log.info(f'Objects: added {new_counter}, updated {update_counter}')
+
         shm.close()
         shm.unlink()
         return id, filename
@@ -91,7 +106,7 @@ def wait_for(futures):
                 if load_content:
                     load_content.status = ContentStatus.PROCESSED
                     load_content.message = None
-                    log.debug(f'load_content({load_content.id}): {load_content.status}')
+                    log.info(f'load_content({load_content.id}): {load_content.status}')
         elif isinstance(err, Error):
             id, filename, *_ = err.params
             with domain.session_scope() as session:

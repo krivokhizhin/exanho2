@@ -1,19 +1,16 @@
-import array
 import concurrent.futures
+import datetime
 import io
 import logging
-import datetime
-import time
 import zipfile
-
-from collections import namedtuple, defaultdict
-from multiprocessing import shared_memory
+from collections import defaultdict, namedtuple
 from ftplib import FTP
+from multiprocessing import shared_memory
 
 import exanho.orm.sqlalchemy as domain
-
 from exanho.core.common import Error, get_used_memory_level
-from exanho.model.loading import FileStatus, FtpFile, ContentStatus, FtpContent
+from exanho.ftp_loading.model.loading import (ContentStatus, FileStatus,
+                                              FtpContent, FtpFile)
 
 log = logging.getLogger(__name__)
 

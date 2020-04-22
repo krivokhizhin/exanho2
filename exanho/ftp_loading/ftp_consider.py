@@ -3,7 +3,7 @@ import re
 
 from ftplib import FTP
 
-from exanho.eis44.insp_objects import InspFile, InspDirectory
+from exanho.ftp_loading.insp_objects import InspFile, InspDirectory
 
 class FtpConsider:
     def __init__(self, *args, **kwargs):

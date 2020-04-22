@@ -3,7 +3,7 @@ import enum
 from sqlalchemy import BigInteger, Column, DateTime, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from ..orm.sqlalchemy import Base
+from exanho.orm.sqlalchemy import Base
 
 class TaskStatus(enum.Enum):
     NEW = 1

@@ -1,15 +1,13 @@
-import logging
 import datetime
+import logging
 import time
-
-from collections import namedtuple, defaultdict
-from threading import Thread
+from collections import defaultdict, namedtuple
 from queue import Queue
+from threading import Thread
 
 import exanho.orm.sqlalchemy as domain
-
-from exanho.model.loading import TaskStatus, FtpTask, FileStatus, FtpFile
-from exanho.eis44.ftp_consider import FtpConsider
+from exanho.ftp_loading.ftp_consider import FtpConsider
+from exanho.ftp_loading.model.loading import FileStatus, FtpFile, FtpTask, TaskStatus
 
 log = logging.getLogger(__name__)
 

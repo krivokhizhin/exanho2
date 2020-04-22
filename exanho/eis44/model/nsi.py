@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
 
-from ..orm.sqlalchemy import Base
+from exanho.orm.sqlalchemy import Base
 from .i_serialize import ISerializeToDict
 
 class NsiOrganizationType(Base, ISerializeToDict):

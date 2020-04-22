@@ -8,7 +8,7 @@ import exanho.orm.sqlalchemy as domain
 from exanho.core.common import try_logged
 from exanho.core.actors import ServiceBase
 from exanho.interfaces import IParse, INsiOrgTypeService
-from exanho.model.nsi import NsiOrganizationType
+from exanho.eis44.model.nsi import NsiOrganizationType
 
 namespaces = {
     '': 'http://zakupki.gov.ru/oos/export/1',

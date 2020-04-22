@@ -6,7 +6,7 @@
             "daemon": true,
             "services":[
                 {
-                    "handler_module": "exanho.services.sample",
+                    "handler_module": "exanho.sample.services.sample",
                     "address": {
                         "host": "",
                         "port": 3120
@@ -22,18 +22,18 @@
         {
             "name": "EisOrgTypeParseServices",
             "kind": "RpcServer",
-            "daemon": false,
+            "daemon": true,
             "services":[
                 {
-                    "handler_module": "exanho.services.nsi.organization_type",
+                    "handler_module": "exanho.eis44.services.nsi.organization_type",
                     "address": {
                         "host": "",
-                        "port": 3131
+                        "port": 3121
                     },
                     "secret_key": "pa$$word",
                     "concurrency": {
                         "degree": 1,
-                        "kind": "process"
+                        "kind": "thread"
                     },
                     "db_domain": {
                         "url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",
@@ -48,7 +48,7 @@
             "daemon": true,
             "workers": [
                 {
-                    "module": "exanho.workers.ftp_task_run",
+                    "module": "exanho.ftp_loading.workers.task_run",
                     "sleep": 5.0,
                     "appsettings":{
                         "db_url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",
@@ -68,7 +68,7 @@
             "daemon": true,
             "workers": [
                 {
-                    "module": "exanho.workers.ftp_file_load",
+                    "module": "exanho.ftp_loading.workers.file_load",
                     "sleep": 5.0,
                     "appsettings":{
                         "db_url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",
@@ -90,12 +90,12 @@
             "daemon": true,
             "workers": [
                 {
-                    "module": "exanho.workers.ftp_content_parse",
+                    "module": "exanho.ftp_loading.workers.content_parse",
                     "sleep": 5.0,
                     "appsettings":{
                         "db_url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",
                         "db_validate": true,
-                        "rpc_port": 3131,
+                        "rpc_port": 3121,
                         "rpc_secretkey": "pa$$word",
                         "max_pool_workers": 4,
                         "like_expression": ""

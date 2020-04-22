@@ -1,20 +1,11 @@
 import concurrent.futures
-import io
 import logging
-import datetime
-import time
-import zipfile
-
 from collections import namedtuple
 from multiprocessing import shared_memory
-from threading import Thread
-from queue import Queue
 
 import exanho.orm.sqlalchemy as domain
-
-from exanho.core.common import create_client_class
-from exanho.core.common import Error
-from exanho.model.loading import ContentStatus, FtpContent
+from exanho.core.common import Error, create_client_class
+from exanho.ftp_loading.model.loading import ContentStatus, FtpContent
 from exanho.interfaces import IParse
 
 log = logging.getLogger(__name__)

@@ -77,6 +77,8 @@
                         "ftp_port": 21,
                         "ftp_user": "free",
                         "ftp_password": "free",
+                        "max_mem_level": 0.8,
+                        "with_swap": false,
                         "max_pool_workers": 20
                     }
                 }

@@ -1,5 +1,7 @@
 import json
 
+from exanho.core.common import meminfo, get_used_memory_level
+
 INDICATOR_LEN = 10
 CHUNK_SIZE = 4092
 
@@ -22,7 +24,7 @@ def receive_rpc_data(data):
 
     return json.loads(b''.join(chunks)) # func_name, args, kwargs for request
 
-if __name__ == "__main__":
+def test_byte_work():
     args = ['config', 'log_queue']
     kwargs = {}
     data = convert_rpc_data('func_name', *args, **kwargs)
@@ -33,3 +35,10 @@ if __name__ == "__main__":
     print(func_name)
     print(args)
     print(kwargs)
+
+
+def run():
+
+    mi = meminfo()
+    print(get_used_memory_level())
+    print(get_used_memory_level(True))

@@ -12,7 +12,7 @@ from ftplib import FTP
 
 import exanho.orm.sqlalchemy as domain
 
-from exanho.core.common import Error
+from exanho.core.common import Error, get_used_memory_level
 from exanho.model.loading import FileStatus, FtpFile, ContentStatus, FtpContent
 
 log = logging.getLogger(__name__)
@@ -23,10 +23,12 @@ Context = namedtuple('Context', [
     'ftp_host', 
     'ftp_port', 
     'ftp_user', 
-    'ftp_password', 
+    'ftp_password',
+    'max_mem_level',
+    'with_swap',
     'max_pool_workers',
     'executor'
-    ], defaults=[20, None])
+    ], defaults=[0.8, False, 20, None])
 
 ContentData = namedtuple('ContentData', ['name', 'crc', 'size', 'last_modify', 'message'])
 
@@ -43,6 +45,12 @@ def initialize(appsettings):
             
     domain.configure(context.db_url)
 
+    if context.max_mem_level > 1:
+        max_mem_level = context.max_mem_level / 100.0
+        if max_mem_level > 1:
+            raise Error('Invalid "max_mem_level" value: must be 0..1 or 0..100')
+        context = context._replace(max_mem_level=max_mem_level)
+
     executor = concurrent.futures.ThreadPoolExecutor(context.max_pool_workers)
     context = context._replace(executor=executor)
 
@@ -51,6 +59,12 @@ def initialize(appsettings):
 
 def work(context):
     while True:
+        used_mem_level = get_used_memory_level(context.with_swap)
+        if used_mem_level > context.max_mem_level:
+            log.warning(f'Allowed memory usage level ({context.max_mem_level:.1%}) exceeded: {used_mem_level:.1%}')
+            break
+
+
         futures = set()
         with domain.session_scope() as session:
             load_file_ids = []

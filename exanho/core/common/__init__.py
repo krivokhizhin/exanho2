@@ -4,3 +4,4 @@ from .timer import Timer
 from .try_logged_method import try_logged
 from .rpc_client_dec import implement_rpc_client, create_client_class
 from .exceptions import Error
+from .os_utilities import meminfo, get_used_memory_level

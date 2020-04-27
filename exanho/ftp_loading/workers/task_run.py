@@ -24,6 +24,8 @@ Context = namedtuple('Context', [
     
 InspFile = namedtuple('InspFile', ['task_id', 'name', 'directory', 'date', 'size'])
 
+files_failed_desc = 'files have failed status'
+
 def initialize(appsettings):
     context = Context(**appsettings)
 
@@ -97,10 +99,25 @@ def work(context):
                 task_done.status = TaskStatus.PERFORMED
                 task_done.err_desc = None
                 log.info(f'FtpTask({task_done.id}): {task_done.status}')
-            elif FileStatus.FAILED in statuses_set:
+            elif (FileStatus.FAILED in statuses_set) and ({FileStatus.READY, FileStatus.LOADING}.isdisjoint(statuses_set)):
                 task_done = session.query(FtpTask).get(task_id)
-                task_done.status = TaskStatus.ERROR
-                task_done.err_desc = f'{statuses.count(FileStatus.FAILED)} files have failed status'
+                if task_done.err_desc is None:
+                    task_done.status = TaskStatus.SCHEDULED
+                    task_done.err_desc = f'{statuses.count(FileStatus.FAILED)} {files_failed_desc}'
+                    log.warning(f'load_task({task_done.id}): {task_done.err_desc}')                    
+                elif task_done.err_desc.endswith(files_failed_desc):
+                    last_err_count = int(task_done.err_desc.split(files_failed_desc)[0])
+                    err_count = statuses.count(FileStatus.FAILED)
+                    if err_count < last_err_count:
+                        task_done.status = TaskStatus.SCHEDULED
+                        task_done.err_desc = f'{err_count} {files_failed_desc}'
+                        log.warning(f'load_task({task_done.id}): {task_done.err_desc}')
+                    else:
+                        task_done.status = TaskStatus.ERROR
+                        task_done.err_desc = f'{err_count} {files_failed_desc}'
+                else:
+                    task_done.status = TaskStatus.ERROR
+                    task_done.err_desc = f'{statuses.count(FileStatus.FAILED)} {files_failed_desc}'
                 log.info(f'load_task({task_done.id}): {task_done.status}')
 
     return context

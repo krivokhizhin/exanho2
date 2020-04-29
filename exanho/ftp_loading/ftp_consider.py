@@ -3,6 +3,7 @@ import re
 
 from ftplib import FTP
 
+import exanho.core.common.dt_utilities as dt_util
 from exanho.ftp_loading.insp_objects import InspFile, InspDirectory
 
 class FtpConsider:
@@ -17,8 +18,8 @@ class FtpConsider:
 
         self.location = kwargs['location']
 
-        self.min_date = kwargs.get('min_date', datetime.datetime(datetime.MINYEAR, 1, 1))
-        self.max_date = kwargs.get('max_date', datetime.datetime(datetime.MAXYEAR, 12, 31))
+        self.min_date = kwargs.get('min_date', dt_util.check_none_return_min())
+        self.max_date = kwargs.get('max_date', dt_util.check_none_return_max())
         self.excluded_folders = kwargs.get('excluded_folders')
         self.delimiter = kwargs.get('delimiter', ',')
 

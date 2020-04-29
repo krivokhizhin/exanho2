@@ -18,8 +18,8 @@ class FtpConsider:
 
         self.location = kwargs['location']
 
-        self.min_date = kwargs.get('min_date', dt_util.check_none_return_min())
-        self.max_date = kwargs.get('max_date', dt_util.check_none_return_max())
+        self.min_date = kwargs.get('min_date', datetime.datetime.min)
+        self.max_date = kwargs.get('max_date', datetime.datetime.max)
         self.excluded_folders = kwargs.get('excluded_folders')
         self.delimiter = kwargs.get('delimiter', ',')
 
@@ -32,10 +32,10 @@ class FtpConsider:
 
     def prepare(self):
         if not isinstance(self.min_date, datetime.datetime):
-            self.min_date = datetime.datetime(datetime.MINYEAR, 1, 1)
+            self.min_date = datetime.datetime.min
 
         if not isinstance(self.max_date, datetime.datetime):
-            self.max_date = datetime.datetime(datetime.MAXYEAR, 12, 31)
+            self.max_date = datetime.datetime.max
 
         if self.excluded_folders:
             self.excluded_folders = self.excluded_folders.split(self.delimiter)

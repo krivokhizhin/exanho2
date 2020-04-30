@@ -1,6 +1,7 @@
 import logging
 
-from multiprocessing import Process, Queue, Event
+from threading import Thread, Event
+from queue import Queue
 
 # The guard used to turn off
 class ActorExit(Exception):
@@ -44,13 +45,12 @@ class Actor:
         Starts competitive execution
         '''
         self._terminated = Event()
-        t = Process(target=self._bootstrap, name=self._config.name, args=(self._log_queue, ))
+        t = Thread(target=self._bootstrap, name=self._config.name)
         t.daemon = self._config.daemon
         t.start()
 
-    def _bootstrap(self, log_queue):
+    def _bootstrap(self):
         try:
-            self._configurer_logging(log_queue)
             self.run()
             self.pool()
         except ActorExit:
@@ -68,12 +68,6 @@ class Actor:
         while True:
             msg = self.recv()
             self.handle(msg)
-
-    def _configurer_logging(self, queue):
-        h = logging.handlers.QueueHandler(queue)  # Just the one handler needed
-        root = logging.getLogger('root')
-        root.addHandler(h)
-        root.setLevel(logging.DEBUG)
 
     def run(self, config):
         pass

@@ -56,10 +56,10 @@ def start_worker(worker_module, timeout, appsettings, event, log_queue):
         from exanho.core.common.log_utilities import configurer_logging
         configurer_logging(log_queue)
 
-    log = logging.getLogger(worker_module)
-
     import importlib
     mod = importlib.import_module(worker_module)
+
+    log = logging.getLogger(worker_module)
 
     context = mod.initialize(appsettings.__dict__ if appsettings else None)
 

@@ -1,7 +1,8 @@
 import logging
 
-from threading import Thread, Event
-from queue import Queue
+from multiprocessing import Process, Queue, Event
+
+from exanho.core.common.log_utilities import configurer_logging
 
 # The guard used to turn off
 class ActorExit(Exception):
@@ -45,12 +46,13 @@ class Actor:
         Starts competitive execution
         '''
         self._terminated = Event()
-        t = Thread(target=self._bootstrap, name=self._config.name)
+        t = Process(target=self._bootstrap, name=self._config.name, args=(self._log_queue, ))
         t.daemon = self._config.daemon
         t.start()
 
-    def _bootstrap(self):
+    def _bootstrap(self, log_queue):
         try:
+            configurer_logging(log_queue)
             self.run()
             self.pool()
         except ActorExit:

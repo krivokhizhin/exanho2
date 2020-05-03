@@ -69,10 +69,6 @@
                 {
                     "module": "exanho.ftp_loading.workers.content_parse",
                     "sleep": 5.0,
-                    "concurrency": {
-                        "degree": 1,
-                        "kind": "process"
-                    },
                     "appsettings":{
                         "db_url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",
                         "db_validate": true,

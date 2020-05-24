@@ -41,7 +41,11 @@ class ExanhoServer:
 
         self.log.info('The ExanhoService has been hosted..')
 
-        # 2. Install actors from configuration file
+        # 2. Inizialize context for manager
+        self.manager.initialize_context()
+        self.log.info(f'Manager context has been initialized: joinable_queues({len(self.manager.context.joinable_queues)})')
+
+        # 3. Install actors from configuration file
         self.manager.install_config()
         self.log.info('All actors have been configured.')
         

@@ -9,9 +9,9 @@ class ActorExit(Exception):
     pass
 
 class Actor:
-    def __init__(self, config, log_queue):
+    def __init__(self, config, context):
         self._config = config
-        self._log_queue = log_queue
+        self._context = context
         self._mailbox = Queue()
 
     @property
@@ -46,14 +46,14 @@ class Actor:
         Starts competitive execution
         '''
         self._terminated = Event()
-        t = Process(target=self._bootstrap, name=self._config.name, args=(self._log_queue, ))
+        t = Process(target=self._bootstrap, name=self._config.name, args=(self._context.log_queue, ), kwargs=self._context.joinable_queues)
         t.daemon = self._config.daemon
         t.start()
 
-    def _bootstrap(self, log_queue):
+    def _bootstrap(self, log_queue, *args, **kwargs):
         try:
             configurer_logging(log_queue)
-            self.run()
+            self.run(*args, **kwargs)
             self.pool()
         except ActorExit:
             self.finalize()

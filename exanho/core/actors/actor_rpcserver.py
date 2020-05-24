@@ -11,7 +11,7 @@ JOIN_TIMEOUT = 1
 
 class RpcServer(Actor):
 
-    def run(self):
+    def run(self, *args, **kwargs):
         log = logging.getLogger(__name__)
 
         self.servers = list()

@@ -1,10 +1,10 @@
 from . import RpcServer, SleepWorker
 
-def create(config, log_queue):
+def create(config, context):
     if config.kind == 'RpcServer':
-        return RpcServer(config, log_queue)
+        return RpcServer(config, context)
 
     if config.kind == 'SleepWorker':
-        return SleepWorker(config, log_queue)
+        return SleepWorker(config, context)
 
     raise Exception(f'No action found for the specified type ({config.kind}).') 

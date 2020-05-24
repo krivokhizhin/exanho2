@@ -1,9 +1,25 @@
 import logging
 from collections import defaultdict
+from multiprocessing import JoinableQueue
 
+from .manager_context import ContextConfig
 from .config import json_actors
 from .actors import Actor, actor_factory
 from .actors.configs import create_actor_config as actor_config_factory
+
+class Context:
+
+    def __init__(self, log_queue):
+        self._log_queue = log_queue
+        self._queues = defaultdict(JoinableQueue)
+
+    @property
+    def log_queue(self):
+        return self._log_queue
+
+    @property
+    def joinable_queues(self):
+        return self._queues
 
 class ActorManager:
 
@@ -11,12 +27,22 @@ class ActorManager:
         self.log = logging.getLogger(__name__)
 
         self.config_path = config_path
-        self.log_queue = log_queue
-
+        self.context = Context(log_queue)
         self.actors = defaultdict(Actor)
 
+    def initialize_context(self):
+        context = json_actors.read_context_from_file(self.config_path)
+        if not context:
+            raise RuntimeError(f'No configuration for actors found in the specified file.')
+
+        context_config = ContextConfig.create_instance(context)
+
+        if context_config.joinable_queues:
+            for queue_config in context_config.joinable_queues:
+                self.context.joinable_queues[queue_config.name] = JoinableQueue(queue_config.maxsize)
+
     def install_config(self):
-        configs = json_actors.read_actors_file(self.config_path)
+        configs = json_actors.read_actors_from_file(self.config_path)
         if not configs:
             raise RuntimeError(f'No configuration for actors found in the specified file.')
         
@@ -28,7 +54,7 @@ class ActorManager:
         return actor_config_factory(config)
 
     def install_actor(self, config):
-        actor = actor_factory.create(config, self.log_queue)
+        actor = actor_factory.create(config, self.context)
         self.actors[config.name] = actor
         actor.start()
 
@@ -66,7 +92,7 @@ class ActorManager:
 
     def get_has_db_model_configs(self):
 
-        configs = json_actors.read_actors_file(self.config_path)
+        configs = json_actors.rread_actors_from_configead_actors_file(self.config_path)
         if not configs:
             raise RuntimeError(f'No configuration for actors found in the specified file.')
         

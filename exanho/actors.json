@@ -1,4 +1,11 @@
 {
+    "exanho_context":{
+        "joinable_queues": [
+            {
+                "name": "task_queue"
+            }
+        ]
+    },
     "exanho_actors": [
         {
             "name": "SampleService",

@@ -11,7 +11,7 @@ TIMEOUT = 2
 class SleepWorker(Actor):
     pass
 
-    def run(self):
+    def run(self, *args, **kwargs):
 
         self.workers = []
         self.thread_terminated = Event()

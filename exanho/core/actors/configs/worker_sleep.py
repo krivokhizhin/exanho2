@@ -1,8 +1,5 @@
-from ...common.descriptors import Integer, Float, String
-from . import ConfigBase, ConfigBaseDerived, List, Concurrency
+from ...common.descriptors import Float
+from . import WorkerConfig
 
-class SleepWorker(ConfigBase):
-    module = String()
+class SleepWorker(WorkerConfig):
     sleep = Float()
-    factor_thread = Integer(1)
-    appsettings = ConfigBaseDerived(List)

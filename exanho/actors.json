@@ -86,6 +86,25 @@
                     }
                 }
             ]
+        },
+        {
+            "name": "SampleQueueWorker",
+            "kind": "QueueWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.sample.workers.queue_handler",
+                    "queue_name": "task_queue",
+                    "appsettings":{
+                        "db_url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",
+                        "db_validate": true,
+                        "rpc_port": 3121,
+                        "rpc_secretkey": "pa$$word",
+                        "max_pool_workers": 4,
+                        "like_expression": ""
+                    }
+                }
+            ]
         }
     ]
 }

@@ -14,6 +14,9 @@ from exanho.ftp_loading.model.loading import (ContentStatus, FileStatus,
 
 log = logging.getLogger(__name__)
 
+ERROR_FTP_LABEL = object()
+ERROR_UNKNOWN_LABEL = object()
+
 Context = namedtuple('Context', [
     'db_url', 
     'db_validate', 
@@ -24,8 +27,10 @@ Context = namedtuple('Context', [
     'max_mem_level',
     'with_swap',
     'max_pool_workers',
-    'executor'
-    ], defaults=[0.8, False, 20, None])
+    'executor',
+    'error_attempts',
+    'attemp_count'
+    ], defaults=[0.8, False, 20, None, 60, 1])
 
 ContentData = namedtuple('ContentData', ['name', 'crc', 'size', 'last_modify', 'message'])
 
@@ -57,52 +62,55 @@ def initialize(appsettings):
 def work(context):
     log.debug('file_load in work')
 
-    while True:
-        used_mem_level = get_used_memory_level(context.with_swap)
-        if used_mem_level > context.max_mem_level:
-            log.warning(f'Allowed memory usage level ({context.max_mem_level:.1%}) exceeded: {used_mem_level:.1%}')
-            break
+    try:
+        while True:
+            used_mem_level = get_used_memory_level(context.with_swap)
+            if used_mem_level > context.max_mem_level:
+                log.warning(f'Allowed memory usage level ({context.max_mem_level:.1%}) exceeded: {used_mem_level:.1%}')
+                break
 
 
-        futures = set()
-        with domain.session_scope() as session:
-            load_file_ids = []
-            for load_file in session.query(FtpFile).filter(FtpFile.status == FileStatus.READY).order_by(FtpFile.date).limit(context.max_pool_workers):
-                load_file.status = FileStatus.LOADING
-                future = context.executor.submit(ftp_loading, context.ftp_host, context.ftp_port, context.ftp_user, context.ftp_password, load_file.id, load_file.filename, load_file.directory)
-                futures.add(future)
-                log.info(f'load_file({load_file.id}): {load_file.status}')
-                load_file_ids.append(load_file.id)
+            futures = set()
+            with domain.session_scope() as session:
+                load_file_ids = []
+                for load_file in session.query(FtpFile).filter(FtpFile.status == FileStatus.READY).order_by(FtpFile.date, FtpFile.filename).limit(context.max_pool_workers):
+                    load_file.status = FileStatus.LOADING
+                    future = context.executor.submit(ftp_loading, context.ftp_host, context.ftp_port, context.ftp_user, context.ftp_password, load_file.id, load_file.filename, load_file.directory)
+                    futures.add(future)
+                    log.info(f'load_file({load_file.id}): {load_file.status}')
+                    load_file_ids.append(load_file.id)
 
-            session.flush()
+                session.flush()
 
-            file_statuses = session.query(FtpFile.id, FtpContent.status).\
-                select_from(FtpFile).join(FtpContent).filter(FtpFile.status == FileStatus.LOADING).all()
-            statuses_by_archive = defaultdict(list)
-            for file_id, file_status in file_statuses:
-                if file_id in load_file_ids:
-                    continue
-                statuses_by_archive[file_id].append(file_status)
+                file_statuses = session.query(FtpFile.id, FtpContent.status).\
+                    select_from(FtpFile).join(FtpContent).filter(FtpFile.status == FileStatus.LOADING).all()
+                statuses_by_archive = defaultdict(list)
+                for file_id, file_status in file_statuses:
+                    if file_id in load_file_ids:
+                        continue
+                    statuses_by_archive[file_id].append(file_status)
 
-            for file_id, statuses in statuses_by_archive.items():
-                statuses_set = set(statuses)
-                if (len(statuses_set) == 1) and (ContentStatus.PROCESSED in statuses_set):
-                    done_file = session.query(FtpFile).get(file_id)
-                    done_file.status = FileStatus.DONE
-                    done_file.err_desc = None
-                    log.info(f'load_file({done_file.id}): {done_file.status}')
-                elif ContentStatus.FAULT in statuses_set:
-                    failed_file = session.query(FtpFile).get(file_id)
-                    failed_file.status = FileStatus.FAILED
-                    failed_file.err_desc = f'{statuses.count(FileStatus.FAILED)} files have failed status'
-                    log.info(f'load_file({failed_file.id}): {failed_file.status}')
+                for file_id, statuses in statuses_by_archive.items():
+                    statuses_set = set(statuses)
+                    if (len(statuses_set) == 1) and (ContentStatus.PROCESSED in statuses_set):
+                        done_file = session.query(FtpFile).get(file_id)
+                        done_file.status = FileStatus.DONE
+                        done_file.err_desc = None
+                        log.info(f'load_file({done_file.id}): {done_file.status}')
+                    elif ContentStatus.FAULT in statuses_set:
+                        failed_file = session.query(FtpFile).get(file_id)
+                        failed_file.status = FileStatus.FAILED
+                        failed_file.err_desc = f'{statuses.count(FileStatus.FAILED)} files have failed status'
+                        log.info(f'load_file({failed_file.id}): {failed_file.status}')
 
-        if futures:
-            wait_for(futures)
+            if futures:
+                wait_for(context, futures)
 
-        with domain.session_scope() as session:
-            if session.query(FtpFile).filter(FtpFile.status == FileStatus.READY).count() == 0:
-                break  
+            with domain.session_scope() as session:
+                if session.query(FtpFile).filter(FtpFile.status == FileStatus.READY).count() == 0:
+                    break
+    except Exception as ex:
+        log.exception(ex)
 
     return context 
 
@@ -114,10 +122,13 @@ def ftp_loading(host, port, user, password, load_file_id, filename, location):
     try:
         files = []
         with FTP() as ftp_client:
-        
-            ftp_client.connect(host, port)
-            ftp_client.login(user, password)            
-            ftp_client.cwd(location) 
+
+            try:
+                ftp_client.connect(host, port)
+                ftp_client.login(user, password)            
+                ftp_client.cwd(location) 
+            except Exception as ex:
+                raise Error(ex.args[0], ex, ERROR_FTP_LABEL)
 
             for name, crc, size, last_modify, message in download_extract_zip(ftp_client, filename):
                 files.append(ContentData(name, crc, size, last_modify, message))
@@ -125,15 +136,19 @@ def ftp_loading(host, port, user, password, load_file_id, filename, location):
         return (load_file_id, filename, location, files)
     except Exception as ex:
         log.exception(ex)
-        raise Error(ex.args[0], ex, (load_file_id, filename, location))
+        label = ERROR_FTP_LABEL if isinstance(err, Error) and err.params == ERROR_FTP_LABEL else ERROR_UNKNOWN_LABEL
+        raise Error(ex.args[0], ex, (load_file_id, filename, location, label))
 
 def download_extract_zip(ftp_client, zipfilename, ext_file='.xml'):
     """
     Download a ZIP file from FTP and extract its contents in memory
     """
     with io.BytesIO() as buffer:
-        
-        ftp_client.retrbinary('RETR '+zipfilename, buffer.write)
+
+        try:
+            ftp_client.retrbinary('RETR '+zipfilename, buffer.write)
+        except Exception as ex:
+            raise Error(ex.args[0], ex, ERROR_FTP_LABEL)
             
         with zipfile.ZipFile(buffer) as thezip:
             for zipinfo in thezip.infolist():
@@ -160,7 +175,7 @@ def download_extract_zip(ftp_client, zipfilename, ext_file='.xml'):
                     ss = 59
                 yield zipinfo.filename, zipinfo.CRC, zipinfo.file_size, datetime.datetime(yy, mt, dd, hh, mi, ss), message
 
-def wait_for(futures):
+def wait_for(context:Context, futures):
     for future in concurrent.futures.as_completed(futures):
         err = future.exception()
         if err is None:
@@ -196,12 +211,16 @@ def wait_for(futures):
                 if session.new or reassigned:
                     log.info(f'{filename} (id={load_file_id}): added {len(session.new)}, reassigned {reassigned} files')
         elif isinstance(err, Error):
-            load_file_id, filename, location = err.params
+            load_file_id, filename, location, label = err.params
             with domain.session_scope() as session:
                 load_file = session.query(FtpFile).get(load_file_id)
                 if load_file:
-                    load_file.status = FileStatus.FAILED
-                    load_file.err_desc = err.message
-                    log.error(f'{filename} (id={load_file_id}) error')
+                    if label == ERROR_UNKNOWN_LABEL or context.attemp_count >= context.error_attempts:
+                        load_file.status = FileStatus.FAILED
+                        load_file.err_desc = err.message
+                        log.error(f'{filename} (id={load_file_id}) error')
+                    else:
+                        load_file.status = FileStatus.READY
+                        context = context._replace(attemp_count=context.attemp_count+1)
         else:
             raise err

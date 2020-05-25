@@ -19,8 +19,10 @@ Context = namedtuple('Context', [
     'ftp_user', 
     'ftp_password',
     'insp_file_queue',
-    'w_thread'
-    ], defaults=[None, None])
+    'w_thread',
+    'error_attempts',
+    'attemp_count'
+    ], defaults=[None, None, 60, 1])
     
 InspFile = namedtuple('InspFile', ['task_id', 'name', 'directory', 'date', 'size'])
 
@@ -49,77 +51,85 @@ def initialize(appsettings):
     log.info(f'initialize')
     return context
 
-def work(context):
+def work(context:Context):
     log.debug('task_run in work')
 
-    with domain.session_scope() as session:
-        now = datetime.datetime.now()
-        load_task = session.query(FtpTask).filter(FtpTask.scheduled_date < now).filter(FtpTask.status == TaskStatus.SCHEDULED).first()
+    try:
+        with domain.session_scope() as session:
+            now = datetime.datetime.now()
+            load_task = session.query(FtpTask).filter(FtpTask.scheduled_date < now).filter(FtpTask.status == TaskStatus.SCHEDULED).first()
 
-        if load_task:
-            load_task.status = TaskStatus.SCANNING
-            session.flush()
-            log.info(f'FtpTask({load_task.id}): {load_task.status}')
+            if load_task:
+                load_task.status = TaskStatus.SCANNING
+                session.flush()
+                log.info(f'FtpTask({load_task.id}): {load_task.status}')
 
-            try:
-                viewer = FtpConsider(
-                    task_id=load_task.id,
-                    insp_q=context.insp_file_queue,
-                    host=context.ftp_host,
-                    port=context.ftp_port,
-                    user=context.ftp_user,
-                    password=context.ftp_password,
-                    location=load_task.location,
-                    min_date=load_task.min_date,
-                    max_date=load_task.max_date,
-                    excluded_folders=load_task.excluded_folders,
-                    delimiter=load_task.delimiter)
-                viewer.prepare()
-                viewer.inspect()
-            except Exception as ex:
-                load_task.status = TaskStatus.ERROR
-                load_task.err_desc = f'{ex.__class__.__name__}: {ex.args[0]}'
-                log.exception(ex)
+                try:
+                    viewer = FtpConsider(
+                        task_id=load_task.id,
+                        insp_q=context.insp_file_queue,
+                        host=context.ftp_host,
+                        port=context.ftp_port,
+                        user=context.ftp_user,
+                        password=context.ftp_password,
+                        location=load_task.location,
+                        min_date=load_task.min_date,
+                        max_date=load_task.max_date,
+                        excluded_folders=load_task.excluded_folders,
+                        delimiter=load_task.delimiter)
+                    viewer.prepare()
+                    viewer.inspect()
+                    load_task.status = TaskStatus.RUNNING                
+                except Exception as ex:                
+                    load_task.err_desc = f'{ex.__class__.__name__}: {ex.args[0]}'
+                    log.exception(ex)
+                    if context.attemp_count >= context.error_attempts:
+                        load_task.status = TaskStatus.ERROR
+                    else:
+                        load_task.status = TaskStatus.SCHEDULED
+                        context = context._replace(attemp_count=context.attemp_count+1)
+                finally:
+                    session.flush()
+                    log.info(f'FtpTask({load_task.id}): {load_task.status}')
                 
-            load_task.status = TaskStatus.RUNNING
-            session.flush()
-            log.info(f'FtpTask({load_task.id}): {load_task.status}')
 
-        insp_file_statuses = session.query(FtpTask.id, FtpFile.status).\
-            select_from(FtpTask).outerjoin(FtpFile).filter(FtpTask.status == TaskStatus.RUNNING).all()
-        statuses_by_task = defaultdict(list)
-        for task_id, insp_file_status in insp_file_statuses:
-            if load_task and task_id == load_task.id:
-                continue
-            statuses_by_task[task_id].append(insp_file_status)
+            insp_file_statuses = session.query(FtpTask.id, FtpFile.status).\
+                select_from(FtpTask).outerjoin(FtpFile).filter(FtpTask.status == TaskStatus.RUNNING).all()
+            statuses_by_task = defaultdict(list)
+            for task_id, insp_file_status in insp_file_statuses:
+                if load_task and task_id == load_task.id:
+                    continue
+                statuses_by_task[task_id].append(insp_file_status)
 
-        for task_id, statuses in statuses_by_task.items():
-            statuses_set = set(statuses)
-            if (len(statuses_set) == 1) and (not {FileStatus.DONE, None}.isdisjoint(statuses_set)):
-                task_done = session.query(FtpTask).get(task_id)
-                task_done.status = TaskStatus.PERFORMED
-                task_done.err_desc = None
-                log.info(f'FtpTask({task_done.id}): {task_done.status}')
-            elif (FileStatus.FAILED in statuses_set) and ({FileStatus.READY, FileStatus.LOADING}.isdisjoint(statuses_set)):
-                task_done = session.query(FtpTask).get(task_id)
-                if task_done.err_desc is None:
-                    task_done.status = TaskStatus.SCHEDULED
-                    task_done.err_desc = f'{statuses.count(FileStatus.FAILED)} {files_failed_desc}'
-                    log.warning(f'load_task({task_done.id}): {task_done.err_desc}')                    
-                elif task_done.err_desc.endswith(files_failed_desc):
-                    last_err_count = int(task_done.err_desc.split(files_failed_desc)[0])
-                    err_count = statuses.count(FileStatus.FAILED)
-                    if err_count < last_err_count:
+            for task_id, statuses in statuses_by_task.items():
+                statuses_set = set(statuses)
+                if (len(statuses_set) == 1) and (not {FileStatus.DONE, None}.isdisjoint(statuses_set)):
+                    task_done = session.query(FtpTask).get(task_id)
+                    task_done.status = TaskStatus.PERFORMED
+                    task_done.err_desc = None
+                    log.info(f'FtpTask({task_done.id}): {task_done.status}')
+                elif (FileStatus.FAILED in statuses_set) and ({FileStatus.READY, FileStatus.LOADING}.isdisjoint(statuses_set)):
+                    task_done = session.query(FtpTask).get(task_id)
+                    if task_done.err_desc is None:
                         task_done.status = TaskStatus.SCHEDULED
-                        task_done.err_desc = f'{err_count} {files_failed_desc}'
-                        log.warning(f'load_task({task_done.id}): {task_done.err_desc}')
+                        task_done.err_desc = f'{statuses.count(FileStatus.FAILED)} {files_failed_desc}'
+                        log.warning(f'load_task({task_done.id}): {task_done.err_desc}')                    
+                    elif task_done.err_desc.endswith(files_failed_desc):
+                        last_err_count = int(task_done.err_desc.split(files_failed_desc)[0])
+                        err_count = statuses.count(FileStatus.FAILED)
+                        if err_count < last_err_count:
+                            task_done.status = TaskStatus.SCHEDULED
+                            task_done.err_desc = f'{err_count} {files_failed_desc}'
+                            log.warning(f'load_task({task_done.id}): {task_done.err_desc}')
+                        else:
+                            task_done.status = TaskStatus.ERROR
+                            task_done.err_desc = f'{err_count} {files_failed_desc}'
                     else:
                         task_done.status = TaskStatus.ERROR
-                        task_done.err_desc = f'{err_count} {files_failed_desc}'
-                else:
-                    task_done.status = TaskStatus.ERROR
-                    task_done.err_desc = f'{statuses.count(FileStatus.FAILED)} {files_failed_desc}'
-                log.info(f'load_task({task_done.id}): {task_done.status}')
+                        task_done.err_desc = f'{statuses.count(FileStatus.FAILED)} {files_failed_desc}'
+                    log.info(f'load_task({task_done.id}): {task_done.status}')
+    except Exception as ex:
+        log.exception(ex)
 
     return context
 

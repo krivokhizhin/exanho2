@@ -55,6 +55,8 @@ def initialize(appsettings):
     return context
 
 def work(context):
+    log.debug('file_load in work')
+
     while True:
         used_mem_level = get_used_memory_level(context.with_swap)
         if used_mem_level > context.max_mem_level:

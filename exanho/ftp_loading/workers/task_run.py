@@ -50,6 +50,7 @@ def initialize(appsettings):
     return context
 
 def work(context):
+    log.debug('task_run in work')
 
     with domain.session_scope() as session:
         now = datetime.datetime.now()

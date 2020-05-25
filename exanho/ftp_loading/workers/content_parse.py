@@ -46,6 +46,8 @@ def initialize(appsettings):
     return context
 
 def work(context):
+    log.debug('content_parse in work')
+
     while True:
         futures = set()
 

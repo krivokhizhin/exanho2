@@ -7,7 +7,7 @@ def initialize(appsettings=None):
     return appsettings if appsettings else object()
 
 def work(context, message):
-    log.info(message)
+    log.info(f'Task "{message}" completed.')
     return context
 
 def finalize(context):

@@ -15,7 +15,7 @@ class QueueWorker(Actor):
 
     def run(self, *args, **kwargs):
         if not isinstance(self.config, QueueWorkerActorConfig):
-            raise RuntimeError(f'{type(self.config)} type configuration, expected {QueueWorkerActorConfig} type')        
+            raise RuntimeError(f'{type(self.config)} type configuration, expected {QueueWorkerActorConfig} type')
 
         self.workers = []
         self.joinable_queues = set()

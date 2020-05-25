@@ -29,3 +29,6 @@ class Integer(Typed):
 
 class Float(Typed):
     expected_type = float
+
+class List(Typed):
+    expected_type = list

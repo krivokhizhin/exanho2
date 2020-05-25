@@ -88,21 +88,28 @@
             ]
         },
         {
-            "name": "SampleQueueWorker",
+            "name": "SampleQueueProducerWorker",
+            "kind": "SleepWorker",
+            "daemon": true,
+            "joinable_queues": ["task_queue"],
+            "workers": [
+                {
+                    "module": "exanho.sample.workers.sample",
+                    "sleep": 5.0,
+                    "appsettings":{
+                        "joinable_queue": "task_queue"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SampleQueueHandlerWorker",
             "kind": "QueueWorker",
             "daemon": true,
             "workers": [
                 {
                     "module": "exanho.sample.workers.queue_handler",
-                    "queue_name": "task_queue",
-                    "appsettings":{
-                        "db_url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44",
-                        "db_validate": true,
-                        "rpc_port": 3121,
-                        "rpc_secretkey": "pa$$word",
-                        "max_pool_workers": 4,
-                        "like_expression": ""
-                    }
+                    "queue_name": "task_queue"
                 }
             ]
         }

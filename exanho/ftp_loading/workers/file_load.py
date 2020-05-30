@@ -57,10 +57,11 @@ def initialize(appsettings, **joinable_queues):
     queue_by_filter = dict()
     queue_num = 0
     counter = context.queue_by_filter[queue_num]
+    filter_count = len(context.parse_filters)
     for index, parse_filter in enumerate(context.parse_filters):
         queue_name = context.parse_queues[queue_num]
         queue_by_filter[parse_filter] = queue_name
-        if index == counter:
+        if index+1 < filter_count and index+1 == counter:
             queue_num += 1
             counter += context.queue_by_filter[queue_num]
 

@@ -3,14 +3,16 @@ import datetime
 import io
 import logging
 import zipfile
+import queue
 from collections import defaultdict, namedtuple
+from multiprocessing import JoinableQueue
 from ftplib import FTP
 from multiprocessing import shared_memory
+from sqlalchemy import text
 
 import exanho.orm.sqlalchemy as domain
 from exanho.core.common import Error, get_used_memory_level
-from exanho.ftp_loading.model.loading import (ContentStatus, FileStatus,
-                                              FtpContent, FtpFile)
+from exanho.ftp_loading.model.loading import ContentStatus, FileStatus, FtpContent, FtpFile
 
 log = logging.getLogger(__name__)
 
@@ -24,18 +26,47 @@ Context = namedtuple('Context', [
     'ftp_port', 
     'ftp_user', 
     'ftp_password',
+    'parse_queues',
+    'queue_by_filter',
+    'parse_filters',
     'max_mem_level',
     'with_swap',
     'max_pool_workers',
     'executor',
     'error_attempts',
-    'attemp_count'
-    ], defaults=[0.8, False, 20, None, 60, 1])
+    'attemp_count',
+    'block_timeout'
+    ], defaults=[[], [], [], 0.8, False, 20, None, 60, 1, 60])
 
 ContentData = namedtuple('ContentData', ['name', 'crc', 'size', 'last_modify', 'message'])
+ParseContent = namedtuple('ParseContent', ['id', 'archive_date', 'archive_name', 'date', 'name'])
 
-def initialize(appsettings):
+def initialize(appsettings, **joinable_queues):
     context = Context(**appsettings)
+
+    if len(context.parse_queues) != len(context.queue_by_filter):
+        raise RuntimeError(f'The number of "parse_queues" and "queue_by_filter" must match ({len(context.parse_queues)}!={len(context.queue_by_filter)})')
+
+    if sum(context.queue_by_filter) != len(context.parse_filters):
+        raise RuntimeError(f'The sum of "queue_by_filter" and number of "parse_filters" must match ({sum(context.queue_by_filter)}!={len(context.parse_filters)})')
+    
+    parse_queues = dict()
+    for parse_queue_name in context.parse_queues:
+        parse_queues[parse_queue_name] = joinable_queues[parse_queue_name]
+
+    queue_by_filter = dict()
+    queue_num = 0
+    counter = context.queue_by_filter[queue_num]
+    for index, parse_filter in enumerate(context.parse_filters):
+        queue_name = context.parse_queues[queue_num]
+        queue_by_filter[parse_filter] = queue_name
+        if index == counter:
+            queue_num += 1
+            counter += context.queue_by_filter[queue_num]
+
+    parse_filters = '({})'.format(' or '.join(["ftp_load_file.filename like '%{}%'".format(parse_filter) for parse_filter in context.parse_filters])) if context.parse_filters and ('' not in context.parse_filters) else None
+
+    context = context._replace(parse_queues=parse_queues, queue_by_filter=queue_by_filter, parse_filters=parse_filters)
 
     if context.db_validate:
         is_valid, errors, warnings = domain.validate(context.db_url)
@@ -59,7 +90,7 @@ def initialize(appsettings):
     log.info(f'initialize')
     return context
 
-def work(context):
+def work(context:Context):
     log.debug('file_load in work')
 
     try:
@@ -69,13 +100,17 @@ def work(context):
                 log.warning(f'Allowed memory usage level ({context.max_mem_level:.1%}) exceeded: {used_mem_level:.1%}')
                 break
 
-
             futures = set()
             with domain.session_scope() as session:
                 load_file_ids = []
-                for load_file in session.query(FtpFile).filter(FtpFile.status == FileStatus.READY).order_by(FtpFile.date, FtpFile.filename).limit(context.max_pool_workers):
+
+                query_ = session.query(FtpFile).filter(FtpFile.status == FileStatus.READY)
+                if context.parse_filters:
+                    query_ = query_.filter(text(context.parse_filters))
+                
+                for load_file in query_.order_by(FtpFile.date, FtpFile.filename).limit(context.max_pool_workers):
                     load_file.status = FileStatus.LOADING
-                    future = context.executor.submit(ftp_loading, context.ftp_host, context.ftp_port, context.ftp_user, context.ftp_password, load_file.id, load_file.filename, load_file.directory)
+                    future = context.executor.submit(ftp_loading, context.ftp_host, context.ftp_port, context.ftp_user, context.ftp_password, load_file.id, load_file.filename, load_file.directory, load_file.date)
                     futures.add(future)
                     log.info(f'load_file({load_file.id}): {load_file.status}')
                     load_file_ids.append(load_file.id)
@@ -107,7 +142,13 @@ def work(context):
                 wait_for(context, futures)
 
             with domain.session_scope() as session:
-                if session.query(FtpFile).filter(FtpFile.status == FileStatus.READY).count() == 0:
+                query_ = session.query(FtpFile).filter(FtpFile.status == FileStatus.READY)
+                if context.parse_filters:
+                    query_ = query_.filter(text(context.parse_filters))
+
+                if query_.count() == 0:
+                    if context.attemp_count > 1:
+                        context = context._replace(attemp_count=1)
                     break
     except Exception as ex:
         log.exception(ex)
@@ -118,7 +159,7 @@ def finalize(context):
     context.executor.shutdown(True)
     log.info(f'finalize')
 
-def ftp_loading(host, port, user, password, load_file_id, filename, location):
+def ftp_loading(host, port, user, password, load_file_id, filename, location, create_date):
     try:
         files = []
         with FTP() as ftp_client:
@@ -133,7 +174,7 @@ def ftp_loading(host, port, user, password, load_file_id, filename, location):
             for name, crc, size, last_modify, message in download_extract_zip(ftp_client, filename):
                 files.append(ContentData(name, crc, size, last_modify, message))
 
-        return (load_file_id, filename, location, files)
+        return (load_file_id, filename, location, create_date, files)
     except Exception as ex:
         log.exception(ex)
         label = ERROR_FTP_LABEL if isinstance(err, Error) and err.params == ERROR_FTP_LABEL else ERROR_UNKNOWN_LABEL
@@ -176,10 +217,12 @@ def download_extract_zip(ftp_client, zipfilename, ext_file='.xml'):
                 yield zipinfo.filename, zipinfo.CRC, zipinfo.file_size, datetime.datetime(yy, mt, dd, hh, mi, ss), message
 
 def wait_for(context:Context, futures):
+    ready_to_parse = list()
+
     for future in concurrent.futures.as_completed(futures):
         err = future.exception()
         if err is None:
-            load_file_id, filename, location, files = future.result()                
+            load_file_id, filename, location, create_date, files = future.result()                
             with domain.session_scope() as session:
                 reassigned = 0
                 if files:               
@@ -189,7 +232,10 @@ def wait_for(context:Context, futures):
                                 filter(FtpContent.name == file_data.name).\
                                     one_or_none()
                         if exists_content is None:
-                            session.add(FtpContent(file_id=load_file_id, status=ContentStatus.PREPARED, name=file_data.name, crc=file_data.crc, size=file_data.size, last_modify=file_data.last_modify, message=file_data.message))
+                            content = FtpContent(file_id=load_file_id, status=ContentStatus.PREPARED, name=file_data.name, crc=file_data.crc, size=file_data.size, last_modify=file_data.last_modify, message=file_data.message)
+                            session.add(content)
+                            session.flush()
+                            ready_to_parse.append(ParseContent(content.id, create_date, filename, content.last_modify, content.name))
                         elif (exists_content.status == ContentStatus.FAULT) or ((exists_content.status in [ContentStatus.PROCESSED, ContentStatus.PREPARED]) and (exists_content.crc != file_data.crc) and (exists_content.last_modify <= file_data.last_modify)):
                             exists_content.crc = file_data.crc
                             exists_content.size = file_data.size
@@ -197,6 +243,7 @@ def wait_for(context:Context, futures):
                             exists_content.message = file_data.message
                             exists_content.status = ContentStatus.PREPARED
                             reassigned += 1
+                            ready_to_parse.append(ParseContent(exists_content.id, create_date, filename, exists_content.last_modify, exists_content.name))
                         else:
                             shm = shared_memory.SharedMemory(file_data.message)
                             shm.close()
@@ -209,7 +256,7 @@ def wait_for(context:Context, futures):
 
 
                 if session.new or reassigned:
-                    log.info(f'{filename} (id={load_file_id}): added {len(session.new)}, reassigned {reassigned} files')
+                    log.debug(f'{filename} (id={load_file_id}): added {len(session.new)}, reassigned {reassigned} files')
         elif isinstance(err, Error):
             load_file_id, filename, location, label = err.params
             with domain.session_scope() as session:
@@ -224,3 +271,21 @@ def wait_for(context:Context, futures):
                         context = context._replace(attemp_count=context.attemp_count+1)
         else:
             raise err
+
+    sorted_ready_to_parse_by_name = sorted(ready_to_parse, key=lambda content: content.name)
+    sorted_ready_to_parse_by_date = sorted(sorted_ready_to_parse_by_name, key=lambda content: content.date)
+    sorted_ready_to_parse_by_archive_name = sorted(ready_to_parse, key=lambda content: content.archive_name)
+    sorted_ready_to_parse = sorted(sorted_ready_to_parse_by_archive_name, key=lambda content: content.archive_date)
+
+    for content in sorted_ready_to_parse:
+
+        for parse_filter, queue_name in context.queue_by_filter.items():
+            if content.archive_name.rfind(parse_filter) != -1:
+                try:
+                    context.parse_queues[queue_name].put(content.id, block=True, timeout=context.block_timeout)
+                except queue.Full:
+                    log.warning(f'The queue is moving slowly enough. {context.block_timeout} seconds is not enough. Another attempt to wait and an exception will be thrown.')
+                    context.parse_queues[queue_name].put(content.id, block=True, timeout=context.block_timeout)                    
+                
+                log.debug(f'q.put: {content.id}')
+                break

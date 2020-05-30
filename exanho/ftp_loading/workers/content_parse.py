@@ -1,24 +1,18 @@
-import concurrent.futures
 import logging
+import time
 from collections import namedtuple
 from multiprocessing import shared_memory
 
 import exanho.orm.sqlalchemy as domain
-from exanho.core.common import Error, create_client_class
+from exanho.core.common import Error
 from exanho.ftp_loading.model.loading import ContentStatus, FtpContent
-from exanho.interfaces import IParse
-
-log = logging.getLogger(__name__)
 
 Context = namedtuple('Context', [
     'db_url', 
-    'db_validate',
-    'rpc_port',
-    'rpc_secretkey',
-    'max_pool_workers',
-    'executor',
-    'like_expression'
-    ], defaults = [None, 4, None, None])
+    'db_validate'
+    ])
+
+log = logging.getLogger(__name__)
 
 def initialize(appsettings):
     context = Context(**appsettings)
@@ -33,80 +27,71 @@ def initialize(appsettings):
             
     domain.configure(context.db_url)
 
-    secretkey = context.rpc_secretkey.encode('utf-8') if context.rpc_secretkey else None
-    
-    global RpcClient
-    RpcClient = create_client_class(IParse, 'localhost', context.rpc_port, secretkey)
-
-    executor = concurrent.futures.ThreadPoolExecutor(context.max_pool_workers)
-
-    context = context._replace(rpc_secretkey=secretkey, executor=executor)
-
     log.info(f'initialize')
     return context
 
-def work(context):
+def work(context:Context, message):
     log.debug('content_parse in work')
 
-    while True:
-        futures = set()
+    content_id = int(message)
+    memory_name = None
+    memory_size = None
+
+    content_date = None
+    content_name = None
+
+    try:
+        with domain.session_scope() as session:
+            content = session.query(FtpContent).filter(FtpContent.id == content_id).one()
+
+            memory_name = content.message
+            memory_size = content.size
+            content_date = content.last_modify
+            content_name = content.name
+            content.status = ContentStatus.PARSING
+        
+        parsed = None
+        error = None
+        shm = buffer = None
+        
+        try:
+            shm = shared_memory.SharedMemory(memory_name)
+            buffer = shm.buf[:memory_size]
+            data = buffer.tobytes().decode(encoding="utf-8", errors="strict")
+
+            # time.sleep(10)
+            # log.debug(f'load_content({content_id}): {content_date} | {content_name} | data={data[:50]}')
+
+            parsed = True
+
+        except Exception as ex:
+            log.exception(ex)
+            parsed = False
+            error = ex.args[0][:100]
+        finally:
+            if buffer:
+                buffer.release()
+            if shm:
+                shm.close()
+                shm.unlink()
+
 
         with domain.session_scope() as session:
-            q = session.query(FtpContent).filter(FtpContent.status == ContentStatus.PREPARED)
-            if context.like_expression:
-                q = q.filter(FtpContent.name.like(context.like_expression))
-            for file_to_parse in q.order_by(FtpContent.last_modify).limit(context.max_pool_workers):
-                file_to_parse.status = ContentStatus.PARSING
-                future = context.executor.submit(send_to_parse, file_to_parse.id, file_to_parse.name, file_to_parse.size, file_to_parse.message)
-                futures.add(future) 
-                log.info(f'load_content({file_to_parse.id}): {file_to_parse.status}')
-        if futures:
-            wait_for(futures)
+            content = session.query(FtpContent).filter(FtpContent.id == content_id).one()
 
-        with domain.session_scope() as session:
-            if session.query(FtpContent).filter(FtpContent.status == ContentStatus.PREPARED).count() == 0:
-                break
+            if parsed:
+                content.status = ContentStatus.PROCESSED
+                content.message = None
+                log.info(f'load_content({content.id}): {content.status}')
+            else:
+                content.status = ContentStatus.FAULT
+                content.message = error
+                log.error(f'load_content({content.id}): {content.status}')
+
+    except Exception as ex:
+        log.exception(ex)
+
     return context 
 
 def finalize(context):
-    context.executor.shutdown(True)
     log.info(f'finalize')
-
-def send_to_parse(id, filename, size, message):
-    try:
-        shm = shared_memory.SharedMemory(message)
-
-        client = RpcClient()
-        new_counter, update_counter = client.parse(filename, size, message)
-        log.info(f'Objects: added {new_counter}, updated {update_counter}')
-
-        shm.close()
-        shm.unlink()
-        return id, filename
-    except Exception as ex:
-        log.exception(ex)
-        raise Error(ex.args[0], ex, (id, filename, size, message))
-    
-
-
-def wait_for(futures):
-    for future in concurrent.futures.as_completed(futures):
-        err = future.exception()
-        if err is None:
-            id, filename = future.result()                
-            with domain.session_scope() as session:
-                load_content = session.query(FtpContent).get(id)
-                if load_content:
-                    load_content.status = ContentStatus.PROCESSED
-                    load_content.message = None
-                    log.info(f'load_content({load_content.id}): {load_content.status}')
-        elif isinstance(err, Error):
-            id, filename, *_ = err.params
-            with domain.session_scope() as session:
-                load_content = session.query(FtpContent).get(id)
-                if load_content:
-                    load_content.status = ContentStatus.FAULT
-                    load_content.message = err.message
-                    log.error(f'{filename} (id={id}) error')
-        else:
-            raise err

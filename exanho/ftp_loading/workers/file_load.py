@@ -68,6 +68,9 @@ def initialize(appsettings, **joinable_queues):
     parse_filters = '({})'.format(' or '.join(["ftp_load_file.filename like '%{}%'".format(parse_filter) for parse_filter in context.parse_filters])) if context.parse_filters and ('' not in context.parse_filters) else None
 
     context = context._replace(parse_queues=parse_queues, queue_by_filter=queue_by_filter, parse_filters=parse_filters)
+    log.debug(context.parse_queues)
+    log.debug(context.queue_by_filter)
+    log.debug(context.parse_filters)
 
     if context.db_validate:
         is_valid, errors, warnings = domain.validate(context.db_url)
@@ -118,8 +121,11 @@ def work(context:Context):
 
                 session.flush()
 
-                file_statuses = session.query(FtpFile.id, FtpContent.status).\
-                    select_from(FtpFile).join(FtpContent).filter(FtpFile.status == FileStatus.LOADING).all()
+                query_ = session.query(FtpFile.id, FtpContent.status).select_from(FtpFile).join(FtpContent).filter(FtpFile.status == FileStatus.LOADING)
+                if context.parse_filters:
+                    query_ = query_.filter(text(context.parse_filters))
+
+                file_statuses = query_.all()
                 statuses_by_archive = defaultdict(list)
                 for file_id, file_status in file_statuses:
                     if file_id in load_file_ids:
@@ -288,5 +294,5 @@ def wait_for(context:Context, futures):
                     log.warning(f'The queue is moving slowly enough. {context.block_timeout} seconds is not enough. Another attempt to wait and an exception will be thrown.')
                     context.parse_queues[queue_name].put(content.id, block=True, timeout=context.block_timeout)                    
                 
-                log.debug(f'q.put: {content.id}')
+                # log.debug(f'q.put: {content.id}')
                 break

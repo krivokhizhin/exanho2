@@ -11,6 +11,7 @@ from multiprocessing import shared_memory
 from sqlalchemy import text
 
 import exanho.orm.sqlalchemy as domain
+from exanho.core.manager_context import Context as ExanhoContext
 from exanho.core.common import Error, get_used_memory_level
 from exanho.ftp_loading.model.loading import ContentStatus, FileStatus, FtpContent, FtpFile
 
@@ -20,7 +21,7 @@ ERROR_FTP_LABEL = object()
 ERROR_UNKNOWN_LABEL = object()
 
 Context = namedtuple('Context', [
-    'db_url', 
+    'db_key', 
     'db_validate', 
     'ftp_host', 
     'ftp_port', 
@@ -41,8 +42,14 @@ Context = namedtuple('Context', [
 ContentData = namedtuple('ContentData', ['name', 'crc', 'size', 'last_modify', 'message'])
 ParseContent = namedtuple('ParseContent', ['id', 'archive_date', 'archive_name', 'date', 'name'])
 
-def initialize(appsettings, **joinable_queues):
+def initialize(appsettings, exanho_context:ExanhoContext):
     context = Context(**appsettings)
+
+    db_url = exanho_context.connectings.get(context.db_key)
+    if db_url:
+        context = context._replace(db_key=db_url)
+    else:
+        raise RuntimeError(f'For the connection name "{context.db_key}" is not found url')
 
     if len(context.parse_queues) != len(context.queue_by_filter):
         raise RuntimeError(f'The number of "parse_queues" and "queue_by_filter" must match ({len(context.parse_queues)}!={len(context.queue_by_filter)})')
@@ -52,7 +59,7 @@ def initialize(appsettings, **joinable_queues):
     
     parse_queues = dict()
     for parse_queue_name in context.parse_queues:
-        parse_queues[parse_queue_name] = joinable_queues[parse_queue_name]
+        parse_queues[parse_queue_name] = exanho_context.joinable_queues[parse_queue_name]
 
     queue_by_filter = dict()
     queue_num = 0
@@ -73,14 +80,14 @@ def initialize(appsettings, **joinable_queues):
     log.debug(context.parse_filters)
 
     if context.db_validate:
-        is_valid, errors, warnings = domain.validate(context.db_url)
+        is_valid, errors, warnings = domain.validate(context.db_key)
         if not is_valid:
             log.error(errors)
             if warnings:
                 log.warning(warnings)
             raise RuntimeError(f'The database schema does not match the ORM model')
             
-    domain.configure(context.db_url)
+    domain.configure(context.db_key)
 
     if context.max_mem_level > 1:
         max_mem_level = context.max_mem_level / 100.0

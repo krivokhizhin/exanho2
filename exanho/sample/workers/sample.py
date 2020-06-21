@@ -3,17 +3,17 @@ import random
 import string
 
 from collections import defaultdict, namedtuple
-# from multiprocessing import JoinableQueue
+from exanho.core.manager_context import Context as ExanhoContext
 
 log = logging.getLogger(__name__)
 
 Context = namedtuple('Context', ['joinable_queue'])
 
-def initialize(appsettings=None, **joinable_queues):
+def initialize(appsettings, exanho_context:ExanhoContext):
     log.info(f'initialize')
     context = Context(**appsettings)
     random.seed()
-    context = context._replace(joinable_queue=joinable_queues.get(context.joinable_queue))
+    context = context._replace(joinable_queue=exanho_context.joinable_queues.get(context.joinable_queue))
     return context
 
 def work(context:Context):

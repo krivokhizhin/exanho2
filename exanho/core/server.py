@@ -21,9 +21,17 @@ class ExanhoServer:
 
 
     def start(self):
-        self.log.info('Exanho is starting...')   
+        self.log.info('Exanho is starting...')
 
-        # 1. Hosting and start ExanhoService
+        # 1. Load config
+        self.manager.load_config()
+        self.log.info(f'Manager context has been initialized: joinable_queues({len(self.manager.context.joinable_queues)})')
+
+        # 2. Install actors from configuration file
+        self.manager.install_actors_from_file()
+        self.log.info('All actors have been configured.')
+
+        # 3. Hosting SimpleXMLRPCServer
         server = SimpleXMLRPCServer((self.service_host, self.service_port), requestHandler=ActorRequestHandler, logRequests=False)
         server.register_introspection_functions()
 
@@ -31,14 +39,6 @@ class ExanhoServer:
             server.register_function(method)
 
         self.log.info('The XMLRPCServer has been created')
-
-        # 2. Inizialize context for manager
-        self.manager.initialize_context()
-        self.log.info(f'Manager context has been initialized: joinable_queues({len(self.manager.context.joinable_queues)})')
-
-        # 3. Install actors from configuration file
-        self.manager.install_actors_from_file()
-        self.log.info('All actors have been configured.')
 
         try:
             server.serve_forever()

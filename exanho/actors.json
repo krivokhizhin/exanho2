@@ -1,6 +1,16 @@
 {
     "exanho_context":{
+        "db_connectings":[
+            {
+                "name": "eis44_test",
+                "url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44_test"
+            }
+        ],
         "joinable_queues": [
+            {
+                "name": "sample_parse",
+                "maxsize": 1000
+            },
             {
                 "name": "parse_notification",
                 "maxsize": 1000
@@ -36,7 +46,7 @@
                     "module": "exanho.ftp_loading.workers.task_run",
                     "sleep": 5.0,
                     "appsettings":{
-                        "db_url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44_test",
+                        "db_key": "eis44_test",
                         "db_validate": true,
                         "ftp_host": "ftp.zakupki.gov.ru",
                         "ftp_port": 21,
@@ -50,13 +60,12 @@
             "name": "LoadFtpFileWorker",
             "kind": "SleepWorker",
             "daemon": true,
-            "joinable_queues": ["parse_notification"],
             "workers": [
                 {
                     "module": "exanho.ftp_loading.workers.file_load",
                     "sleep": 5.0,
                     "appsettings":{
-                        "db_url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44_test",
+                        "db_key": "eis44_test",
                         "db_validate": true,
                         "ftp_host": "ftp.zakupki.gov.ru",
                         "ftp_port": 21,
@@ -82,7 +91,36 @@
                     "module": "exanho.ftp_loading.workers.content_parse",
                     "queue_name": "parse_notification",
                     "appsettings":{
-                        "db_url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44_test",
+                        "db_key": "eis44_test",
+                        "db_validate": true
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SampleTaskWorker",
+            "kind": "SleepWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.sample.workers.sample",
+                    "sleep": 2.0,
+                    "appsettings":{
+                        "joinable_queue": "sample_parse"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SampleQueueHandlerWorker",
+            "kind": "QueueWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.sample.workers.queue_handler",
+                    "queue_name": "sample_parse",
+                    "appsettings":{
+                        "db_key": "eis44_test",
                         "db_validate": true
                     }
                 }

@@ -2,10 +2,10 @@ import json
 
 from .ini_options import json_context_item, json_actors_item
 
-def read_context_from_file(actors_file : str) -> dict:
+def read_config_from_file(actors_file : str) -> dict:
     with open(actors_file, 'r') as f:
         content = json.load(f)
-        return content.get(json_context_item, {})
+        return content.get(json_context_item, {}), content.get(json_actors_item, [])
 
 def read_actors_from_file(actors_file : str) -> list:
     with open(actors_file, 'r') as f:

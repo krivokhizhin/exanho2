@@ -2,7 +2,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-def initialize(appsettings=None):
+def initialize(appsettings, exanho_context):
     log.info(f'initialize')
     return appsettings if appsettings else object()
 

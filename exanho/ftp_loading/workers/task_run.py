@@ -6,13 +6,14 @@ from queue import Queue
 from threading import Thread
 
 import exanho.orm.sqlalchemy as domain
+from exanho.core.manager_context import Context as ExanhoContext
 from exanho.ftp_loading.ftp_consider import FtpConsider
 from exanho.ftp_loading.model.loading import FileStatus, FtpFile, FtpTask, TaskStatus
 
 log = logging.getLogger(__name__)
 
 Context = namedtuple('Context', [
-    'db_url', 
+    'db_key', 
     'db_validate', 
     'ftp_host', 
     'ftp_port', 
@@ -28,18 +29,24 @@ InspFile = namedtuple('InspFile', ['task_id', 'name', 'directory', 'date', 'size
 
 files_failed_desc = 'files have failed status'
 
-def initialize(appsettings):
+def initialize(appsettings, exanho_context:ExanhoContext):
     context = Context(**appsettings)
 
+    db_url = exanho_context.connectings.get(context.db_key)
+    if db_url:
+        context = context._replace(db_key=db_url)
+    else:
+        raise RuntimeError(f'For the connection name "{context.db_key}" is not found url')
+
     if context.db_validate:
-        is_valid, errors, warnings = domain.validate(context.db_url)
+        is_valid, errors, warnings = domain.validate(context.db_key)
         if not is_valid:
             log.error(errors)
             if warnings:
                 log.warning(warnings)
             raise RuntimeError(f'The database schema does not match the ORM model')
             
-    domain.configure(context.db_url)
+    domain.configure(context.db_key)
     
     insp_file_queue=Queue()
     w_thread = Thread(target=write_ftp_files, args=(insp_file_queue, ))

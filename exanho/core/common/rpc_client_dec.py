@@ -28,6 +28,6 @@ def implement_rpc_client(host, port, secretkey=None):
     return decorate
 
 def create_client_class(interface, host, port, secretkey=None):
-    _class = type('RpcClient', (interface,), {})
+    _class = type(interface.__name__.lstrip('I')+'Client', (interface,), {})
     _class = implement_rpc_client(host, port, secretkey)(_class)
     return _class

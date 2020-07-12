@@ -11,12 +11,12 @@ JOIN_TIMEOUT = 1
 
 class RpcServer(Actor):
 
-    def run(self, *args, **kwargs):
+    def run(self, config, context):
         log = logging.getLogger(__name__)
 
         self.servers = list()
 
-        for service_config in self.config.services:
+        for service_config in config.services:
 
             mod = importlib.import_module(service_config.handler_module)  
 
@@ -28,14 +28,16 @@ class RpcServer(Actor):
                     hosting_service = service_class
                         
             if not hosting_service:
-                raise Exception('{}: No services'.format(self.config.name))
+                raise Exception('{}: No services'.format(config.name))
+
+            hosting_service.context = context
 
             if service_config.secret_key:
                 hosting_service.secret_key = service_config.secret_key.encode('utf-8')          
 
             if service_config.db_domain:                
                 mod.domain.configure(service_config.db_domain.url)
-                log.info(f'The actor "{self.config.name}", service "{hosting_service.__name__}: domain has been configured')
+                log.info(f'The actor "{config.name}", service "{hosting_service.__name__}: domain has been configured')
 
                 if service_config.db_domain.validate:
                     #TODO: move to a separate process
@@ -45,14 +47,14 @@ class RpcServer(Actor):
                         if warnings:
                             log.warning(warnings)
                         raise RuntimeError(f'The database schema does not match the ORM model')
-                    log.info(f'The actor "{self.config.name}", service "{hosting_service.__name__}: domain is valid')   
+                    log.info(f'The actor "{config.name}", service "{hosting_service.__name__}: domain is valid')   
 
             TCPServer.allow_reuse_address = True
             serv = TCPServer((service_config.address.host, service_config.address.port), hosting_service)
             serv.handle_error = self._handle_error
             self.servers.append(serv)
 
-            log.info(f'The actor "{self.config.name}": service "{hosting_service.__name__}" has been initialized')
+            log.info(f'The actor "{config.name}": service "{hosting_service.__name__}" has been initialized')
 
             if service_config.concurrency.degree > 0:
                 if service_config.concurrency.kind == 'process':
@@ -70,15 +72,15 @@ class RpcServer(Actor):
                 else:
                     raise Exception(f'The concurrency_type is "{service_config.concurrency.kind}". There must be either "Thread" or "Process"')
 
-            log.info(f'The actor "{self.config.name}": "{hosting_service.__name__}" has been started')
+            log.info(f'The actor "{config.name}": "{hosting_service.__name__}" has been started')
 
-        log.info(f'The actor "{self.config.name}" has been installed')
+        log.info(f'The actor "{config.name}" has been installed')
 
     def finalize(self):
         for serv in self.servers:
             serv.server_close()       
 
-    def handle(msg):
+    def handle(self, msg):
         pass
 
     def _handle_error(self, request, client_address):

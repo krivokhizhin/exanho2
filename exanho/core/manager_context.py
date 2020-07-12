@@ -1,9 +1,11 @@
 
+from abc import ABC
 from collections import defaultdict
 from multiprocessing import JoinableQueue
 
-from .actors.configs import create_actor_config as actor_config_factory
+from .actors.configs import is_service_config, create_actor_config as actor_config_factory
 from .exanho_config import ContextConfig, ExanhoConfig
+from ..core.common import create_client_class
 
 class Context:
 
@@ -13,6 +15,7 @@ class Context:
         self._actor_configs = dict()
         self._connectings = dict()
         self._queues = defaultdict(JoinableQueue)
+        self._services = dict()
 
     @property
     def log_queue(self):
@@ -47,3 +50,28 @@ class Context:
                 self._actor_configs[actor_config.name] = actor_config
             else:
                 raise Exception(f'The name of the {actor_config.name} worker is not unique')
+
+        self.registry_services()
+
+    def registry_services(self):
+        pass
+        # for actor_config in self._services.values():
+        #     if not is_service_config(actor_config):
+        #         continue
+
+    def registry_service(self, interface, host, port, secretkey=None):
+        if not issubclass(interface, ABC):
+            raise Exception(f'{interface} is not an interface (subclass of ABC)')
+
+        if interface in self._services:
+            return
+
+        self._services[interface] = create_client_class(interface, host, port, secretkey)
+
+    def get_service(self, interface):
+        service_class = self._services.get(interface)
+
+        if service_class is None:
+            return None
+
+        return service_class()

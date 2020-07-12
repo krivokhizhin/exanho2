@@ -12,4 +12,4 @@ from .config_actor_rpcserver import RpcServerActorConfig
 from .config_actor_sleepworker import SleepWorkerActorConfig
 from .config_actor_queueworker import QueueWorkerActorConfig
 
-from .creator_actor_config import create_actor_config
+from .creator_actor_config import create_actor_config, is_service_config

@@ -10,4 +10,7 @@ def create_actor_config(config: dict):
     if config['kind'].lower() == 'QueueWorker'.lower():
         return QueueWorkerActorConfig.create_instance(config)
     
-    raise Exception('Unknown type of actor configuration: {}.'.format(config.kind)) 
+    raise Exception('Unknown type of actor configuration: {}.'.format(config.kind))
+
+def is_service_config(actor_config):
+    return isinstance(actor_config, RpcServerActorConfig)

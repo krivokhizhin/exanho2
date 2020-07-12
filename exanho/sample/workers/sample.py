@@ -5,6 +5,9 @@ import string
 from collections import defaultdict, namedtuple
 from exanho.core.manager_context import Context as ExanhoContext
 
+from exanho.interfaces import ISampleService
+from exanho.core.common import create_client_class
+
 log = logging.getLogger(__name__)
 
 Context = namedtuple('Context', ['joinable_queue'])
@@ -22,6 +25,9 @@ def work(context:Context):
     task_number = ''.join([random.choice(string.hexdigits) for _ in range(10)])
     context.joinable_queue.put(task_number)
     log.info(f'Task "{task_number}" has been assigned.')
+
+    client = create_client_class(ISampleService, '', 3120, b'qwerty')()
+    print(client.echo(task_number))
 
     return context
 

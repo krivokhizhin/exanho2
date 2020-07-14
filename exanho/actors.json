@@ -15,72 +15,35 @@
                 "name": "parse_notification",
                 "maxsize": 1000
             }
+        ],
+        "service_endpoints": [
+            {
+                "interface": "ISampleService",
+                "host": "",
+                "port": 3120
+            },
+            {
+                "interface": "ISampleService2",
+                "host": "",
+                "port": 3121
+            }
         ]
     },
     "exanho_actors": [
         {
             "name": "SampleService",
-            "kind": "RpcServer",
-            "daemon": true,
+            "kind": "XmlRpcServer",
+            "daemon": false,
             "services":[
                 {
                     "handler_module": "exanho.sample.services.sample",
-                    "address": {
-                        "host": "",
-                        "port": 3120
-                    },
-                    "secret_key": "qwerty",
+                    "interface": "ISampleService",
                     "concurrency": {
                         "degree": 2,
-                        "kind": "thread"
+                        "kind": "process"
                     }
                 }
             ]            
-        },
-        {
-            "name": "RunFtpTaskWorker",
-            "kind": "SleepWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.ftp_loading.workers.task_run",
-                    "sleep": 5.0,
-                    "appsettings":{
-                        "db_key": "eis44_test",
-                        "db_validate": true,
-                        "ftp_host": "ftp.zakupki.gov.ru",
-                        "ftp_port": 21,
-                        "ftp_user": "free",
-                        "ftp_password": "free"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "LoadFtpFileWorker",
-            "kind": "SleepWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.ftp_loading.workers.file_load",
-                    "sleep": 5.0,
-                    "appsettings":{
-                        "db_key": "eis44_test",
-                        "db_validate": true,
-                        "ftp_host": "ftp.zakupki.gov.ru",
-                        "ftp_port": 21,
-                        "ftp_user": "free",
-                        "ftp_password": "free",
-                        "parse_queues":["parse_notification"],
-                        "queue_by_filter":[1],
-                        "parse_filters":["notification_Adygeja_Resp"],
-                        "max_mem_level": 0.8,
-                        "with_swap": false,
-                        "max_pool_workers": 2,
-                        "block_timeout": 60
-                    }
-                }
-            ]
         },
         {
             "name": "NotificationQueueHandlerWorker",

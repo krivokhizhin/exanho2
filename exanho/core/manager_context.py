@@ -1,11 +1,9 @@
 
-from abc import ABC
 from collections import defaultdict
 from multiprocessing import JoinableQueue
 
-from .actors.configs import is_service_config, create_actor_config as actor_config_factory
-from .exanho_config import ContextConfig, ExanhoConfig
-from ..core.common import create_client_class
+from .actors.configs import create_actor_config as actor_config_factory
+from .exanho_config import ContextConfig
 
 class Context:
 
@@ -44,6 +42,10 @@ class Context:
             for queue_config in self._context_config.joinable_queues:
                 self._queues[queue_config.name] = JoinableQueue(queue_config.maxsize)
 
+        if self._context_config.service_endpoints:
+            for service_endpoint in self._context_config.service_endpoints:
+                self._services[service_endpoint.interface.lower()] = self._check_and_modify_endpoint(service_endpoint.host, service_endpoint.port)
+
         for actor_config_dict in actor_config_list:
             actor_config = actor_config_factory(actor_config_dict)
             if self._actor_configs.get(actor_config.name) is None:
@@ -51,27 +53,17 @@ class Context:
             else:
                 raise Exception(f'The name of the {actor_config.name} worker is not unique')
 
-        self.registry_services()
+    def _check_and_modify_endpoint(self, host, port, default_host='localhost'):
+        if port is None or type(port) != int or port < 1024:
+            raise Exception('The port value must be greater than 1023')
 
-    def registry_services(self):
-        pass
-        # for actor_config in self._services.values():
-        #     if not is_service_config(actor_config):
-        #         continue
+        if port in [port for host, port in self._services.values()]:
+            raise Exception(f'The {port} port is already in use')
 
-    def registry_service(self, interface, host, port, secretkey=None):
-        if not issubclass(interface, ABC):
-            raise Exception(f'{interface} is not an interface (subclass of ABC)')
+        if host is None or host == '':
+            host = default_host
 
-        if interface in self._services:
-            return
+        return (host, port)
 
-        self._services[interface] = create_client_class(interface, host, port, secretkey)
-
-    def get_service(self, interface):
-        service_class = self._services.get(interface)
-
-        if service_class is None:
-            return None
-
-        return service_class()
+    def get_service_endpoint(self, interface_key):
+        return self._services.get(interface_key.lower(), (None, None))

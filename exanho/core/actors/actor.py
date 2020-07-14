@@ -77,5 +77,5 @@ class Actor:
     def finalize(self):
         pass
 
-    def handle(msg):
+    def handle(self, msg):
         pass

@@ -9,9 +9,15 @@ class QueueConfig(ConfigBase):
     name = String()
     maxsize = Integer(-1)
 
+class EndpointConfig(ConfigBase):
+    interface = String()
+    host = String()
+    port = Integer()
+
 class ContextConfig(ConfigBase):
     db_connectings = ListConfigBaseDerived(ConnectingConfig)
     joinable_queues = ListConfigBaseDerived(QueueConfig)
+    service_endpoints = ListConfigBaseDerived(EndpointConfig)
 
 class ExanhoConfig(ConfigBase):
     context = ConfigBaseDerived(ContextConfig)

@@ -1,4 +1,4 @@
-
+from abc import ABCMeta
 from collections import defaultdict
 from multiprocessing import JoinableQueue
 
@@ -65,5 +65,9 @@ class Context:
 
         return (host, port)
 
-    def get_service_endpoint(self, interface_key):
+    def get_service_endpoint(self, interface):
+        interface_key = interface
+        if (type(interface) == type or type(interface) == ABCMeta):
+            interface_key = interface.__name__
+
         return self._services.get(interface_key.lower(), (None, None))

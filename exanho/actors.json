@@ -42,6 +42,14 @@
                         "degree": 2,
                         "kind": "process"
                     }
+                },
+                {
+                    "handler_module": "exanho.sample.services.sample2",
+                    "interface": "ISampleService2",
+                    "concurrency": {
+                        "degree": 2,
+                        "kind": "process"
+                    }
                 }
             ]            
         },

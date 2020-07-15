@@ -32,10 +32,12 @@ def work(context:Context):
     context.joinable_queue.put(task_number)
     log.info(f'Task "{task_number}" has been assigned.')
 
-    host, port = context.exanho_context.get_service_endpoint(ISampleService.__name__.lower())
+    host, port = context.exanho_context.get_service_endpoint(ISampleService)
     rpc_paths = '/'
-    client = ServerProxy(f'http://{host}:{port}{rpc_paths}', allow_none=True, use_builtin_types=True)
-    print(client.echo(task_number))
+    
+    if host and port:
+        client = ServerProxy(f'http://{host}:{port}{rpc_paths}', allow_none=True, use_builtin_types=True)
+        client.execute(task_number)
 
     return context
 

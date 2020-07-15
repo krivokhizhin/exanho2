@@ -33,7 +33,7 @@
         {
             "name": "SampleService",
             "kind": "XmlRpcServer",
-            "daemon": false,
+            "daemon": true,
             "services":[
                 {
                     "handler_module": "exanho.sample.services.sample",

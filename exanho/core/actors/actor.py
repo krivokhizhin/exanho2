@@ -1,6 +1,7 @@
 import logging
 
-from multiprocessing import Process, Queue, Event
+from queue import Queue
+from threading import Thread, Event
 
 from exanho.core.common.log_utilities import configurer_logging
 
@@ -46,7 +47,7 @@ class Actor:
         Starts competitive execution
         '''
         self._terminated = Event()
-        t = Process(target=self._bootstrap, name=self._config.name, args=(self._config, self._context, ))
+        t = Thread(target=self._bootstrap, name=self._config.name, args=(self._config, self._context, ))
         t.daemon = self._config.daemon
         t.start()
 

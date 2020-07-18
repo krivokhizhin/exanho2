@@ -2,18 +2,21 @@ import importlib
 import logging
 
 from abc import ABCMeta
+from collections import namedtuple
+from multiprocessing import Process
 from xmlrpc.server import SimpleXMLRPCServer
 
-from . import Actor, ServiceBase
+from . import Actor, ServiceBase, serve_forever
 
 JOIN_TIMEOUT = 1
+ServerByProcess = namedtuple('ServerByProcess', ['process', 'server'])
 
 class XmlRpcServer(Actor):
 
     def run(self, config, context):
         log = logging.getLogger(__name__)
 
-        self.servers = list()
+        self._processes = list()
 
         for service_config in config.services:
 
@@ -34,41 +37,38 @@ class XmlRpcServer(Actor):
             hosting_service.context = context         
 
             if service_config.db_key:
-                db_url = context.connectings[service_config.db_key]         
-                mod.domain.configure(db_url)
-                log.info(f'The actor "{config.name}", service "{hosting_service.__name__}: domain has been configured')
+                hosting_service.domain = context.get_domain(service_config.db_key)
 
             SimpleXMLRPCServer.allow_reuse_address = True
             serv = SimpleXMLRPCServer(context.get_service_endpoint(interface_key), logRequests=False, allow_none=True, use_builtin_types=True)
             serv.register_instance(hosting_service())
 
-            self.servers.append(serv)
+            log.debug(f'The actor "{config.name}": service "{hosting_service.__name__}" has been initialized')
 
-            log.info(f'The actor "{config.name}": service "{hosting_service.__name__}" has been initialized')
-
-            if service_config.concurrency.degree > 0:
-                if service_config.concurrency.kind == 'process':
-                    from multiprocessing import Process
-                    for n in range(service_config.concurrency.degree):
-                        p = Process(target=serv.serve_forever, name=f'Process#{n}')
-                        p.daemon = True
-                        p.start()
-                elif service_config.concurrency.kind == 'thread':
-                    from threading import Thread
-                    for n in range(service_config.concurrency.degree):
-                        t = Thread(target=serv.serve_forever, name=f'Thread#{n}')
-                        t.daemon = True
-                        t.start()
-                else:
-                    raise Exception(f'The concurrency_type is "{service_config.concurrency.kind}". There must be either "Thread" or "Process"')
+            if service_config.concurrency.kind.lower() == 'process':
+                for n in range(service_config.concurrency.degree):
+                    p = Process(target=serve_forever, name=f'{interface_key}-{n+1}', args=(serv, hosting_service), daemon=True)
+                    p.start()
+                    self._processes.append(ServerByProcess(p, serv))
+                    log.debug(f'Service "{hosting_service.__name__}" has been located in "{p.name}" process')
+            elif service_config.concurrency.kind.lower() == 'thread':
+                p = Process(target=serve_forever, name=interface_key, args=(serv, hosting_service, service_config.concurrency.degree), daemon=True)
+                p.start()
+                self._processes.append(ServerByProcess(p, serv))
+                log.debug(f'Service "{hosting_service.__name__}" has been located in "{p.name}" process')
+            else:
+                raise Exception(f'The concurrency_type is "{service_config.concurrency.kind}". There must be either "Thread" or "Process"')
 
             log.info(f'The actor "{config.name}": "{hosting_service.__name__}" has been started')
 
         log.info(f'The actor "{config.name}" has been installed')
 
     def finalize(self):
-        for serv in self.servers:
-            serv.server_close()       
+        for p, serv in self._processes:
+            serv.server_close()
+            p.join(JOIN_TIMEOUT)
+            if p.is_alive():
+                p.terminate()  
 
     def handle(self, msg):
         pass

@@ -40,7 +40,7 @@
                     "interface": "ISampleService",
                     "concurrency": {
                         "degree": 2,
-                        "kind": "process"
+                        "kind": "thread"
                     }
                 },
                 {
@@ -49,7 +49,8 @@
                     "concurrency": {
                         "degree": 2,
                         "kind": "process"
-                    }
+                    },
+                    "db_key": "eis44_test"
                 }
             ]            
         },

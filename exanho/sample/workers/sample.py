@@ -19,9 +19,6 @@ def initialize(appsettings, exanho_context:ExanhoContext):
     context = Context(**appsettings)
     random.seed()
 
-    services = {
-        ISampleService: exanho_context.get_service_endpoint(ISampleService.__name__.lower())
-    }
     context = context._replace(joinable_queue=exanho_context.joinable_queues.get(context.joinable_queue), exanho_context=exanho_context)
     return context
 

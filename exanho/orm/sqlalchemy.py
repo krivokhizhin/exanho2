@@ -2,19 +2,60 @@ from contextlib import contextmanager
 from functools import wraps
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 Base = declarative_base()
-Session = sessionmaker()
 
+class Domain:
+
+    def __init__(self, url):
+        self._engine = create_engine(url)
+        self._session = scoped_session(sessionmaker(bind=self._engine))
+
+    def recreate(self):
+        Base.metadata.create_all(self._engine)
+
+    def dispose(self):
+        self._engine.dispose()
+
+    @property
+    def Session(self):
+        return self._session()
+
+    def sessional(self, func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            session = self.Session
+            result = None
+            try:
+                result = func(*args, **kwargs)
+                session.commit()
+            except:
+                session.rollback()
+                raise
+            finally:
+                session.close()
+            return result
+        return wrapper
+
+    @contextmanager
+    def session_scope(self):
+        """Provide a transactional scope around a series of operations."""
+        session = self.Session
+        try:
+            yield session
+            session.commit()
+        except:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+Session = sessionmaker()
 
 def configure(url):
     engine = create_engine(url)
     Session.configure(bind=engine)
-
-def recreate(url):
-    engine = create_engine(url)
-    Base.metadata.create_all(engine)
 
 def validate(url):
     from sqlalchemy import inspect
@@ -61,3 +102,7 @@ def session_scope():
         raise
     finally:
         session.close()
+
+def has_domain(cls):
+    cls.domain = None
+    return cls

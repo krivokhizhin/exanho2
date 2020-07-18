@@ -2,6 +2,8 @@ from abc import ABCMeta
 from collections import defaultdict
 from multiprocessing import JoinableQueue
 
+from exanho.orm.sqlalchemy import Domain
+
 from .actors.configs import create_actor_config as actor_config_factory
 from .exanho_config import ContextConfig
 
@@ -12,6 +14,7 @@ class Context:
         self._context_config = None
         self._actor_configs = dict()
         self._connectings = dict()
+        self._domains = dict()
         self._queues = defaultdict(JoinableQueue)
         self._services = dict()
 
@@ -22,6 +25,10 @@ class Context:
     @property
     def connectings(self):
         return self._connectings
+
+    @property
+    def domains(self):
+        return self._domains
 
     @property
     def joinable_queues(self):
@@ -37,6 +44,7 @@ class Context:
         if self._context_config.db_connectings:
             for conecting in self._context_config.db_connectings:
                 self._connectings[conecting.name] = conecting.url
+                self._domains[conecting.name] = Domain(conecting.url)
 
         if self._context_config.joinable_queues:
             for queue_config in self._context_config.joinable_queues:
@@ -52,6 +60,9 @@ class Context:
                 self._actor_configs[actor_config.name] = actor_config
             else:
                 raise Exception(f'The name of the {actor_config.name} worker is not unique')
+
+    def get_domain(self, conecting_name):
+        return self._domains.get(conecting_name, None)
 
     def _check_and_modify_endpoint(self, host, port, default_host='localhost'):
         if port is None or type(port) != int or port < 1024:

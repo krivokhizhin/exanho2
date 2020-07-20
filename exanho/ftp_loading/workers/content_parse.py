@@ -23,14 +23,6 @@ def initialize(appsettings, exanho_context:ExanhoContext):
         context = context._replace(db_key=db_url)
     else:
         raise RuntimeError(f'For the connection name "{context.db_key}" is not found url')
-
-    if context.db_validate:
-        is_valid, errors, warnings = domain.validate(context.db_key)
-        if not is_valid:
-            log.error(errors)
-            if warnings:
-                log.warning(warnings)
-            raise RuntimeError(f'The database schema does not match the ORM model')
             
     domain.configure(context.db_key)
 

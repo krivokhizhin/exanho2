@@ -14,6 +14,6 @@ class ISampleService(ABC):
     def raise_ex(self, message = 'raise Exception'):
         pass
     
-    @abstractmethod
-    def execute(self, task):
-        pass
+    # @abstractmethod
+    # def execute(self, task):
+    #     pass

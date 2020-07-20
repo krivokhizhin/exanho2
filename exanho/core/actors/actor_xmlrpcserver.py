@@ -34,10 +34,7 @@ class XmlRpcServer(Actor):
             if not hosting_service:
                 raise Exception('{}: No services'.format(config.name))
 
-            hosting_service.context = context         
-
-            if service_config.db_key:
-                hosting_service.domain = context.get_domain(service_config.db_key)
+            hosting_service.context = context
 
             SimpleXMLRPCServer.allow_reuse_address = True
             serv = SimpleXMLRPCServer(context.get_service_endpoint(interface_key), logRequests=False, allow_none=True, use_builtin_types=True)
@@ -47,12 +44,12 @@ class XmlRpcServer(Actor):
 
             if service_config.concurrency.kind.lower() == 'process':
                 for n in range(service_config.concurrency.degree):
-                    p = Process(target=serve_forever, name=f'{interface_key}-{n+1}', args=(serv, hosting_service), daemon=True)
+                    p = Process(target=serve_forever, name=f'{interface_key}-{n+1}', args=(serv, hosting_service, service_config.db_key), daemon=True)
                     p.start()
                     self._processes.append(ServerByProcess(p, serv))
                     log.debug(f'Service "{hosting_service.__name__}" has been located in "{p.name}" process')
             elif service_config.concurrency.kind.lower() == 'thread':
-                p = Process(target=serve_forever, name=interface_key, args=(serv, hosting_service, service_config.concurrency.degree), daemon=True)
+                p = Process(target=serve_forever, name=interface_key, args=(serv, hosting_service, service_config.db_key, service_config.concurrency.degree), daemon=True)
                 p.start()
                 self._processes.append(ServerByProcess(p, serv))
                 log.debug(f'Service "{hosting_service.__name__}" has been located in "{p.name}" process')

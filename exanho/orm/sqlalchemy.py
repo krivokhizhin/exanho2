@@ -1,3 +1,5 @@
+import types
+
 from contextlib import contextmanager
 from functools import wraps
 from sqlalchemy import create_engine
@@ -12,11 +14,22 @@ class Domain:
         self._engine = create_engine(url)
         self._session = scoped_session(sessionmaker(bind=self._engine))
 
-    def recreate(self):
-        Base.metadata.create_all(self._engine)
-
     def dispose(self):
         self._engine.dispose()
+
+    def validate(self, model_modules):
+        self.dispose()
+        self._load_models(model_modules)
+
+        from sqlalchemy import inspect
+        from exanho.orm.validators.sqlalchemy import Validator
+
+        inspector = inspect(self._engine)
+        
+        validator = Validator(Base.metadata, inspector)
+        validator.validate()
+
+        return validator.is_valid, validator.error_messages, validator.warning_messages
 
     @property
     def Session(self):
@@ -53,11 +66,27 @@ class Domain:
 
 Session = sessionmaker()
 
+def load_models(model_modules):
+    if not isinstance(model_modules, list):
+        raise TypeError(model_modules)
+
+    from importlib import import_module
+    for model_module in model_modules:
+        import_module(model_module)
+
 def configure(url):
     engine = create_engine(url)
     Session.configure(bind=engine)
 
-def validate(url):
+def recreate(url:str, models:list):
+    load_models(models)
+
+    engine = create_engine(url)
+    Base.metadata.create_all(engine)
+
+def validate(url:str, models:list):
+    load_models(models)
+
     from sqlalchemy import inspect
     from exanho.orm.validators.sqlalchemy import Validator
 
@@ -72,28 +101,41 @@ def validate(url):
 def upgrade(self):
     pass
 
-def sessional(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        session = Session()
-        self, *_ = args
-        self.session = session
-        result = None
-        try:
-            result = func(*args, **kwargs)
-            session.commit()
-        except:
-            session.rollback()
-            raise
-        finally:
-            session.close()
-        return result
-    return wrapper
+# def sessional(func):
+#     @wraps(func)
+#     def wrapper(*args, **kwargs):
+#         session = Session()
+#         self, *_ = args
+#         self.session = session
+#         result = None
+#         try:
+#             result = func(*args, **kwargs)
+#             session.commit()
+#         except:
+#             session.rollback()
+#             raise
+#         finally:
+#             session.close()
+#         return result
+#     return wrapper
+
+# @contextmanager
+# def session_scope():
+#     """Provide a transactional scope around a series of operations."""
+#     session = Session()
+#     try:
+#         yield session
+#         session.commit()
+#     except:
+#         session.rollback()
+#         raise
+#     finally:
+#         session.close()
 
 @contextmanager
-def session_scope():
+def session_scope(domain):
     """Provide a transactional scope around a series of operations."""
-    session = Session()
+    session = domain.Session
     try:
         yield session
         session.commit()
@@ -103,6 +145,21 @@ def session_scope():
     finally:
         session.close()
 
-def has_domain(cls):
-    cls.domain = None
-    return cls
+class Sessional:
+
+    domain = None
+
+    def __init__(self, func):
+        wraps(func)(self)
+        self.session = None
+
+    def __call__(self, *args, **kwargs):
+        with session_scope(self.__class__.domain) as session:
+            self.session = session
+            return self.__wrapped__(*args, **kwargs)
+
+    def __get__(self, instance, cls):
+        if instance is None:
+            return self
+        else:
+            return types.MethodType(self, instance)

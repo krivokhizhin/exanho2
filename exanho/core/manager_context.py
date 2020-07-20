@@ -15,6 +15,7 @@ class Context:
         self._actor_configs = dict()
         self._connectings = dict()
         self._domains = dict()
+        self._models = dict()
         self._queues = defaultdict(JoinableQueue)
         self._services = dict()
 
@@ -25,10 +26,6 @@ class Context:
     @property
     def connectings(self):
         return self._connectings
-
-    @property
-    def domains(self):
-        return self._domains
 
     @property
     def joinable_queues(self):
@@ -45,6 +42,7 @@ class Context:
             for conecting in self._context_config.db_connectings:
                 self._connectings[conecting.name] = conecting.url
                 self._domains[conecting.name] = Domain(conecting.url)
+                self._models[conecting.name] = list(conecting.models)
 
         if self._context_config.joinable_queues:
             for queue_config in self._context_config.joinable_queues:
@@ -63,6 +61,9 @@ class Context:
 
     def get_domain(self, conecting_name):
         return self._domains.get(conecting_name, None)
+
+    def get_url_with_models(self, conecting_name):
+        return self._connectings.get(conecting_name, None), self._models.get(conecting_name, None)
 
     def _check_and_modify_endpoint(self, host, port, default_host='localhost'):
         if port is None or type(port) != int or port < 1024:

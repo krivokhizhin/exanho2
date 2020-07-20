@@ -30,6 +30,8 @@ def run():
 
     if args.validate:
         exanho.validate()
+    elif args.create:
+        exanho.create_model()
     else:
         exanho.start()
 
@@ -39,11 +41,13 @@ def parse_arguments():
             description='Execution and hosting framework (exanho, ExAnHo)'
             )
     parser.add_argument('-install', action='store_true',
-            help='ExAnHo installation as daemon proccess')
+            help='ExAnHo installation as systemd service')
     parser.add_argument('-uninstall', action='store_true',
-            help='uninstalling ExAnHo as daemon proccess')
+            help='uninstalling ExAnHo as systemd service')
     parser.add_argument('-validate', action='store_true',
-            help='validate ExAnHo configuration')
+            help='validate DB model')
+    parser.add_argument('-create', action='store_true',
+            help='create model in DB')
 
     arguments = parser.parse_args()
 

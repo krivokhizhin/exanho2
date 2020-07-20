@@ -3,7 +3,11 @@
         "db_connectings":[
             {
                 "name": "eis44_test",
-                "url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44_test"
+                "url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44_test",
+                "models": [
+                    "exanho.sample.model.__init__",
+                    "exanho.ftp_loading.model.loading"
+                ]
             }
         ],
         "joinable_queues": [
@@ -23,7 +27,7 @@
                 "port": 3120
             },
             {
-                "interface": "ISampleService2",
+                "interface": "IKeyValueService",
                 "host": "",
                 "port": 3121
             }
@@ -44,8 +48,8 @@
                     }
                 },
                 {
-                    "handler_module": "exanho.sample.services.sample2",
-                    "interface": "ISampleService2",
+                    "handler_module": "exanho.sample.services.key_value",
+                    "interface": "IKeyValueService",
                     "concurrency": {
                         "degree": 2,
                         "kind": "process"

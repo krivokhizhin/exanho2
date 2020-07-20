@@ -1,9 +1,14 @@
-def serve_forever(server, service, max_workers=0):
+def serve_forever(server, service, db_key, max_workers=0):
 
-    if hasattr(service, 'domain'):
+    if db_key:
+        domain = service.context.get_domain(db_key)
+
         # Using Connection Pools with Multiprocessing or os.fork() , second approach:
         # https://docs.sqlalchemy.org/en/13/core/pooling.html#using-connection-pools-with-multiprocessing-or-os-fork
-        service.domain.dispose()
+        domain.dispose()
+
+        from exanho.orm.sqlalchemy import Sessional
+        Sessional.domain = domain
 
     if max_workers and isinstance(max_workers, int):
         from threading import Thread

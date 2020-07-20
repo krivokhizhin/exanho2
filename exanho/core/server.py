@@ -64,30 +64,47 @@ class ExanhoServer:
         self.log.info('Exanho server has been stopped.')
 
     def validate(self):
-        has_db_model_configs = self.manager.get_has_db_model_configs()
+        self.manager.load_config()
 
-        if not has_db_model_configs:
-            print(f'There is nothing to validate from a actors file')
-            return
+        import concurrent.futures
+        from exanho.orm.sqlalchemy import validate
 
-        from . import db_validate as db
-        results, canceled = db.validate(has_db_model_configs)
-        
-        if canceled:
-            print('Validation canceled')
-            return 
+        futures = dict()
 
-        for result in results:
-            module, valid, errors, warnings = result
-            if valid:
-                print(f'{module} is valid')
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            for connecting in self.manager.context.connectings:
+                self.log.debug(f'connecting: {connecting}')
+                future = executor.submit(validate, *self.manager.context.get_url_with_models(connecting))
+                futures[future] = connecting
+
+        for future in concurrent.futures.as_completed(futures):
+            err = future.exception()
+            if err is None:
+                valid, errors, warnings = future.result()
+                if valid:
+                    self.log.info(f'Model is valid for connecting "{connecting}". Warnings: {", ".join(warnings)}')
+                else:
+                    self.log.error(f'Model is not valid for connecting "{connecting}". Errors: {", ".join(errors)}. Warnings: {", ".join(warnings)}')
             else:
-                print(f'{module} is not valid')
-            if errors:
-                print('Errors:')
-                for error in errors:
-                    print(error)
-            if warnings:
-                print('Warnings:')
-                for warning in warnings:
-                    print(warning)
+                self.log.exception(connecting, err.args)
+
+    def create_model(self):
+        self.manager.load_config()
+
+        import concurrent.futures
+        from exanho.orm.sqlalchemy import recreate
+
+        futures = dict()
+
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            for connecting in self.manager.context.connectings:
+                future = executor.submit(recreate, *self.manager.context.get_url_with_models(connecting))
+                futures[future] = connecting
+
+        for future in concurrent.futures.as_completed(futures):
+            err = future.exception()
+            if err is None:
+                self.log.info(f'Models have been created for connecting "{connecting}"')
+            else:
+                self.log.exception(connecting, err.args[0])
+

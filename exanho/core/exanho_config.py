@@ -1,9 +1,10 @@
-from .common.descriptors import Boolean, Integer, String
+from .common.descriptors import Boolean, Integer, String, List
 from .actors.configs import ConfigBase, ActorConfig, ConfigBaseDerived, ListConfigBaseDerived
 
 class ConnectingConfig(ConfigBase):
     name = String('default')
     url = String()
+    models = List()
 
 class QueueConfig(ConfigBase):
     name = String()

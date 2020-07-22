@@ -1,8 +1,6 @@
-from . import RpcServer, XmlRpcServer, SleepWorker, QueueWorker
+from . import XmlRpcServer, SleepWorker, QueueWorker
 
 def create(config, context):
-    if config.kind == 'RpcServer':
-        return RpcServer(config, context)
 
     if config.kind == 'XmlRpcServer':
         return XmlRpcServer(config, context)

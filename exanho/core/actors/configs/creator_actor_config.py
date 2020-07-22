@@ -1,8 +1,6 @@
-from . import RpcServerActorConfig, XmlRpcServerActorConfig, SleepWorkerActorConfig, QueueWorkerActorConfig
+from . import XmlRpcServerActorConfig, SleepWorkerActorConfig, QueueWorkerActorConfig
 
 def create_actor_config(config: dict):
-    if config['kind'].lower() == 'RpcServer'.lower():
-        return RpcServerActorConfig.create_instance(config)
 
     if config['kind'].lower() == 'XmlRpcServer'.lower():
         return XmlRpcServerActorConfig.create_instance(config)

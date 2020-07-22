@@ -8,7 +8,6 @@ from collections import defaultdict, namedtuple
 from exanho.core.manager_context import Context as ExanhoContext
 
 from exanho.interfaces import IKeyValueService
-from exanho.core.common import create_client_class
 
 log = logging.getLogger(__name__)
 

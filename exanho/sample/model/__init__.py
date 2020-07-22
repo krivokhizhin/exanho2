@@ -1,4 +1,4 @@
-from .key_value import ValueType, KeyValue
+from .key_value import *
 
 type_matching = {
     'valuetype': 'VARCHAR(3)'

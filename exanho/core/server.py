@@ -27,11 +27,17 @@ class ExanhoServer:
         self.manager.load_config()
         self.log.info(f'Manager context has been initialized: joinable_queues({len(self.manager.context.joinable_queues)})')
 
-        # 2. Install actors from configuration file
+        # 2. Validate models
+        results = self._inner_validate()
+        valid = self.print_validation(results)
+        if not valid:
+            raise Exception('Validation failed')
+
+        # 3. Install actors from configuration file
         self.manager.install_actors_from_file()
         self.log.info('All actors have been configured.')
 
-        # 3. Hosting SimpleXMLRPCServer
+        # 4. Hosting SimpleXMLRPCServer for control
         server = SimpleXMLRPCServer((self.service_host, self.service_port), requestHandler=ActorRequestHandler, logRequests=False)
         server.register_introspection_functions()
 
@@ -65,28 +71,49 @@ class ExanhoServer:
 
     def validate(self):
         self.manager.load_config()
+        results = self._inner_validate()
+        self.print_validation(results)
 
+    def _inner_validate(self):
         import concurrent.futures
         from exanho.orm.sqlalchemy import validate
 
         futures = dict()
+        results = dict()
 
         with concurrent.futures.ProcessPoolExecutor() as executor:
             for connecting in self.manager.context.connectings:
-                self.log.debug(f'connecting: {connecting}')
                 future = executor.submit(validate, *self.manager.context.get_url_with_models(connecting))
                 futures[future] = connecting
+                results[connecting] = None
 
-        for future in concurrent.futures.as_completed(futures):
+        for future in concurrent.futures.as_completed(futures.keys()):
             err = future.exception()
             if err is None:
-                valid, errors, warnings = future.result()
-                if valid:
-                    self.log.info(f'Model is valid for connecting "{connecting}". Warnings: {", ".join(warnings)}')
-                else:
-                    self.log.error(f'Model is not valid for connecting "{connecting}". Errors: {", ".join(errors)}. Warnings: {", ".join(warnings)}')
+                results[futures[future]] = future.result()
             else:
-                self.log.exception(connecting, err.args)
+                results[futures[future]] = err
+
+        return results
+
+    def print_validation(self, results:dict):
+        valid = True
+        for connecting in results.keys():
+            result = results[connecting]
+            if isinstance(result, Exception):
+                self.log.exception(f'{connecting}: ', result)
+                valid = False
+                continue
+
+            valid, errors, warnings = result
+            warn_text = f' Warnings: {", ".join(warnings)}' if warnings else ''
+            if valid:
+                self.log.info(f'{connecting}: model is valid.{warn_text}')
+            else:
+                self.log.error(f'{connecting}: model is not valid. Errors: {", ".join(errors)}.{warn_text}')
+                valid = False
+
+        return valid
 
     def create_model(self):
         self.manager.load_config()

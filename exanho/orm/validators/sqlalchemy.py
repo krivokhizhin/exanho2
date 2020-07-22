@@ -9,7 +9,7 @@ class Validator():
         
     def validate(self, full=False):
         if (self._insp.default_schema_name != 'public'):
-            self.error_messages.append("For the specified user, the default schema is '{}', but the expected 'public'.".format(self._insp.default_schema_name))
+            self.error_messages.append("For the specified user, the default schema is '{}', but the expected 'public'".format(self._insp.default_schema_name))
             self.is_valid = False
             return
         
@@ -25,11 +25,11 @@ class Validator():
         db_table_names = set(self._insp.get_table_names())
         
         for md_miss_table_name in md_table_names.difference(db_table_names):
-            self.error_messages.append("There is no '{}' table in the database.".format(md_miss_table_name))
+            self.error_messages.append("There is no '{}' table in the database".format(md_miss_table_name))
 
         if full:  
             for db_miss_table_name in db_table_names.difference(md_table_names):
-                self.error_messages.append("There is no '{}' table in the domain.".format(db_miss_table_name))
+                self.error_messages.append("There is no '{}' table in the domain".format(db_miss_table_name))
 
         for table_name in md_table_names.intersection(db_table_names):
             self.validate_table(table_name)
@@ -41,7 +41,7 @@ class Validator():
         for md_column in md_table.columns:
             db_column = db_columns.get(md_column.key, None)
             if db_column is None:
-                self.error_messages.append(f'There is no "{md_column.key}" column in "{table_name}" table from database.')
+                self.error_messages.append(f'There is no "{md_column.key}" column in "{table_name}" table from database')
                 continue
 
             # This function is currently not implemented for SQLAlchemy types, and for all built in types will return None.
@@ -54,19 +54,16 @@ class Validator():
 
             db_type = str(db_column['type'])
             md_type = str(md_column.type)
-            if (md_type != db_type) and (type_matching.get(md_type, '') != db_type) and (type_matching_rev.get(db_type, '') != md_type):
-                self.error_messages.append(f'Type mismatch for {md_column.key} column of the {table_name} table: {md_type} != {db_type}.')
+            if (md_type != db_type) and (type_matching.get(md_type, '') != db_type) and (type_matching.get(db_type, '') != md_type):
+                self.error_messages.append(f'Type mismatch for {md_column.key} column of the {table_name} table: {md_type} != {db_type}')
 
             del db_columns[md_column.key]
 
         if db_columns:
-            self.error_messages.extend([f'There is no "{name}" column in "{table_name}" table from domain.' for name in db_columns.keys()])
+            self.error_messages.extend([f'There is no "{name}" column in "{table_name}" table from domain' for name in db_columns.keys()])
 
 type_matching = {
-    'BIGINT': 'INTEGER'
-}
-
-type_matching_rev = {
+    'BIGINT': 'INTEGER',
     'taskstatus': 'VARCHAR(9)',
     'filestatus': 'VARCHAR(7)',
     'contentstatus': 'VARCHAR(11)',

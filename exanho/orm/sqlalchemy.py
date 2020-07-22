@@ -70,9 +70,13 @@ def load_models(model_modules):
     if not isinstance(model_modules, list):
         raise TypeError(model_modules)
 
+    from .validators.sqlalchemy import type_matching
+
     from importlib import import_module
     for model_module in model_modules:
-        import_module(model_module)
+        mod = import_module(model_module)
+        if hasattr(mod, 'type_matching'):
+            type_matching.update(mod.type_matching)
 
 def configure(url):
     engine = create_engine(url)

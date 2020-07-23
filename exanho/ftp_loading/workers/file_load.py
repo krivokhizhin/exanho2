@@ -10,7 +10,7 @@ from ftplib import FTP
 from multiprocessing import shared_memory
 from sqlalchemy import text
 
-import exanho.orm.sqlalchemy as domain
+from exanho.orm.sqlalchemy import Sessional
 from exanho.core.manager_context import Context as ExanhoContext
 from exanho.core.common import Error, get_used_memory_level
 from exanho.ftp_loading.model.loading import ContentStatus, FileStatus, FtpContent, FtpFile
@@ -21,8 +21,6 @@ ERROR_FTP_LABEL = object()
 ERROR_UNKNOWN_LABEL = object()
 
 Context = namedtuple('Context', [
-    'db_key', 
-    'db_validate', 
     'ftp_host', 
     'ftp_port', 
     'ftp_user', 
@@ -44,12 +42,6 @@ ParseContent = namedtuple('ParseContent', ['id', 'archive_date', 'archive_name',
 
 def initialize(appsettings, exanho_context:ExanhoContext):
     context = Context(**appsettings)
-
-    db_url = exanho_context.connectings.get(context.db_key)
-    if db_url:
-        context = context._replace(db_key=db_url)
-    else:
-        raise RuntimeError(f'For the connection name "{context.db_key}" is not found url')
 
     if len(context.parse_queues) != len(context.queue_by_filter):
         raise RuntimeError(f'The number of "parse_queues" and "queue_by_filter" must match ({len(context.parse_queues)}!={len(context.queue_by_filter)})')
@@ -79,16 +71,6 @@ def initialize(appsettings, exanho_context:ExanhoContext):
     log.debug(context.queue_by_filter)
     log.debug(context.parse_filters)
 
-    if context.db_validate:
-        is_valid, errors, warnings = domain.validate(context.db_key)
-        if not is_valid:
-            log.error(errors)
-            if warnings:
-                log.warning(warnings)
-            raise RuntimeError(f'The database schema does not match the ORM model')
-            
-    domain.configure(context.db_key)
-
     if context.max_mem_level > 1:
         max_mem_level = context.max_mem_level / 100.0
         if max_mem_level > 1:
@@ -112,7 +94,7 @@ def work(context:Context):
                 break
 
             futures = set()
-            with domain.session_scope() as session:
+            with Sessional.domain.session_scope() as session:
                 load_file_ids = []
 
                 query_ = session.query(FtpFile).filter(FtpFile.status == FileStatus.READY)
@@ -155,7 +137,7 @@ def work(context:Context):
             if futures:
                 wait_for(context, futures)
 
-            with domain.session_scope() as session:
+            with Sessional.domain.session_scope() as session:
                 query_ = session.query(FtpFile).filter(FtpFile.status == FileStatus.READY)
                 if context.parse_filters:
                     query_ = query_.filter(text(context.parse_filters))
@@ -237,7 +219,7 @@ def wait_for(context:Context, futures):
         err = future.exception()
         if err is None:
             load_file_id, filename, location, create_date, files = future.result()                
-            with domain.session_scope() as session:
+            with Sessional.domain.session_scope() as session:
                 reassigned = 0
                 if files:               
                     for file_data in files:
@@ -273,7 +255,7 @@ def wait_for(context:Context, futures):
                     log.debug(f'{filename} (id={load_file_id}): added {len(session.new)}, reassigned {reassigned} files')
         elif isinstance(err, Error):
             load_file_id, filename, location, label = err.params
-            with domain.session_scope() as session:
+            with Sessional.domain.session_scope() as session:
                 load_file = session.query(FtpFile).get(load_file_id)
                 if load_file:
                     if label == ERROR_UNKNOWN_LABEL or context.attemp_count >= context.error_attempts:

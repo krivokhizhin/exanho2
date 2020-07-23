@@ -3,33 +3,19 @@ import time
 from collections import namedtuple
 from multiprocessing import shared_memory
 
-import exanho.orm.sqlalchemy as domain
+from exanho.orm.sqlalchemy import Sessional
 from exanho.core.manager_context import Context as ExanhoContext
 from exanho.core.common import Error
 from exanho.ftp_loading.model.loading import ContentStatus, FtpContent
 
-Context = namedtuple('Context', [
-    'db_key', 
-    'db_validate'
-    ])
-
 log = logging.getLogger(__name__)
 
 def initialize(appsettings, exanho_context:ExanhoContext):
-    context = Context(**appsettings)
-
-    db_url = exanho_context.connectings.get(context.db_key)
-    if db_url:
-        context = context._replace(db_key=db_url)
-    else:
-        raise RuntimeError(f'For the connection name "{context.db_key}" is not found url')
-            
-    domain.configure(context.db_key)
-
+    context = appsettings
     log.info(f'initialize')
     return context
 
-def work(context:Context, message):
+def work(context, message):
     log.debug('content_parse in work')
 
     content_id = int(message)
@@ -40,7 +26,7 @@ def work(context:Context, message):
     content_name = None
 
     try:
-        with domain.session_scope() as session:
+        with Sessional.domain.session_scope() as session:
             content = session.query(FtpContent).filter(FtpContent.id == content_id).one()
 
             memory_name = content.message
@@ -75,7 +61,7 @@ def work(context:Context, message):
                 shm.unlink()
 
 
-        with domain.session_scope() as session:
+        with Sessional.domain.session_scope() as session:
             content = session.query(FtpContent).filter(FtpContent.id == content_id).one()
 
             if parsed:

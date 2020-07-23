@@ -14,6 +14,7 @@ class Actor:
         self._config = config
         self._context = context
         self._mailbox = Queue()
+        self.launched = Event()
 
     @property
     def config(self):
@@ -47,6 +48,7 @@ class Actor:
         Starts competitive execution
         '''
         self._terminated = Event()
+        self.launched.clear()
         t = Thread(target=self._bootstrap, name=self._config.name, args=(self._config, self._context, ))
         t.daemon = self._config.daemon
         t.start()
@@ -55,6 +57,7 @@ class Actor:
         try:
             configurer_logging(context.log_queue)
             self.run(config, context)
+            self.launched.set()
             self.pool()
         except ActorExit:
             self.finalize()

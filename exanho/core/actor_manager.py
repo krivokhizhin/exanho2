@@ -6,6 +6,8 @@ from .config import json_actors
 from .actors import Actor, actor_factory
 from .actors.configs import create_actor_config as actor_config_factory
 
+LAUNCH_WAIT = 5
+
 class ActorManager:
 
     def __init__(self, config_path, log_queue):
@@ -25,6 +27,7 @@ class ActorManager:
             actor = actor_factory.create(actor_config, self.context)
             self.actors[actor_config.name] = actor
             actor.start()
+            actor.launched.wait(LAUNCH_WAIT)
 
     def install_actor(self, config:str):
         actor_config = json_actors.convert_config_to_dict(config)

@@ -2,14 +2,12 @@ import importlib
 import logging
 
 from abc import ABCMeta
-from collections import namedtuple
 from multiprocessing import Process
 from xmlrpc.server import SimpleXMLRPCServer
 
-from . import Actor, ServiceBase, serve_forever
+from . import Actor, ServiceBase, ServeByProcess, serve_forever
 
 JOIN_TIMEOUT = 1
-ServerByProcess = namedtuple('ServerByProcess', ['process', 'server'])
 
 class XmlRpcServer(Actor):
 
@@ -44,14 +42,14 @@ class XmlRpcServer(Actor):
 
             if service_config.concurrency.kind.lower() == 'process':
                 for n in range(service_config.concurrency.degree):
-                    p = Process(target=serve_forever, name=f'{interface_key}-{n+1}', args=(serv, hosting_service, service_config.db_key), daemon=True)
+                    p = Process(target=serve_forever, name=f'{interface_key}-{n+1}', args=(serv.serve_forever, context, service_config.db_key), daemon=True)
                     p.start()
-                    self._processes.append(ServerByProcess(p, serv))
+                    self._processes.append(ServeByProcess(p, serv))
                     log.debug(f'Service "{hosting_service.__name__}" has been located in "{p.name}" process')
             elif service_config.concurrency.kind.lower() == 'thread':
-                p = Process(target=serve_forever, name=interface_key, args=(serv, hosting_service, service_config.db_key, service_config.concurrency.degree), daemon=True)
+                p = Process(target=serve_forever, name=interface_key, args=(serv.serve_forever, context, service_config.db_key, service_config.concurrency.degree), daemon=True)
                 p.start()
-                self._processes.append(ServerByProcess(p, serv))
+                self._processes.append(ServeByProcess(p, serv))
                 log.debug(f'Service "{hosting_service.__name__}" has been located in "{p.name}" process')
             else:
                 raise Exception(f'The concurrency_type is "{service_config.concurrency.kind}". There must be either "Thread" or "Process"')
@@ -65,7 +63,7 @@ class XmlRpcServer(Actor):
             serv.server_close()
             p.join(JOIN_TIMEOUT)
             if p.is_alive():
-                p.terminate()  
+                p.terminate()
 
     def handle(self, msg):
         pass

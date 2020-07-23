@@ -65,10 +65,62 @@
             "workers": [
                 {
                     "module": "exanho.ftp_loading.workers.content_parse",
-                    "queue_name": "parse_notification",
+                    "db_key": "eis44_test",
+                    "queue_name": "parse_notification"
+                }
+            ]
+        },
+        {
+            "name": "SampleQueueHandlerWorker",
+            "kind": "QueueWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.sample.workers.queue_handler",
+                    "db_key": "eis44_test",
+                    "queue_name": "sample_parse"
+                }
+            ]
+        },
+        {
+            "name": "RunFtpTaskWorker",
+            "kind": "SleepWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.ftp_loading.workers.task_run",
+                    "db_key": "eis44_test",
+                    "sleep": 5.0,
                     "appsettings":{
-                        "db_key": "eis44_test",
-                        "db_validate": true
+                        "ftp_host": "ftp.zakupki.gov.ru",
+                        "ftp_port": 21,
+                        "ftp_user": "free",
+                        "ftp_password": "free"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "LoadFtpFileWorker",
+            "kind": "SleepWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.ftp_loading.workers.file_load",
+                    "db_key": "eis44_test",
+                    "sleep": 5.0,
+                    "appsettings":{
+                        "ftp_host": "ftp.zakupki.gov.ru",
+                        "ftp_port": 21,
+                        "ftp_user": "free",
+                        "ftp_password": "free",
+                        "parse_queues":["parse_notification"],
+                        "queue_by_filter":[1],
+                        "parse_filters":["notification_Adygeja_Resp"],
+                        "max_mem_level": 0.8,
+                        "with_swap": false,
+                        "max_pool_workers": 2,
+                        "block_timeout": 60
                     }
                 }
             ]
@@ -80,24 +132,9 @@
             "workers": [
                 {
                     "module": "exanho.sample.workers.sample",
-                    "sleep": 2.0,
+                    "sleep": 5.0,
                     "appsettings":{
                         "joinable_queue": "sample_parse"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "SampleQueueHandlerWorker",
-            "kind": "QueueWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.sample.workers.queue_handler",
-                    "queue_name": "sample_parse",
-                    "appsettings":{
-                        "db_key": "eis44_test",
-                        "db_validate": true
                     }
                 }
             ]

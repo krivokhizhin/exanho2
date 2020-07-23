@@ -5,7 +5,7 @@ from collections import defaultdict, namedtuple
 from queue import Queue
 from threading import Thread
 
-import exanho.orm.sqlalchemy as domain
+from exanho.orm.sqlalchemy import Sessional
 from exanho.core.manager_context import Context as ExanhoContext
 from exanho.ftp_loading.ftp_consider import FtpConsider
 from exanho.ftp_loading.model.loading import FileStatus, FtpFile, FtpTask, TaskStatus
@@ -13,8 +13,6 @@ from exanho.ftp_loading.model.loading import FileStatus, FtpFile, FtpTask, TaskS
 log = logging.getLogger(__name__)
 
 Context = namedtuple('Context', [
-    'db_key', 
-    'db_validate', 
     'ftp_host', 
     'ftp_port', 
     'ftp_user', 
@@ -31,22 +29,6 @@ files_failed_desc = 'files have failed status'
 
 def initialize(appsettings, exanho_context:ExanhoContext):
     context = Context(**appsettings)
-
-    db_url = exanho_context.connectings.get(context.db_key)
-    if db_url:
-        context = context._replace(db_key=db_url)
-    else:
-        raise RuntimeError(f'For the connection name "{context.db_key}" is not found url')
-
-    if context.db_validate:
-        is_valid, errors, warnings = domain.validate(context.db_key)
-        if not is_valid:
-            log.error(errors)
-            if warnings:
-                log.warning(warnings)
-            raise RuntimeError(f'The database schema does not match the ORM model')
-            
-    domain.configure(context.db_key)
     
     insp_file_queue=Queue()
     w_thread = Thread(target=write_ftp_files, args=(insp_file_queue, ))
@@ -61,8 +43,8 @@ def initialize(appsettings, exanho_context:ExanhoContext):
 def work(context:Context):
     log.debug('task_run in work')
 
-    try:
-        with domain.session_scope() as session:
+    try:        
+        with Sessional.domain.session_scope() as session:
             now = datetime.datetime.now()
             load_task = session.query(FtpTask).filter(FtpTask.scheduled_date < now).filter(FtpTask.status == TaskStatus.SCHEDULED).first()
 
@@ -153,7 +135,7 @@ def write_ftp_files(insp_file_queue):
                 break
 
             insp_file = InspFile(*insp_file)
-            with domain.session_scope() as session:
+            with Sessional.domain.session_scope() as session:
 
                 exists_file = session.query(FtpFile).\
                     filter(FtpFile.task_id == insp_file.task_id).\

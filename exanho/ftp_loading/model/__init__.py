@@ -1,5 +1,7 @@
 from .loading import *
 
 type_matching = {
-    'valuetype': 'VARCHAR(3)'
+    'taskstatus': 'VARCHAR(9)',
+    'filestatus': 'VARCHAR(7)',
+    'contentstatus': 'VARCHAR(11)',
 }

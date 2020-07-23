@@ -64,9 +64,6 @@ class Validator():
 
 type_matching = {
     'BIGINT': 'INTEGER',
-    'taskstatus': 'VARCHAR(9)',
-    'filestatus': 'VARCHAR(7)',
-    'contentstatus': 'VARCHAR(11)',
     'TIMESTAMP WITH TIME ZONE': 'DATETIME',
     'TIMESTAMP WITHOUT TIME ZONE': 'DATETIME'
 }

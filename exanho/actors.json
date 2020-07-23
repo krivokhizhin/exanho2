@@ -6,7 +6,7 @@
                 "url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44_test",
                 "models": [
                     "exanho.sample.model.__init__",
-                    "exanho.ftp_loading.model.loading"
+                    "exanho.ftp_loading.model.__init__"
                 ]
             }
         ],

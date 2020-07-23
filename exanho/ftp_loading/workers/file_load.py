@@ -13,7 +13,7 @@ from sqlalchemy import text
 from exanho.orm.sqlalchemy import Sessional
 from exanho.core.manager_context import Context as ExanhoContext
 from exanho.core.common import Error, get_used_memory_level
-from exanho.ftp_loading.model.loading import ContentStatus, FileStatus, FtpContent, FtpFile
+from exanho.ftp_loading.model import FtpContentStatus, FtpFileStatus, FtpContent, FtpFile
 
 log = logging.getLogger(__name__)
 
@@ -97,12 +97,12 @@ def work(context:Context):
             with Sessional.domain.session_scope() as session:
                 load_file_ids = []
 
-                query_ = session.query(FtpFile).filter(FtpFile.status == FileStatus.READY)
+                query_ = session.query(FtpFile).filter(FtpFile.status == FtpFileStatus.READY)
                 if context.parse_filters:
                     query_ = query_.filter(text(context.parse_filters))
                 
                 for load_file in query_.order_by(FtpFile.date, FtpFile.filename).limit(context.max_pool_workers):
-                    load_file.status = FileStatus.LOADING
+                    load_file.status = FtpFileStatus.LOADING
                     future = context.executor.submit(ftp_loading, context.ftp_host, context.ftp_port, context.ftp_user, context.ftp_password, load_file.id, load_file.filename, load_file.directory, load_file.date)
                     futures.add(future)
                     log.info(f'load_file({load_file.id}): {load_file.status}')
@@ -110,7 +110,7 @@ def work(context:Context):
 
                 session.flush()
 
-                query_ = session.query(FtpFile.id, FtpContent.status).select_from(FtpFile).join(FtpContent).filter(FtpFile.status == FileStatus.LOADING)
+                query_ = session.query(FtpFile.id, FtpContent.status).select_from(FtpFile).join(FtpContent).filter(FtpFile.status == FtpFileStatus.LOADING)
                 if context.parse_filters:
                     query_ = query_.filter(text(context.parse_filters))
 
@@ -123,22 +123,22 @@ def work(context:Context):
 
                 for file_id, statuses in statuses_by_archive.items():
                     statuses_set = set(statuses)
-                    if (len(statuses_set) == 1) and (ContentStatus.PROCESSED in statuses_set):
+                    if (len(statuses_set) == 1) and (FtpContentStatus.PROCESSED in statuses_set):
                         done_file = session.query(FtpFile).get(file_id)
-                        done_file.status = FileStatus.DONE
+                        done_file.status = FtpFileStatus.DONE
                         done_file.err_desc = None
                         log.info(f'load_file({done_file.id}): {done_file.status}')
-                    elif ContentStatus.FAULT in statuses_set:
+                    elif FtpContentStatus.FAULT in statuses_set:
                         failed_file = session.query(FtpFile).get(file_id)
-                        failed_file.status = FileStatus.FAILED
-                        failed_file.err_desc = f'{statuses.count(FileStatus.FAILED)} files have failed status'
+                        failed_file.status = FtpFileStatus.FAILED
+                        failed_file.err_desc = f'{statuses.count(FtpFileStatus.FAILED)} files have failed status'
                         log.info(f'load_file({failed_file.id}): {failed_file.status}')
 
             if futures:
                 wait_for(context, futures)
 
             with Sessional.domain.session_scope() as session:
-                query_ = session.query(FtpFile).filter(FtpFile.status == FileStatus.READY)
+                query_ = session.query(FtpFile).filter(FtpFile.status == FtpFileStatus.READY)
                 if context.parse_filters:
                     query_ = query_.filter(text(context.parse_filters))
 
@@ -228,16 +228,16 @@ def wait_for(context:Context, futures):
                                 filter(FtpContent.name == file_data.name).\
                                     one_or_none()
                         if exists_content is None:
-                            content = FtpContent(file_id=load_file_id, status=ContentStatus.PREPARED, name=file_data.name, crc=file_data.crc, size=file_data.size, last_modify=file_data.last_modify, message=file_data.message)
+                            content = FtpContent(file_id=load_file_id, status=FtpContentStatus.PREPARED, name=file_data.name, crc=file_data.crc, size=file_data.size, last_modify=file_data.last_modify, message=file_data.message)
                             session.add(content)
                             session.flush()
                             ready_to_parse.append(ParseContent(content.id, create_date, filename, content.last_modify, content.name))
-                        elif (exists_content.status == ContentStatus.FAULT) or ((exists_content.status in [ContentStatus.PROCESSED, ContentStatus.PREPARED]) and (exists_content.crc != file_data.crc) and (exists_content.last_modify <= file_data.last_modify)):
+                        elif (exists_content.status == FtpContentStatus.FAULT) or ((exists_content.status in [FtpContentStatus.PROCESSED, FtpContentStatus.PREPARED]) and (exists_content.crc != file_data.crc) and (exists_content.last_modify <= file_data.last_modify)):
                             exists_content.crc = file_data.crc
                             exists_content.size = file_data.size
                             exists_content.last_modify = file_data.last_modify
                             exists_content.message = file_data.message
-                            exists_content.status = ContentStatus.PREPARED
+                            exists_content.status = FtpContentStatus.PREPARED
                             reassigned += 1
                             ready_to_parse.append(ParseContent(exists_content.id, create_date, filename, exists_content.last_modify, exists_content.name))
                         else:
@@ -247,7 +247,7 @@ def wait_for(context:Context, futures):
                 else:
                     load_file = session.query(FtpFile).get(load_file_id)
                     if load_file:
-                        load_file.status = FileStatus.DONE
+                        load_file.status = FtpFileStatus.DONE
                         load_file.err_desc = 'Empty'
 
 
@@ -259,11 +259,11 @@ def wait_for(context:Context, futures):
                 load_file = session.query(FtpFile).get(load_file_id)
                 if load_file:
                     if label == ERROR_UNKNOWN_LABEL or context.attemp_count >= context.error_attempts:
-                        load_file.status = FileStatus.FAILED
+                        load_file.status = FtpFileStatus.FAILED
                         load_file.err_desc = err.message
                         log.error(f'{filename} (id={load_file_id}) error')
                     else:
-                        load_file.status = FileStatus.READY
+                        load_file.status = FtpFileStatus.READY
                         context = context._replace(attemp_count=context.attemp_count+1)
         else:
             raise err

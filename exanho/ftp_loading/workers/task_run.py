@@ -8,7 +8,7 @@ from threading import Thread
 from exanho.orm.sqlalchemy import Sessional
 from exanho.core.manager_context import Context as ExanhoContext
 from exanho.ftp_loading.ftp_consider import FtpConsider
-from exanho.ftp_loading.model.loading import FileStatus, FtpFile, FtpTask, TaskStatus
+from exanho.ftp_loading.model import FtpFileStatus, FtpFile, FtpTask, FtpTaskStatus
 
 log = logging.getLogger(__name__)
 
@@ -46,10 +46,10 @@ def work(context:Context):
     try:        
         with Sessional.domain.session_scope() as session:
             now = datetime.datetime.now()
-            load_task = session.query(FtpTask).filter(FtpTask.scheduled_date < now).filter(FtpTask.status == TaskStatus.SCHEDULED).first()
+            load_task = session.query(FtpTask).filter(FtpTask.scheduled_date < now).filter(FtpTask.status == FtpTaskStatus.SCHEDULED).first()
 
             if load_task:
-                load_task.status = TaskStatus.SCANNING
+                load_task.status = FtpTaskStatus.SCANNING
                 session.flush()
                 log.info(f'FtpTask({load_task.id}): {load_task.status}')
 
@@ -68,14 +68,14 @@ def work(context:Context):
                         delimiter=load_task.delimiter)
                     viewer.prepare()
                     viewer.inspect()
-                    load_task.status = TaskStatus.RUNNING                
+                    load_task.status = FtpTaskStatus.RUNNING                
                 except Exception as ex:                
                     load_task.err_desc = f'{ex.__class__.__name__}: {ex.args[0]}'
                     log.exception(ex)
                     if context.attemp_count >= context.error_attempts:
-                        load_task.status = TaskStatus.ERROR
+                        load_task.status = FtpTaskStatus.ERROR
                     else:
-                        load_task.status = TaskStatus.SCHEDULED
+                        load_task.status = FtpTaskStatus.SCHEDULED
                         context = context._replace(attemp_count=context.attemp_count+1)
                 finally:
                     session.flush()
@@ -83,7 +83,7 @@ def work(context:Context):
                 
 
             insp_file_statuses = session.query(FtpTask.id, FtpFile.status).\
-                select_from(FtpTask).outerjoin(FtpFile).filter(FtpTask.status == TaskStatus.RUNNING).all()
+                select_from(FtpTask).outerjoin(FtpFile).filter(FtpTask.status == FtpTaskStatus.RUNNING).all()
             statuses_by_task = defaultdict(list)
             for task_id, insp_file_status in insp_file_statuses:
                 if load_task and task_id == load_task.id:
@@ -92,30 +92,30 @@ def work(context:Context):
 
             for task_id, statuses in statuses_by_task.items():
                 statuses_set = set(statuses)
-                if (len(statuses_set) == 1) and (not {FileStatus.DONE, None}.isdisjoint(statuses_set)):
+                if (len(statuses_set) == 1) and (not {FtpFileStatus.DONE, None}.isdisjoint(statuses_set)):
                     task_done = session.query(FtpTask).get(task_id)
-                    task_done.status = TaskStatus.PERFORMED
+                    task_done.status = FtpTaskStatus.PERFORMED
                     task_done.err_desc = None
                     log.info(f'FtpTask({task_done.id}): {task_done.status}')
-                elif (FileStatus.FAILED in statuses_set) and ({FileStatus.READY, FileStatus.LOADING}.isdisjoint(statuses_set)):
+                elif (FtpFileStatus.FAILED in statuses_set) and ({FtpFileStatus.READY, FtpFileStatus.LOADING}.isdisjoint(statuses_set)):
                     task_done = session.query(FtpTask).get(task_id)
                     if task_done.err_desc is None:
-                        task_done.status = TaskStatus.SCHEDULED
-                        task_done.err_desc = f'{statuses.count(FileStatus.FAILED)} {files_failed_desc}'
+                        task_done.status = FtpTaskStatus.SCHEDULED
+                        task_done.err_desc = f'{statuses.count(FtpFileStatus.FAILED)} {files_failed_desc}'
                         log.warning(f'load_task({task_done.id}): {task_done.err_desc}')                    
                     elif task_done.err_desc.endswith(files_failed_desc):
                         last_err_count = int(task_done.err_desc.split(files_failed_desc)[0])
-                        err_count = statuses.count(FileStatus.FAILED)
+                        err_count = statuses.count(FtpFileStatus.FAILED)
                         if err_count < last_err_count:
-                            task_done.status = TaskStatus.SCHEDULED
+                            task_done.status = FtpTaskStatus.SCHEDULED
                             task_done.err_desc = f'{err_count} {files_failed_desc}'
                             log.warning(f'load_task({task_done.id}): {task_done.err_desc}')
                         else:
-                            task_done.status = TaskStatus.ERROR
+                            task_done.status = FtpTaskStatus.ERROR
                             task_done.err_desc = f'{err_count} {files_failed_desc}'
                     else:
-                        task_done.status = TaskStatus.ERROR
-                        task_done.err_desc = f'{statuses.count(FileStatus.FAILED)} {files_failed_desc}'
+                        task_done.status = FtpTaskStatus.ERROR
+                        task_done.err_desc = f'{statuses.count(FtpFileStatus.FAILED)} {files_failed_desc}'
                     log.info(f'load_task({task_done.id}): {task_done.status}')
     except Exception as ex:
         log.exception(ex)
@@ -143,12 +143,12 @@ def write_ftp_files(insp_file_queue):
                             one_or_none()
 
                 if exists_file is None:
-                    session.add(FtpFile(task_id=insp_file.task_id, filename=insp_file.name, directory=insp_file.directory, status=FileStatus.READY, date=insp_file.date, size=insp_file.size))
-                elif exists_file.date < insp_file.date or (exists_file.status == FileStatus.FAILED):
+                    session.add(FtpFile(task_id=insp_file.task_id, filename=insp_file.name, directory=insp_file.directory, status=FtpFileStatus.READY, date=insp_file.date, size=insp_file.size))
+                elif exists_file.date < insp_file.date or (exists_file.status == FtpFileStatus.FAILED):
                     exists_file.date = insp_file.date
                     exists_file.size = insp_file.size
                     exists_file.err_desc = None
-                    exists_file.status = FileStatus.READY
+                    exists_file.status = FtpFileStatus.READY
             
         except Exception as ex:
             log.exception(ex)

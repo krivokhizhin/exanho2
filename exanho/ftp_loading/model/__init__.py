@@ -1,7 +1,9 @@
-from .loading import *
+from .task import *
+from .file import *
+from .content import *
 
 type_matching = {
-    'taskstatus': 'VARCHAR(9)',
-    'filestatus': 'VARCHAR(7)',
-    'contentstatus': 'VARCHAR(11)',
+    'ftptaskstatus': 'VARCHAR(9)',
+    'ftpfilestatus': 'VARCHAR(7)',
+    'ftpcontentstatus': 'VARCHAR(11)',
 }

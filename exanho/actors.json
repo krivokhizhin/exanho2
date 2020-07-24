@@ -10,16 +10,6 @@
                 ]
             }
         ],
-        "joinable_queues": [
-            {
-                "name": "sample_parse",
-                "maxsize": 1000
-            },
-            {
-                "name": "parse_notification",
-                "maxsize": 1000
-            }
-        ],
         "service_endpoints": [
             {
                 "interface": "ISampleService",
@@ -30,6 +20,16 @@
                 "interface": "IKeyValueService",
                 "host": "",
                 "port": 3121
+            }
+        ],
+        "joinable_queues": [
+            {
+                "name": "sample_parse",
+                "maxsize": 1000
+            },
+            {
+                "name": "parse_notification",
+                "maxsize": 1000
             }
         ]
     },

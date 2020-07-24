@@ -51,7 +51,13 @@ class ConfigBaseDerived:
         obj.__dict__[self.name] = self.config_class.create_instance(value)
 
 
-class ListConfigBaseDerived(ConfigBaseDerived):
+class ListConfigBaseDerived(ConfigBaseDerived):  
+
+    def __get__(self, obj, type=None):
+        if self.name not in obj.__dict__:
+            obj.__dict__[self.name] = list()
+        
+        return obj.__dict__[self.name]
 
     def __set__(self, obj, value):
         if not isinstance(value, list):

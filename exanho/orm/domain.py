@@ -22,7 +22,7 @@ class Domain:
         self._load_models(model_modules)
 
         from sqlalchemy import inspect
-        from exanho.orm.validators.sqlalchemy import Validator
+        from exanho.orm.validator import Validator
 
         inspector = inspect(self._engine)
         
@@ -70,7 +70,7 @@ def load_models(model_modules):
     if not isinstance(model_modules, list):
         raise TypeError(model_modules)
 
-    from .validators.sqlalchemy import type_matching
+    from .validator import type_matching
 
     from importlib import import_module
     for model_module in model_modules:
@@ -92,7 +92,7 @@ def validate(url:str, models:list):
     load_models(models)
 
     from sqlalchemy import inspect
-    from exanho.orm.validators.sqlalchemy import Validator
+    from exanho.orm.validator import Validator
 
     engine = create_engine(url)
     inspector = inspect(engine)

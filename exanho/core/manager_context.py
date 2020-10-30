@@ -2,7 +2,7 @@ from abc import ABCMeta
 from collections import defaultdict
 from multiprocessing import JoinableQueue
 
-from exanho.orm.sqlalchemy import Domain
+from exanho.orm.domain import Domain
 
 from .actors.configs import create_actor_config as actor_config_factory
 from .exanho_config import ContextConfig

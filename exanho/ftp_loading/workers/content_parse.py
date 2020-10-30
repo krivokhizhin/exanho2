@@ -3,7 +3,7 @@ import time
 from collections import namedtuple
 from multiprocessing import shared_memory
 
-from exanho.orm.sqlalchemy import Sessional
+from exanho.orm.domain import Sessional
 from exanho.core.manager_context import Context as ExanhoContext
 from exanho.core.common import Error
 from exanho.ftp_loading.model import FtpContentStatus, FtpContent

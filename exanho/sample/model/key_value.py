@@ -1,7 +1,7 @@
 import enum
 from sqlalchemy import Column, Enum, Integer, String
 
-from exanho.orm.sqlalchemy import Base
+from exanho.orm.domain import Base
 
 class ValueType(enum.Enum):
     int = 0

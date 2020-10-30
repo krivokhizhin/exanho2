@@ -5,7 +5,7 @@ from collections import defaultdict, namedtuple
 from queue import Queue
 from threading import Thread
 
-from exanho.orm.sqlalchemy import Sessional
+from exanho.orm.domain import Sessional
 from exanho.core.manager_context import Context as ExanhoContext
 from exanho.ftp_loading.ftp_consider import FtpConsider
 from exanho.ftp_loading.model import FtpFileStatus, FtpFile, FtpTask, FtpTaskStatus

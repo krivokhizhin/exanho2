@@ -76,7 +76,7 @@ class ExanhoServer:
 
     def _inner_validate(self):
         import concurrent.futures
-        from exanho.orm.sqlalchemy import validate
+        from exanho.orm.domain import validate
 
         futures = dict()
         results = dict()
@@ -119,7 +119,7 @@ class ExanhoServer:
         self.manager.load_config()
 
         import concurrent.futures
-        from exanho.orm.sqlalchemy import recreate
+        from exanho.orm.domain import recreate
 
         futures = dict()
 

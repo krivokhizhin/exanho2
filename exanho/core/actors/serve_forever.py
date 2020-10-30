@@ -12,7 +12,7 @@ def serve_forever(serve, context, db_key, max_workers=0, **kwargs):
         # https://docs.sqlalchemy.org/en/13/core/pooling.html#using-connection-pools-with-multiprocessing-or-os-fork
         domain.dispose()
 
-        from exanho.orm.sqlalchemy import Sessional
+        from exanho.orm.domain import Sessional
         Sessional.domain = domain
 
     if max_workers and isinstance(max_workers, int) and max_workers > 0:

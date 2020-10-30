@@ -10,7 +10,7 @@ from ftplib import FTP
 from multiprocessing import shared_memory
 from sqlalchemy import text
 
-from exanho.orm.sqlalchemy import Sessional
+from exanho.orm.domain import Sessional
 from exanho.core.manager_context import Context as ExanhoContext
 from exanho.core.common import Error, get_used_memory_level
 from exanho.ftp_loading.model import FtpContentStatus, FtpFileStatus, FtpContent, FtpFile

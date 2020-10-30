@@ -3,7 +3,7 @@ import enum
 from sqlalchemy import BigInteger, Column, DateTime, Enum, String
 from sqlalchemy.orm import relationship
 
-from exanho.orm.sqlalchemy import Base
+from exanho.orm.domain import Base
 
 class FtpTaskStatus(enum.Enum):
     NEW = 1

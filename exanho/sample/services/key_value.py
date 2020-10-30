@@ -4,7 +4,7 @@ import time
 from exanho.core.common import try_logged, Timer
 from exanho.core.actors import ServiceBase
 from exanho.interfaces import IKeyValueService
-from exanho.orm.sqlalchemy import Sessional
+from exanho.orm.domain import Sessional
 
 from ..model import ValueType, KeyValue
 

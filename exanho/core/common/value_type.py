@@ -26,7 +26,7 @@ def convert_str_to_value(value_type:ValueType, value_str:str):
 
     raise Exception(f'Unknown value type: {value_type}')
 
-def convert_value_to_str(typed_value) -> Tuple(str, ValueType):
+def convert_value_to_str(typed_value) -> (str, ValueType):
 
     if type(typed_value) == str:
         if len(typed_value) < DEFAULT_STRING_LENGTH+1:

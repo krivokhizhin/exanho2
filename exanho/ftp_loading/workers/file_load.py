@@ -173,7 +173,7 @@ def ftp_loading(host, port, user, password, load_file_id, filename, location, cr
         return (load_file_id, filename, location, create_date, files)
     except Exception as ex:
         log.exception(ex)
-        label = ERROR_FTP_LABEL if isinstance(err, Error) and err.params == ERROR_FTP_LABEL else ERROR_UNKNOWN_LABEL
+        label = ERROR_FTP_LABEL if isinstance(ex, Error) and ex.params == ERROR_FTP_LABEL else ERROR_UNKNOWN_LABEL
         raise Error(ex.args[0], ex, (load_file_id, filename, location, label))
 
 def download_extract_zip(ftp_client, zipfilename, ext_file='.xml'):

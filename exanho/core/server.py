@@ -131,7 +131,7 @@ class ExanhoServer:
         for future in concurrent.futures.as_completed(futures):
             err = future.exception()
             if err is None:
-                self.log.info(f'Models have been created for connecting "{connecting}"')
+                self.log.info(f'Models have been created for connecting "{futures[future]}"')
             else:
-                self.log.exception(connecting, err.args[0])
+                self.log.exception(futures[future], err.args[0])
 

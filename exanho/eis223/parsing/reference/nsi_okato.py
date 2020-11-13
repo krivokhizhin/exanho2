@@ -9,7 +9,7 @@ def parse(session, root_obj:nsiOkato, update=True, **kwargs):
         exist_okato = session.query(NsiOkato).filter(NsiOkato.parent_code == parent_code, NsiOkato.code == code).one_or_none()
 
         if exist_okato is None:
-            new_okved = NsiOkato(
+            new_okato = NsiOkato(
                 guid = item.nsiOkatoData.guid,
                 change_dt = item.nsiOkatoData.changeDateTime,
                 start_date_active = item.nsiOkatoData.startDateActive,
@@ -19,7 +19,7 @@ def parse(session, root_obj:nsiOkato, update=True, **kwargs):
                 name = item.nsiOkatoData.name,
                 parent_code = parent_code
             )
-            session.add(new_okved)
+            session.add(new_okato)
 
         if update or (exist_okato and item.nsiOkatoData.changeDateTime > exist_okato.change_dt):
             exist_okato.guid = item.nsiOkatoData.guid

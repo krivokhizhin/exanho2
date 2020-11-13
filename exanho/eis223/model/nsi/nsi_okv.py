@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Date, DateTime, Index, Integer, String
+from sqlalchemy import Column, Date, DateTime, Index, Integer, String
 from exanho.orm.domain import Base
 
 class NsiOkv(Base):

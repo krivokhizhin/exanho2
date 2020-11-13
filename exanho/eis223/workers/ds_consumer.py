@@ -50,7 +50,7 @@ def work(context:Context, message):
             try:
                 shm = shared_memory.SharedMemory(content_to_parse.message)
                 buffer = shm.buf[:content_to_parse.size]
-                root_obj = ds_mod.parseString(buffer.tobytes())
+                root_obj = ds_mod.parseString(buffer.tobytes(),silence = True, print_warnings=False)
 
                 xml_root_tag = root_obj.get_xml_tag()
                 parser = parsers.get(xml_root_tag, None)

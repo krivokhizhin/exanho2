@@ -193,24 +193,26 @@ def download_extract_zip(ftp_client, zipfilename, ext_file='.xml'):
                 if not zipinfo.filename.endswith(ext_file):
                     continue
 
-                shm = shared_memory.SharedMemory(create=True, size=zipinfo.file_size)
-                message = shm.name              
-                with thezip.open(zipinfo) as thefile:
-                    shm.buf[:zipinfo.file_size] = thefile.read()
-                shm.close()
-                #TODO: take out in a function
-                yy, mt, dd, hh, mi, ss = zipinfo.date_time                
-                if ss > 59:
-                    ss = 0
-                    mi += 1
-                if mi > 59:
-                    mi = 0
-                    hh += 1
-                if hh > 23:
-                    hh = 23
-                    mi = 59
-                    ss = 59
-                yield zipinfo.filename, zipinfo.CRC, zipinfo.file_size, datetime.datetime(yy, mt, dd, hh, mi, ss), message
+                if zipinfo.file_size > 0:
+                    shm = shared_memory.SharedMemory(create=True, size=zipinfo.file_size)
+                    message = shm.name              
+                    with thezip.open(zipinfo) as thefile:
+                        shm.buf[:zipinfo.file_size] = thefile.read()
+                    shm.close()
+
+                    #TODO: take out in a function
+                    yy, mt, dd, hh, mi, ss = zipinfo.date_time                
+                    if ss > 59:
+                        ss = 0
+                        mi += 1
+                    if mi > 59:
+                        mi = 0
+                        hh += 1
+                    if hh > 23:
+                        hh = 23
+                        mi = 59
+                        ss = 59
+                    yield zipinfo.filename, zipinfo.CRC, zipinfo.file_size, datetime.datetime(yy, mt, dd, hh, mi, ss), message
 
 def wait_for(context:Context, futures):
     ready_to_parse = list()
@@ -223,6 +225,7 @@ def wait_for(context:Context, futures):
                 reassigned = 0
                 if files:               
                     for file_data in files:
+
                         exists_content = session.query(FtpContent).\
                             filter(FtpContent.file_id == load_file_id).\
                                 filter(FtpContent.name == file_data.name).\

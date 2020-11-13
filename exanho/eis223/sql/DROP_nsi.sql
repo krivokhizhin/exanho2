@@ -1,0 +1,3 @@
+DROP TABLE nsi_okv CASCADE;
+DROP TABLE nsi_okved CASCADE;
+DROP TABLE nsi_okved2 CASCADE;

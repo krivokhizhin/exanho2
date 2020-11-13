@@ -1,1 +1,0 @@
-DROP TABLE nsi_okv CASCADE;

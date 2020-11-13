@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from ...ds.reference import nsiOkv
 from ...model.nsi import NsiOkv
 
@@ -21,8 +23,12 @@ def parse(session, root_obj:nsiOkv, update=True, **kwargs):
                 short_name = item.nsiOkvData.shortName
             )
             session.add(new_okv)
+            continue
 
-        if update or (exist_okv and item.nsiOkvData.changeDateTime > exist_okv.change_dt):
+        exist_chage_dt = exist_okv.change_dt if exist_okv.change_dt else datetime.fromtimestamp(0, tz=timezone.utc)
+        new_chage_dt = item.nsiOkvData.changeDateTime if item.nsiOkvData.changeDateTime else datetime.fromtimestamp(0, tz=timezone.utc)
+
+        if update or (new_chage_dt > exist_chage_dt):
             exist_okv.guid = item.nsiOkvData.guid
             exist_okv.change_dt = item.nsiOkvData.changeDateTime
             exist_okv.start_date_active = item.nsiOkvData.startDateActive

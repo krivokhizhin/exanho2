@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from ...ds.reference import nsiOkdp
 from ...model.nsi import NsiOkdp
 
@@ -23,8 +25,12 @@ def parse(session, root_obj:nsiOkdp, update=True, **kwargs):
                 section = section
             )
             session.add(new_okdp)
+            continue
 
-        if update or (exist_okdp and item.nsiOkdpData.changeDateTime > exist_okdp.change_dt):
+        exist_chage_dt = exist_okdp.change_dt if exist_okdp.change_dt else datetime.fromtimestamp(0, tz=timezone.utc)
+        new_chage_dt = item.nsiOkdpData.changeDateTime if item.nsiOkdpData.changeDateTime else datetime.fromtimestamp(0, tz=timezone.utc)
+
+        if update or (new_chage_dt > exist_chage_dt):
             exist_okdp.guid = item.nsiOkdpData.guid
             exist_okdp.change_dt = item.nsiOkdpData.changeDateTime
             exist_okdp.start_date_active = item.nsiOkdpData.startDateActive

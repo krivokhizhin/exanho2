@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from ...ds.reference import nsiOkato
 from ...model.nsi import NsiOkato
 
@@ -20,8 +22,12 @@ def parse(session, root_obj:nsiOkato, update=True, **kwargs):
                 parent_code = parent_code
             )
             session.add(new_okato)
+            continue
 
-        if update or (exist_okato and item.nsiOkatoData.changeDateTime > exist_okato.change_dt):
+        exist_chage_dt = exist_okato.change_dt if exist_okato.change_dt else datetime.fromtimestamp(0, tz=timezone.utc)
+        new_chage_dt = item.nsiOkatoData.changeDateTime if item.nsiOkatoData.changeDateTime else datetime.fromtimestamp(0, tz=timezone.utc)
+
+        if update or (new_chage_dt > exist_chage_dt):
             exist_okato.guid = item.nsiOkatoData.guid
             exist_okato.change_dt = item.nsiOkatoData.changeDateTime
             exist_okato.start_date_active = item.nsiOkatoData.startDateActive

@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from ...ds.reference import nsiOkved
 from ...model.nsi import NsiOkved
 
@@ -24,8 +26,12 @@ def parse(session, root_obj:nsiOkved, update=True, **kwargs):
                 subsection = subsection
             )
             session.add(new_okved)
+            continue
 
-        if update or (exist_okved and item.nsiOkvedData.changeDateTime > exist_okved.change_dt):
+        exist_chage_dt = exist_okved.change_dt if exist_okved.change_dt else datetime.fromtimestamp(0, tz=timezone.utc)
+        new_chage_dt = item.nsiOkvedData.changeDateTime if item.nsiOkvedData.changeDateTime else datetime.fromtimestamp(0, tz=timezone.utc)
+
+        if update or (new_chage_dt > exist_chage_dt):
             exist_okved.guid = item.nsiOkvedData.guid
             exist_okved.change_dt = item.nsiOkvedData.changeDateTime
             exist_okved.start_date_active = item.nsiOkvedData.startDateActive

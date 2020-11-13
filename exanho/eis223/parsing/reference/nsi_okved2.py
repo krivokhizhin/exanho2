@@ -11,6 +11,7 @@ def parse(session, root_obj:nsiOkved2, update=True, **kwargs):
 
         if exist_okved2 is None:
             new_okved2 = NsiOkved2(
+                guid = item.nsiOkved2Data.guid,
                 change_dt = item.nsiOkved2Data.changeDateTime,
                 start_date_active = item.nsiOkved2Data.startDateActive,
                 end_date_active = item.nsiOkved2Data.endDateActive,
@@ -23,10 +24,11 @@ def parse(session, root_obj:nsiOkved2, update=True, **kwargs):
             session.add(new_okved2)
 
         if update or (exist_okved2 and item.nsiOkved2Data.changeDateTime > exist_okved2.change_dt):
-            exist_okved2.change_dt = item.nsiOkved2Data.changeDateTime,
-            exist_okved2.start_date_active = item.nsiOkved2Data.startDateActive,
-            exist_okved2.end_date_active = item.nsiOkved2Data.endDateActive,
-            exist_okved2.business_status = item.nsiOkved2Data.businessStatus,
+            exist_okved2.guid = item.nsiOkved2Data.guid
+            exist_okved2.change_dt = item.nsiOkved2Data.changeDateTime
+            exist_okved2.start_date_active = item.nsiOkved2Data.startDateActive
+            exist_okved2.end_date_active = item.nsiOkved2Data.endDateActive
+            exist_okved2.business_status = item.nsiOkved2Data.businessStatus
             exist_okved2.name = item.nsiOkved2Data.name
 
         

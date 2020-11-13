@@ -5,6 +5,7 @@ class NsiOkved2(Base):
     __tablename__ = 'nsi_okved2'
     
     id = Column(Integer, primary_key=True)
+    guid = Column(String(36))
     change_dt = Column(DateTime(timezone=True))
     start_date_active = Column(Date)
     end_date_active = Column(Date)

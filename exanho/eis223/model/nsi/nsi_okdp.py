@@ -15,4 +15,4 @@ class NsiOkdp(Base):
     parent_code = Column(String(7))
     section = Column(String(1))
 
-Index('idx_nsi_okpd', NsiOkdp.section, NsiOkdp.parent_code, NsiOkdp.code, unique=True)
+Index('idx_nsi_okdp', NsiOkdp.section, NsiOkdp.parent_code, NsiOkdp.code, unique=True)

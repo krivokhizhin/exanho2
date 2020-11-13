@@ -1,7 +1,7 @@
-from ...ds.reference import nsiOkved2
+from ...ds.reference import nsiOkved
 from ...model.nsi import NsiOkved
 
-def parse(session, root_obj:nsiOkved2, update=True, **kwargs):
+def parse(session, root_obj:nsiOkved, update=True, **kwargs):
     for item in root_obj.body.item:
         section = item.nsiOkvedData.section
         subsection = item.nsiOkvedData.subsection

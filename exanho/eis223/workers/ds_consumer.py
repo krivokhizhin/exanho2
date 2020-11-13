@@ -61,7 +61,7 @@ def work(context:Context, message):
                 while remain_attempt > 0:
 
                     try:
-                        parser(session, root_obj, update, {content_id : content_to_parse.id})                    
+                        parser(session, root_obj, update, **{'content_id' : content_to_parse.id})                    
                         content_to_parse.status = FtpContentStatus.PROCESSED
                         content_to_parse.message = None
                         session.flush()

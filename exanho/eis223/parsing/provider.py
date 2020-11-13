@@ -1,5 +1,5 @@
 from .reference import nsi_okv
 
 parsers = {
-    'content_to_parse.id' : nsi_okv.parse
+    '{http://zakupki.gov.ru/223fz/reference/1}nsiOkv' : nsi_okv.parse
 }

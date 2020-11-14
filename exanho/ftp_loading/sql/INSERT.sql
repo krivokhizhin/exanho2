@@ -1,2 +1,2 @@
 INSERT INTO ftp_load_task (status, location, schedule, scheduled_date, excluded_folders, delimiter)
-VALUES('NEW', '/out/nsi/*', '*', date '2020-11-13' + time '08:00:00', 'agencyRelations|archive|customerRegistry|nsiAgency|nsiClauseType|nsiOkfs|nsiOkogu|nsiOkopf|nsiOkpd2|nsiOktmo|nsiOrganization|nsiProtocol|nsiPurchaseMethod', '|');
+VALUES('NEW', '/out/nsi/*', '*', date '2020-11-13' + time '08:00:00', 'agencyRelations|archive|customerRegistry|nsiAgency|nsiClauseType|nsiOkogu|nsiOkopf|nsiOkpd2|nsiOktmo|nsiOrganization|nsiProtocol|nsiPurchaseMethod', '|');

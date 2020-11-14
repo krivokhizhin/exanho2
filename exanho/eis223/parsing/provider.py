@@ -3,6 +3,7 @@ from .reference import nsi_okdp
 from .reference import nsi_okei
 from .reference import nsi_okfs
 from .reference import nsi_okogu
+from .reference import nsi_okopf
 from .reference import nsi_okv
 from .reference import nsi_okved
 from .reference import nsi_okved2
@@ -13,6 +14,7 @@ parsers = {
     '{http://zakupki.gov.ru/223fz/reference/1}nsiOkei' : nsi_okei.parse,
     '{http://zakupki.gov.ru/223fz/reference/1}nsiOkfs' : nsi_okfs.parse,
     '{http://zakupki.gov.ru/223fz/reference/1}nsiOkogu' : nsi_okogu.parse,
+    '{http://zakupki.gov.ru/223fz/reference/1}nsiOkopf' : nsi_okopf.parse,
     '{http://zakupki.gov.ru/223fz/reference/1}nsiOkv' : nsi_okv.parse,
     '{http://zakupki.gov.ru/223fz/reference/1}nsiOkved' : nsi_okved.parse,
     '{http://zakupki.gov.ru/223fz/reference/1}nsiOkved2' : nsi_okved2.parse

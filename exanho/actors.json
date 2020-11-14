@@ -68,7 +68,7 @@
                         "ftp_user": "fz223free",
                         "ftp_password": "fz223free",
                         "parse_queues":["nsi_1"],
-                        "queue_by_filter":[18],
+                        "queue_by_filter":[20],
                         "parse_filters":[
                             "nsiOkato_all_","nsiOkato_inc_",
                             "nsiOkdp_all_","nsiOkdp_inc_",
@@ -76,6 +76,7 @@
                             "nsiOkfs_all_","nsiOkfs_inc_",
                             "nsiOkogu_all_","nsiOkogu_inc_",
                             "nsiOkopf_all_","nsiOkopf_inc_",
+                            "nsiOkpd2_all_","nsiOkpd2_inc_",
                             "nsiOkv_all_","nsiOkv_inc_",
                             "nsiOkved_all_","nsiOkved_inc_",
                             "nsiOkved2_all_","nsiOkved2_inc_"

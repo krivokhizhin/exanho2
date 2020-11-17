@@ -2,8 +2,6 @@ from sqlalchemy import Boolean, Column, Date, DateTime, ForeignKey, Integer, Str
 from sqlalchemy.orm import relationship
 from exanho.orm.domain import Base
 
-from .fz223types import nsi_org_fz223type_association_table
-
 class NsiOrganization(Base):
     __tablename__ = 'nsi_organization'
     
@@ -19,7 +17,7 @@ class NsiOrganization(Base):
     start_date_active = Column(Date)
     end_date_active = Column(Date)
 
-    customer_id = Column(Integer, ForeignKey('nsi_org_customer.id'), nullable=False, index=True)
+    customer_id = Column(Integer, ForeignKey('nsi_org_customer.id'), nullable=False, index=True, unique=True)
     customer = relationship('NsiOrgCustomer', back_populates='org') 
 
     status = Column(String(20), nullable=False)
@@ -39,8 +37,7 @@ class NsiOrganization(Base):
 
     okved_list = relationship('NsiOrgOkvedActivitiy', back_populates='org', cascade='all, delete-orphan')
     okved2_list = relationship('NsiOrgOkved2Activitiy', back_populates='org', cascade='all, delete-orphan')
-
-    fz223types = relationship('NsiOrgFz223type', secondary=nsi_org_fz223type_association_table)
+    fz223types = relationship('NsiOrgFz223typeAs', back_populates='org', cascade='all, delete-orphan')
 
     time_zone_offset = Column(Integer, nullable=False)
     time_zone_name = Column(String(100), nullable=False)

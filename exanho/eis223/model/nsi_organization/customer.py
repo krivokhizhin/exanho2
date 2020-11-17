@@ -7,7 +7,7 @@ class NsiOrgCustomer(Base):
     
     id = Column(Integer, primary_key=True)
 
-    org = relationship('NsiOrganization', uselist=False, back_populates='customer')
+    org = relationship('NsiOrganization', uselist=False, back_populates='customer', cascade='all, delete-orphan')
 
     full_name = Column(String(1000))
     short_name = Column(String(500))
@@ -25,7 +25,7 @@ class NsiOrgCustomer(Base):
 
     okato = Column(String(20))
     okopf = Column(String(10))
-    okopfName = Column(String(200))
+    okopf_name = Column(String(200))
     okpo = Column(String(10))
 
     reg_date = Column(DateTime(timezone=True))

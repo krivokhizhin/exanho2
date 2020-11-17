@@ -8,11 +8,11 @@ def run():
 
     # ds_mod = importlib.import_module('exanho.eis223.ds.reference')
     import exanho.eis223.ds.reference as ds_mod
-    f = open('/home/kks/projects/eis223DS/nsiOkv_all_20201108_021309_001.xml', 'br')
+    f = open('/home/kks/projects/eis223DS/nsiOrganization/nsiOrganization_all_20201115_010000_001.xml/nsiOrganization_all_20201115_010000_001.xml', 'br')
     f_str = f.read()
     rootObj = ds_mod.parseString(f_str)
 
-    from exanho.eis223.parsing.reference.nsi_okv import parse as ds_parse
+    from exanho.eis223.parsing.reference.nsi_organization import parse as ds_parse
     with d.session_scope() as session:
         ds_parse(session, rootObj, False)
 

@@ -12,21 +12,42 @@
         ],
         "joinable_queues": [
             {
-                "name": "nsi_1",
+                "name": "nsi_common",
+                "maxsize": 100
+            },
+            {
+                "name": "nsi_organization",
                 "maxsize": 100
             }
         ]
     },
     "exanho_actors": [
         {
-            "name": "Nsi1QueueHandlerWorker",
+            "name": "NsiCommonQHWorker",
             "kind": "QueueWorker",
             "daemon": true,
             "workers": [
                 {
                     "module": "exanho.eis223.workers.ds_consumer",
                     "db_key": "eis223_test",
-                    "queue_name": "nsi_1",
+                    "queue_name": "nsi_common",
+                    "appsettings":{
+                        "data_structure_module": "exanho.eis223.ds.reference",
+                        "error_attempts": 2,
+                        "update": false
+                    }
+                }
+            ]
+        },
+        {
+            "name": "NsiOrgQHWorker",
+            "kind": "QueueWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.eis223.workers.ds_consumer",
+                    "db_key": "eis223_test",
+                    "queue_name": "nsi_organization",
                     "appsettings":{
                         "data_structure_module": "exanho.eis223.ds.reference",
                         "error_attempts": 2,
@@ -67,8 +88,8 @@
                         "ftp_port": 21,
                         "ftp_user": "fz223free",
                         "ftp_password": "fz223free",
-                        "parse_queues":["nsi_1"],
-                        "queue_by_filter":[22],
+                        "parse_queues":["nsi_common", "nsi_organization"],
+                        "queue_by_filter":[22, 1],
                         "parse_filters":[
                             "nsiOkato_all_","nsiOkato_inc_",
                             "nsiOkdp_all_","nsiOkdp_inc_",
@@ -80,7 +101,9 @@
                             "nsiOktmo_all_","nsiOktmo_inc_",
                             "nsiOkv_all_","nsiOkv_inc_",
                             "nsiOkved_all_","nsiOkved_inc_",
-                            "nsiOkved2_all_","nsiOkved2_inc_"
+                            "nsiOkved2_all_","nsiOkved2_inc_",
+
+                            "nsiOrganization_all_"
                         ],
                         "max_mem_level": 0.8,
                         "with_swap": false,

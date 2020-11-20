@@ -89,7 +89,7 @@
                         "ftp_user": "fz223free",
                         "ftp_password": "fz223free",
                         "parse_queues":["nsi_common", "nsi_organization"],
-                        "queue_by_filter":[22, 1],
+                        "queue_by_filter":[22, 2],
                         "parse_filters":[
                             "nsiOkato_all_","nsiOkato_inc_",
                             "nsiOkdp_all_","nsiOkdp_inc_",
@@ -103,7 +103,7 @@
                             "nsiOkved_all_","nsiOkved_inc_",
                             "nsiOkved2_all_","nsiOkved2_inc_",
 
-                            "nsiOrganization_all_"
+                            "nsiOrganization_all_", "nsiOrganization_inc_"
                         ],
                         "max_mem_level": 0.8,
                         "with_swap": false,

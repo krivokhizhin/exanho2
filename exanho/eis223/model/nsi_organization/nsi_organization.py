@@ -20,12 +20,12 @@ class NsiOrganization(Base):
     customer_id = Column(Integer, ForeignKey('nsi_org_customer.id'), nullable=False, index=True, unique=True)
     customer = relationship('NsiOrgCustomer', back_populates='org') 
 
-    status = Column(String(20), nullable=False)
-    okfs = Column(String(10), nullable=False)
-    okopf = Column(String(10), nullable=False)
-    okato = Column(String(20), nullable=False)
-    oktmo = Column(String(20), nullable=False)
-    okpo = Column(String(20), nullable=False)
+    status = Column(String(20))
+    okfs = Column(String(10))
+    okopf = Column(String(10))
+    okato = Column(String(20))
+    oktmo = Column(String(20))
+    okpo = Column(String(20))
 
     spz_code = Column(String(255))
     pgmu_code = Column(String(255))
@@ -35,12 +35,12 @@ class NsiOrganization(Base):
     ppo_code = Column(String(20))
     ppo_name = Column(String(2000))
 
-    okved_list = relationship('NsiOrgOkvedActivitiy', back_populates='org', cascade='all, delete-orphan')
-    okved2_list = relationship('NsiOrgOkved2Activitiy', back_populates='org', cascade='all, delete-orphan')
+    okved_list = relationship('NsiOrgOkvedActivity', back_populates='org', cascade='all, delete-orphan')
+    okved2_list = relationship('NsiOrgOkved2Activity', back_populates='org', cascade='all, delete-orphan')
     fz223types = relationship('NsiOrgFz223typeAs', back_populates='org', cascade='all, delete-orphan')
 
-    time_zone_offset = Column(Integer, nullable=False)
-    time_zone_name = Column(String(100), nullable=False)
+    time_zone_offset = Column(Integer)
+    time_zone_name = Column(String(100))
 
     is_detached_department = Column(Boolean, default=False)
 

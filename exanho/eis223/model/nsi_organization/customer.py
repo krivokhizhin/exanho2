@@ -13,9 +13,9 @@ class NsiOrgCustomer(Base):
     short_name = Column(String(500))
     iko = Column(String(30))
 
-    inn = Column(String(20), nullable=False)
-    kpp = Column(String(20), nullable=False)
-    ogrn = Column(String(20), nullable=False)
+    inn = Column(String(20), nullable=False, default='')
+    kpp = Column(String(20), nullable=False, default='')
+    ogrn = Column(String(20), nullable=False, default='')
 
     legal_address = Column(String(2000))
     postal_address = Column(String(2000))
@@ -35,5 +35,5 @@ class NsiOrgCustomer(Base):
     assessed_compliance = Column(Boolean)
     monitored_compliance = Column(Boolean)
 
-Index('idx_nsi_org_customer_inn_kpp', NsiOrgCustomer.inn, NsiOrgCustomer.kpp, unique=True)
-Index('idx_nsi_org_customer_ogrn_inn', NsiOrgCustomer.ogrn, NsiOrgCustomer.inn, unique=True)
+Index('idx_nsi_org_customer_ogrn_inn_kpp', NsiOrgCustomer.ogrn, NsiOrgCustomer.inn, NsiOrgCustomer.kpp, unique=True)
+Index('idx_nsi_org_customer_inn_kpp_orgn', NsiOrgCustomer.inn, NsiOrgCustomer.kpp, NsiOrgCustomer.ogrn, unique=True)

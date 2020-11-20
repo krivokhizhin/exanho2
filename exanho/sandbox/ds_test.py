@@ -8,7 +8,7 @@ def run():
 
     # ds_mod = importlib.import_module('exanho.eis223.ds.reference')
     import exanho.eis223.ds.reference as ds_mod
-    f = open('/home/kks/projects/eis223DS/nsiOrganization/nsiOrganization_all_20201115_010000_001.xml/nsiOrganization_all_20201115_010000_001.xml', 'br')
+    f = open('/home/kks/projects/eis223DS/nsiOrganization/daily/nsiOrganization_inc_20200414_000000_001.xml', 'br')
     f_str = f.read()
     rootObj = ds_mod.parseString(f_str)
 

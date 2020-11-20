@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Date, DateTime, Index, Integer, String
-from sqlalchemy.orm import relationship
 from exanho.orm.domain import Base
 
 class NsiOkved(Base):
@@ -16,8 +15,6 @@ class NsiOkved(Base):
     parent_code = Column(String(10))
     section = Column(String(1), nullable=False)
     subsection = Column(String(2))
-
-    org_list = relationship('NsiOrgOkvedActivitiy', back_populates='okved', cascade='all, delete-orphan')
 
 Index('idx_nsi_okved_code', NsiOkved.code, NsiOkved.business_status, unique=True)
 Index('idx_nsi_okved', NsiOkved.subsection, NsiOkved.section, NsiOkved.parent_code, NsiOkved.code, unique=True)

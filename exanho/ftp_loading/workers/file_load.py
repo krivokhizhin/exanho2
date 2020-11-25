@@ -84,7 +84,7 @@ def initialize(appsettings, exanho_context:ExanhoContext):
     return context
 
 def work(context:Context):
-    log.debug('file_load in work')
+    # log.debug('file_load in work')
 
     try:
         while True:

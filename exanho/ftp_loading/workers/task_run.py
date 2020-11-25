@@ -41,7 +41,7 @@ def initialize(appsettings, exanho_context:ExanhoContext):
     return context
 
 def work(context:Context):
-    log.debug('task_run in work')
+    # log.debug('task_run in work')
 
     try:        
         with Sessional.domain.session_scope() as session:

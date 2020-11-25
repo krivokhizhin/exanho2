@@ -1,3 +1,4 @@
+from enum import unique
 from sqlalchemy import BigInteger, Boolean, Column, Date, DateTime, Index, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship
 from exanho.orm.domain import Base
@@ -18,8 +19,12 @@ class NsiPurchaseMethod(Base):
     order_number = Column(Integer, nullable=False)
     is_electronic = Column(Boolean, default=False)
 
-    creator_id = Column(Integer, ForeignKey('nsi_org_customer.id'))
-    creator = relationship('NsiOrgCustomer')
+    # creator_id = Column(Integer, ForeignKey('nsi_org_customer.id'))
+    # creator = relationship('NsiOrgCustomer')
+
+    creator_inn = Column(String(20))
+    creator_kpp = Column(String(20))
+    creator_ogrn = Column(String(20))
 
     extended = Column(Boolean)
     competitive = Column(Boolean)
@@ -30,7 +35,9 @@ class NsiPurchaseMethod(Base):
     protocols = relationship('NsiPurchMethodProtocolAs', back_populates='method', cascade='all, delete-orphan')
     phases = relationship('NsiPurchMethodPhaseAs', back_populates='method', cascade='all, delete-orphan')
 
-    hasPhases = Column(Boolean, nullable=False)
+    has_phases = Column(Boolean, nullable=False)
     typal = Column(Boolean, nullable=False)
-    typalKind = Column(String(10))
-    lotOriented = Column(Boolean, nullable=False)
+    typal_kind = Column(String(10))
+    lot_oriented = Column(Boolean, nullable=False)
+
+Index('idx_purch_method_code', NsiPurchaseMethod.parent_code, NsiPurchaseMethod.code, unique=True)

@@ -18,6 +18,10 @@
             {
                 "name": "nsi_organization",
                 "maxsize": 100
+            },
+            {
+                "name": "nsi_purchase_method",
+                "maxsize": 100
             }
         ]
     },
@@ -48,6 +52,23 @@
                     "module": "exanho.eis223.workers.ds_consumer",
                     "db_key": "eis223_test",
                     "queue_name": "nsi_organization",
+                    "appsettings":{
+                        "data_structure_module": "exanho.eis223.ds.reference",
+                        "error_attempts": 2,
+                        "update": false
+                    }
+                }
+            ]
+        },
+        {
+            "name": "NsiPurchMethodQHWorker",
+            "kind": "QueueWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.eis223.workers.ds_consumer",
+                    "db_key": "eis223_test",
+                    "queue_name": "nsi_purchase_method",
                     "appsettings":{
                         "data_structure_module": "exanho.eis223.ds.reference",
                         "error_attempts": 2,

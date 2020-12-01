@@ -13,7 +13,7 @@ class NsiTableColumnTemplate(Base):
     length = Column(String(21))
     mandatory = Column(Boolean, nullable=False)
     integr_code = Column(String(50), nullable=False)
-    info = Column(String(400), nullable=False)
+    info = Column(String(400))
 
     table_id = Column(Integer, ForeignKey('nsi_template_table.id'))
     table = relationship('NsiTableTemplate', back_populates='columns')

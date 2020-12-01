@@ -7,7 +7,7 @@ class NsiTableTemplate(Base):
     
     id = Column(Integer, primary_key=True)
 
-    long_id = Column(BigInteger, nullable=False)
+    long_id = Column(BigInteger, nullable=False, index=True, unique=True)
     name = Column(String(100), nullable=False)
 
     fixed_columns_data = relationship('NsiTableTemplateFixedColumnData', back_populates='table', cascade='all, delete-orphan')

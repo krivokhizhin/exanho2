@@ -12,4 +12,4 @@ class NsiPurchaseProtocol(Base):
     methods = relationship('NsiPurchMethodProtocolAs', back_populates='protocol', cascade='all, delete-orphan')
     phases = relationship('NsiPurchPhaseProtocolAs', back_populates='protocol', cascade='all, delete-orphan')
 
-Index('idx_purch_protocol', NsiPurchaseProtocol.code)
+Index('idx_purch_protocol', NsiPurchaseProtocol.code, unique=True)

@@ -10,6 +10,7 @@ from .reference import nsi_okv
 from .reference import nsi_okved
 from .reference import nsi_okved2
 from .reference import nsi_organization
+from .reference import nsi_purchase_method
 
 parsers = {
     '{http://zakupki.gov.ru/223fz/reference/1}nsiOkato' : nsi_okato.parse,
@@ -23,5 +24,6 @@ parsers = {
     '{http://zakupki.gov.ru/223fz/reference/1}nsiOkv' : nsi_okv.parse,
     '{http://zakupki.gov.ru/223fz/reference/1}nsiOkved' : nsi_okved.parse,
     '{http://zakupki.gov.ru/223fz/reference/1}nsiOkved2' : nsi_okved2.parse,
-    '{http://zakupki.gov.ru/223fz/reference/1}nsiOrganization' : nsi_organization.parse
+    '{http://zakupki.gov.ru/223fz/reference/1}nsiOrganization' : nsi_organization.parse,
+    '{http://zakupki.gov.ru/223fz/reference/1}nsiPurchaseMethod' : nsi_purchase_method.parse
 }

@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Boolean, Column, Date, DateTime, Index, Integer, ForeignKey, String
+from sqlalchemy import BigInteger, Boolean, Column, Date, DateTime, Index, Integer, String
 from sqlalchemy.orm import relationship
 from exanho.orm.domain import Base
 
@@ -36,6 +36,6 @@ class NsiPurchaseMethod(Base):
     typal_kind = Column(String(10))
     lot_oriented = Column(Boolean, nullable=False)
 
-Index('idx_purch_method_code', NsiPurchaseMethod.parent_code, NsiPurchaseMethod.code, unique=True)
-Index('idx_purch_method_ogrn_inn_kpp', NsiPurchaseMethod.ogrn, NsiPurchaseMethod.inn, NsiPurchaseMethod.kpp)
-Index('idx_purch_method_inn_kpp_orgn', NsiPurchaseMethod.inn, NsiPurchaseMethod.kpp, NsiPurchaseMethod.ogrn)
+Index('idx_purch_method_code', NsiPurchaseMethod.code, unique=True)
+Index('idx_purch_method_ogrn_inn_kpp', NsiPurchaseMethod.creator_ogrn, NsiPurchaseMethod.creator_inn, NsiPurchaseMethod.creator_kpp)
+Index('idx_purch_method_inn_kpp_orgn', NsiPurchaseMethod.creator_inn, NsiPurchaseMethod.creator_kpp, NsiPurchaseMethod.creator_ogrn)

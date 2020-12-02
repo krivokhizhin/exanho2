@@ -7,3 +7,6 @@ DROP TABLE nsi_purch_method_template_association CASCADE;
 DROP TABLE nsi_purch_method_protocol_association CASCADE;
 DROP TABLE nsi_purchase_protocol CASCADE;
 DROP TABLE nsi_purchase_method CASCADE;
+
+DROP TABLE nsi_template_field_notice CASCADE;
+DROP TABLE nsi_template_notice CASCADE;

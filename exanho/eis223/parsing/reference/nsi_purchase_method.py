@@ -18,8 +18,7 @@ def parse(session, root_obj:nsiPurchaseMethod, update=True, **kwargs):
 def parse_purchase_method(session, method_obj:nsiPurchaseMethodDataType, update=True):
     
     code = method_obj.code
-    parent_code = method_obj.parentCode
-    exist_method = session.query(NsiPurchaseMethod).filter(NsiPurchaseMethod.parent_code == parent_code, NsiPurchaseMethod.code == code).one_or_none()
+    exist_method = session.query(NsiPurchaseMethod).filter(NsiPurchaseMethod.code == code).one_or_none()
 
     if exist_method is None:
         new_method = NsiPurchaseMethod(
@@ -31,7 +30,7 @@ def parse_purchase_method(session, method_obj:nsiPurchaseMethodDataType, update=
             business_status = method_obj.businessStatus,
             code = code,
             name = method_obj.name,
-            parent_code = parent_code,
+            parent_code = method_obj.parentCode,
             order_number = method_obj.orderNumber,
             is_electronic = False if method_obj.isElectronic is None else method_obj.isElectronic,
 
@@ -66,6 +65,7 @@ def parse_purchase_method(session, method_obj:nsiPurchaseMethodDataType, update=
             exist_method.end_date_active = method_obj.endDateActive
             exist_method.business_status = method_obj.businessStatus
             exist_method.name = method_obj.name
+            exist_method.parent_code = method_obj.parentCode
             exist_method.order_number = method_obj.orderNumber
             exist_method.is_electronic = False if method_obj.isElectronic is None else method_obj.isElectronic
 

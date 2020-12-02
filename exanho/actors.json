@@ -21,7 +21,7 @@
             },
             {
                 "name": "nsi_purchase_method",
-                "maxsize": 100
+                "maxsize": 200
             }
         ]
     },

@@ -1,8 +1,7 @@
 from datetime import datetime, timezone
-from exanho.orm.domain import validate
 
-from ...ds.reference import nsiPurchaseMethod, nsiPurchaseMethodDataType, protocolListType, purchasePhaseListType, templatesType29, noticeTemplateType, noticeTemplateFieldType, templateTableType, purchaseProtocol, purchasePhase, phaseTransitionsListType, phaseTransition, templateTableColumnType
-from ...model.nsi_template import *
+from ...ds.reference import nsiPurchaseMethod, nsiPurchaseMethodDataType, protocolListType, purchasePhaseListType, templatesType29, noticeTemplateType, noticeTemplateFieldType, purchaseProtocol, purchasePhase, phaseTransitionsListType, phaseTransition
+from .nsi_template import get_template, fill_template, fill_field_template
 from ...model.nsi_purchase_method import *
 
 NOT_VALIDATE_VALUE = '???'
@@ -23,8 +22,8 @@ def parse_purchase_method(session, method_obj:nsiPurchaseMethodDataType, update=
     if exist_method is None:
         new_method = NsiPurchaseMethod(
             guid = method_obj.guid,
-            create_dt = method_obj.changeDateTime,
-            change_dt = method_obj.createDateTime,
+            create_dt = method_obj.createDateTime,
+            change_dt = method_obj.changeDateTime,
             start_date_active = method_obj.startDateActive,
             end_date_active = method_obj.endDateActive,
             business_status = method_obj.businessStatus,
@@ -54,13 +53,13 @@ def parse_purchase_method(session, method_obj:nsiPurchaseMethodDataType, update=
         fill_protocols(session, new_method, method_obj.protocols, get_protocol_association)
         fill_phases(session, new_method, method_obj.phases)
     else:
-        exist_change_dt = exist_method.change_dt if exist_method.change_dt else exist_method.fromtimestamp(0, tz=timezone.utc)
+        exist_change_dt = exist_method.change_dt if exist_method.change_dt else datetime.fromtimestamp(0, tz=timezone.utc)
         new_change_dt = method_obj.changeDateTime if method_obj.changeDateTime else datetime.fromtimestamp(0, tz=timezone.utc)
 
         if update or (new_change_dt > exist_change_dt):
             exist_method.guid = method_obj.guid
-            exist_method.create_dt = method_obj.changeDateTime
-            exist_method.change_dt = method_obj.createDateTime
+            exist_method.create_dt = method_obj.createDateTime
+            exist_method.change_dt = method_obj.changeDateTime
             exist_method.start_date_active = method_obj.startDateActive
             exist_method.end_date_active = method_obj.endDateActive
             exist_method.business_status = method_obj.businessStatus
@@ -101,20 +100,14 @@ def get_template_association(session, template_obj:noticeTemplateType):
     if template_obj is None:
         return None
 
-    long_id = template_obj.id
-    parent_id = template_obj.parent
-    template = session.query(NsiTemplateBase).filter(NsiTemplateBase.parent_long_id == parent_id, NsiTemplateBase.long_id == long_id).one_or_none()
+    template = get_template(session, NsiNoticeTemplate, 'notice', template_obj.id)
 
     if template is None:
-        template = NsiNoticeTemplate(
-            long_id = long_id,
-            parent_long_id = parent_id,
-            status = template_obj.status,
-            version = template_obj.version,
+        template = NsiNoticeTemplate()
+        fill_template(session, template, template_obj)
 
-            copy_of_type = template_obj.copyOfType if template_obj.copyOfType and template_obj.validate_templateExtendPurchaseTypes(template_obj.copyOfType) else NOT_VALIDATE_VALUE,
-            hidden_fields = template_obj.hiddenFields if template_obj.hiddenFields and template_obj.validate_hiddenFieldsType(template_obj.hiddenFields) else NOT_VALIDATE_VALUE
-        )
+        template.copy_of_type = template_obj.copyOfType if template_obj.copyOfType and template_obj.validate_templateExtendPurchaseTypes(template_obj.copyOfType) else NOT_VALIDATE_VALUE
+        template.hidden_fields = template_obj.hiddenFields if template_obj.hiddenFields and template_obj.validate_hiddenFieldsType(template_obj.hiddenFields) else NOT_VALIDATE_VALUE
 
         if template_obj.fields:
             for field_obj in template_obj.fields.field:
@@ -127,87 +120,17 @@ def get_template_association(session, template_obj:noticeTemplateType):
 
     return template_as
 
-def get_notice_field(session, fields_obj:noticeTemplateFieldType):
-    if fields_obj is None:
+def get_notice_field(session, field_template_obj:noticeTemplateFieldType):
+    if field_template_obj is None:
         return None
 
-    field = NsiNoticeFieldTemplate(
-        long_id = fields_obj.id,
-        name = fields_obj.name,
-        extend_type = fields_obj.type_,
-        length = fields_obj.length,
-        mandatory = fields_obj.mandatory,
+    field_template = NsiNoticeFieldTemplate()
+    fill_field_template(session, field_template, field_template_obj)
 
-        tab_ordinal = fields_obj.position.tabOrdinal,
-        tab_name = fields_obj.position.tabName,
-        section_ordinal = fields_obj.position.sectionOrdinal,
-        section_name = fields_obj.position.sectionName,
+    field_template.tab_level = field_template_obj.tabLevel
+    field_template.is_base_field = field_template_obj.isBaseField
 
-        info = fields_obj.typeInfo,
-        integr_code = fields_obj.integrCode,
-        index_number = fields_obj.indexNumber,
-        code = fields_obj.code,
-
-        tab_level = fields_obj.tabLevel,
-        is_base_field = fields_obj.isBaseField
-    )
-
-    field.table_type = get_table_type(session, fields_obj.tableType)
-
-    return field
-
-def get_table_type(session, template_table_obj:templateTableType):
-    if template_table_obj is None:
-        return None
-
-    long_id = template_table_obj.id
-    table = session.query(NsiTableTemplate).filter(NsiTableTemplate.long_id == long_id).one_or_none()
-
-    if table is None:
-        table = NsiTableTemplate(
-            long_id = long_id,
-            name = template_table_obj.name
-        )
-
-        if template_table_obj.fixedColumnsData:
-            for fixed_column_data_obj in template_table_obj.fixedColumnsData.colValue:
-                fixed_column_data = get_table_fixed_column_data(session, fixed_column_data_obj)
-                if fixed_column_data:
-                    table.fixed_columns_data.append(fixed_column_data)
-
-        if template_table_obj.columns:
-            for column_obj in template_table_obj.columns.column:
-                column = get_table_column(session, column_obj)
-                if column:
-                    table.columns.append(column)
-
-    return table
-
-def get_table_fixed_column_data(session, fixed_column_data_obj:str):
-    if fixed_column_data_obj is None:
-        return None
-        
-    fixed_column_data = NsiTableTemplateFixedColumnData(
-        value = fixed_column_data_obj
-    )
-
-    return fixed_column_data
-
-def get_table_column(session, column_obj:templateTableColumnType):
-    if column_obj is None:
-        return None
-
-    column = NsiTableColumnTemplate(
-        index = column_obj.colIndex,
-        name = column_obj.colName,
-        extend_type = column_obj.colType,
-        length = column_obj.colLength,
-        mandatory = column_obj.colMandatory,
-        integr_code = column_obj.integrCode,
-        info = column_obj.typeInfo
-    )
-
-    return column
+    return field_template
 
 def fill_protocols(session, owner, protocols_obj:protocolListType, get_association:callable):
     owner.protocols = []

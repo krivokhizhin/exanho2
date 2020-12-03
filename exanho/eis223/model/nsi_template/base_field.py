@@ -30,4 +30,4 @@ class NsiFieldTemplateBase(Base):
 
     __mapper_args__ = {'polymorphic_on': discriminator}
 
-Index('idx_nsi_template_field_tab_section', NsiFieldTemplateBase.tab_ordinal, NsiFieldTemplateBase.section_ordinal)
+Index('idx_nsi_template_discriminator_id', NsiFieldTemplateBase.discriminator, NsiFieldTemplateBase.long_id)

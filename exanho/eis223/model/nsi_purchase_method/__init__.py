@@ -1,3 +1,6 @@
+from .template_notice import NsiNoticeTemplate
+from .template_notice_field import NsiNoticeFieldTemplate
+
 from .method import NsiPurchaseMethod
 from .method_template_as import NsiPurchMethodTemplateAs
 from .protocol import NsiPurchaseProtocol

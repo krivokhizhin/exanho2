@@ -14,4 +14,4 @@ class NsiTemplateBase(Base):
 
     __mapper_args__ = {'polymorphic_on': discriminator}
 
-Index('idx_purch_template_id', NsiTemplateBase.parent_long_id, NsiTemplateBase.long_id, unique=True)
+Index('idx_purch_template_id', NsiTemplateBase.discriminator, NsiTemplateBase.long_id, unique=True)

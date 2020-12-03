@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from .base import NsiTemplateBase
+from .. import NsiTemplateBase
 
 class NsiNoticeTemplate(NsiTemplateBase):
     __tablename__ = 'nsi_template_notice'

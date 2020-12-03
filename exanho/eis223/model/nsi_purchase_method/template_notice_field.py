@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from .base_field import NsiFieldTemplateBase
+from .. import NsiFieldTemplateBase
 
 class NsiNoticeFieldTemplate(NsiFieldTemplateBase):
     __tablename__ = 'nsi_template_field_notice'

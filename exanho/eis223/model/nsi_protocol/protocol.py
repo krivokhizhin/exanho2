@@ -20,7 +20,7 @@ class NsiProtocol(Base):
 
     extended = Column(Boolean)
 
-    templates = relationship('NsiPurchMethodTemplateAs', back_populates='template', cascade='all, delete-orphan')
+    templates = relationship('NsiProtocolTemplateAs', back_populates='protocol', cascade='all, delete-orphan')
 
     protocol_kind = Column(String(20))
     lot_oriented = Column(Boolean, nullable=False)

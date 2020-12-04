@@ -12,7 +12,7 @@ class NsiProtocol(Base):
     start_date_active = Column(Date)
     end_date_active = Column(Date)
     business_status = Column(String(10), nullable=False)
-    code = Column(BigInteger, nullable=False)
+    code = Column(BigInteger, nullable=False, index=True, unique=True)
     name = Column(String(2000), nullable=False)
     order_number = Column(Integer, nullable=False)
 
@@ -24,5 +24,3 @@ class NsiProtocol(Base):
 
     protocol_kind = Column(String(20))
     lot_oriented = Column(Boolean, nullable=False)
-
-Index('idx_nsi_protocol_code', NsiProtocol.code, unique=True)

@@ -47,7 +47,6 @@ def get_table_type(session, template_table_obj:templateTableType):
         )
         
         session.add(table)
-        session.flush()
 
         if template_table_obj.fixedColumnsData:
             for fixed_column_data_obj in template_table_obj.fixedColumnsData.colValue:

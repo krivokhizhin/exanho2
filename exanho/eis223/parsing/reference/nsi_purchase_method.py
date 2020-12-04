@@ -148,17 +148,14 @@ def get_protocol_association(session, owner:NsiPurchaseMethod, protocol_obj:purc
 
     code = protocol_obj.code
 
-    protocol = [p_as.protocol for p_as in owner.protocols if p_as.protocol.code == code]
-    if protocol:
-        protocol = protocol[0]
-    else:
-        protocol = session.query(NsiPurchaseProtocol).filter(NsiPurchaseProtocol.code == code).one_or_none()
+    protocol = session.query(NsiPurchaseProtocol).filter(NsiPurchaseProtocol.code == code).one_or_none()
 
     if protocol is None:
         protocol = NsiPurchaseProtocol(
             code = code,
             name = protocol_obj.name
         )
+        session.add(protocol)
 
     protocol_as = NsiPurchMethodProtocolAs()
     protocol_as.protocol = protocol
@@ -181,11 +178,7 @@ def get_phase_association(session, owner:NsiPurchaseMethod, phase_obj:purchasePh
 
     code = phase_obj.code
 
-    phase = [p_as.phase for p_as in owner.phases if p_as.phase.code == code]
-    if phase:
-        phase = phase[0]
-    else:
-        phase = session.query(NsiPurchasePhase).filter(NsiPurchasePhase.code == code).one_or_none()
+    phase = session.query(NsiPurchasePhase).filter(NsiPurchasePhase.code == code).one_or_none()
 
     if phase is None:
         phase = NsiPurchasePhase(
@@ -195,6 +188,7 @@ def get_phase_association(session, owner:NsiPurchaseMethod, phase_obj:purchasePh
             edit_enabled = phase_obj.editEnabled,
             protocol_controlled_order = None if phase_obj.protocols is None else phase_obj.protocols.controlledOrder
         )
+        session.add(phase)
 
         fill_protocols(session, phase, phase_obj.protocols, get_phase_protocol_association)
         fill_phase_transitions(session, phase, phase_obj.phaseTransitions)
@@ -210,17 +204,14 @@ def get_phase_protocol_association(session, owner:NsiPurchasePhase, protocol_obj
 
     code = protocol_obj.code
 
-    protocol = [p_as.protocol for p_as in owner.protocols if p_as.protocol.code == code]
-    if protocol:
-        protocol = protocol[0]
-    else:
-        protocol = session.query(NsiPurchaseProtocol).filter(NsiPurchaseProtocol.code == code).one_or_none()
+    protocol = session.query(NsiPurchaseProtocol).filter(NsiPurchaseProtocol.code == code).one_or_none()
 
     if protocol is None:
         protocol = NsiPurchaseProtocol(
             code = code,
             name = protocol_obj.name
         )
+        session.add(protocol)
 
     protocol_as = NsiPurchPhaseProtocolAs()
     protocol_as.protocol = protocol
@@ -244,17 +235,14 @@ def get_transition_association(session, owner:NsiPurchasePhase, transition_obj:p
     protocol_code = transition_obj.protocolCode
     phase_code = transition_obj.phaseCode
 
-    transition = [t_as.transition for t_as in owner.transitions if t_as.transition.protocol_code == protocol_code and t_as.transition.phase_code == phase_code]
-    if transition:
-        transition = transition[0]
-    else:
-        transition = session.query(NsiPurchasePhaseTransition).filter(NsiPurchasePhaseTransition.protocol_code == protocol_code, NsiPurchasePhaseTransition.phase_code == phase_code).one_or_none()
+    transition = session.query(NsiPurchasePhaseTransition).filter(NsiPurchasePhaseTransition.protocol_code == protocol_code, NsiPurchasePhaseTransition.phase_code == phase_code).one_or_none()
 
     if transition is None:
         transition = NsiPurchasePhaseTransition(
             protocol_code = protocol_code,
             phase_code = phase_code
         )
+        session.add(transition)
 
     transition_as = NsiPurchPhaseTransitionAs()
     transition_as.transition = transition

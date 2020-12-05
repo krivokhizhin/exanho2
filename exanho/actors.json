@@ -13,7 +13,7 @@
         "joinable_queues": [
             {
                 "name": "nsi_common",
-                "maxsize": 100
+                "maxsize": 200
             },
             {
                 "name": "nsi_organization",
@@ -21,10 +21,6 @@
             },
             {
                 "name": "nsi_purchase_method",
-                "maxsize": 200
-            },
-            {
-                "name": "nsi_template",
                 "maxsize": 200
             }
         ]
@@ -82,23 +78,6 @@
             ]
         },
         {
-            "name": "NsiProtocolQHWorker",
-            "kind": "QueueWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.eis223.workers.ds_consumer",
-                    "db_key": "eis223_test",
-                    "queue_name": "nsi_template",
-                    "appsettings":{
-                        "data_structure_module": "exanho.eis223.ds.reference",
-                        "error_attempts": 2,
-                        "update": false
-                    }
-                }
-            ]
-        },
-        {
             "name": "RunFtpTaskWorker",
             "kind": "SleepWorker",
             "daemon": true,
@@ -130,8 +109,8 @@
                         "ftp_port": 21,
                         "ftp_user": "fz223free",
                         "ftp_password": "fz223free",
-                        "parse_queues":["nsi_common", "nsi_organization", "nsi_template", "nsi_purchase_method"],
-                        "queue_by_filter":[22, 2, 4, 2],
+                        "parse_queues":["nsi_common", "nsi_organization", "nsi_purchase_method"],
+                        "queue_by_filter":[26, 2, 2],
                         "parse_filters":[
                             "nsiOkato_all_","nsiOkato_inc_",
                             "nsiOkdp_all_","nsiOkdp_inc_",
@@ -144,11 +123,10 @@
                             "nsiOkv_all_","nsiOkv_inc_",
                             "nsiOkved_all_","nsiOkved_inc_",
                             "nsiOkved2_all_","nsiOkved2_inc_",
-
-                            "nsiOrganization_all_", "nsiOrganization_inc_",
-
                             "nsiClauseType_all_", "nsiClauseType_inc_",
                             "nsiProtocol_all_", "nsiProtocol_inc_",
+
+                            "nsiOrganization_all_", "nsiOrganization_inc_",
 
                             "nsiPurchaseMethod_all_", "nsiPurchaseMethod_inc_"
                         ],

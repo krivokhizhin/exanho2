@@ -91,19 +91,22 @@ def get_template_association(session, template_obj:protocolTemplateType):
 
     if template is None:
         template = NsiProtocolTemplate()
-        fill_template(session, template, template_obj)
+        session.add(template)
 
-        template.hide_comm_decision = template_obj.blocks.hideCommDecision
-        template.hide_comm_decision_access = template_obj.blocks.hideCommDecisionAccess
-        template.hide_comm_decision_result = template_obj.blocks.hideCommDecisionResult
-        template.hide_procedure = template_obj.blocks.hideProcedure
-        template.hide_cancellation = template_obj.blocks.hideCancellation
+    fill_template(session, template, template_obj)
+    template.fields = []
 
-        if template_obj.fields:
-            for field_template_obj in template_obj.fields.field:
-                field_template = get_protocol_field(session, field_template_obj)
-                if field_template:
-                    template.fields.append(field_template)
+    template.hide_comm_decision = template_obj.blocks.hideCommDecision
+    template.hide_comm_decision_access = template_obj.blocks.hideCommDecisionAccess
+    template.hide_comm_decision_result = template_obj.blocks.hideCommDecisionResult
+    template.hide_procedure = template_obj.blocks.hideProcedure
+    template.hide_cancellation = template_obj.blocks.hideCancellation
+
+    if template_obj.fields:
+        for field_template_obj in template_obj.fields.field:
+            field_template = get_protocol_field(session, field_template_obj)
+            if field_template:
+                template.fields.append(field_template)
 
     template_as = NsiProtocolTemplateAs()
     template_as.template = template

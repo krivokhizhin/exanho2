@@ -104,16 +104,19 @@ def get_template_association(session, template_obj:noticeTemplateType):
 
     if template is None:
         template = NsiNoticeTemplate()
-        fill_template(session, template, template_obj)
+        session.add(template)
 
-        template.copy_of_type = template_obj.copyOfType if template_obj.copyOfType and template_obj.validate_templateExtendPurchaseTypes(template_obj.copyOfType) else NOT_VALIDATE_VALUE
-        template.hidden_fields = template_obj.hiddenFields if template_obj.hiddenFields and template_obj.validate_hiddenFieldsType(template_obj.hiddenFields) else NOT_VALIDATE_VALUE
+    fill_template(session, template, template_obj)
+    template.fields = []
 
-        if template_obj.fields:
-            for field_obj in template_obj.fields.field:
-                field = get_notice_field(session, field_obj)
-                if field:
-                    template.fields.append(field)
+    template.copy_of_type = template_obj.copyOfType if template_obj.copyOfType and template_obj.validate_templateExtendPurchaseTypes(template_obj.copyOfType) else NOT_VALIDATE_VALUE
+    template.hidden_fields = template_obj.hiddenFields if template_obj.hiddenFields and template_obj.validate_hiddenFieldsType(template_obj.hiddenFields) else NOT_VALIDATE_VALUE
+
+    if template_obj.fields:
+        for field_obj in template_obj.fields.field:
+            field = get_notice_field(session, field_obj)
+            if field:
+                template.fields.append(field)
 
     template_as = NsiPurchMethodTemplateAs()
     template_as.template = template

@@ -80,8 +80,10 @@ def get_template_association(session, template_obj:orderClauseTemplateType):
 
     if template is None:
         template = NsiOrderClauseTemplate()
+        session.add(template)
         
     fill_template(session, template, template_obj)
+    template.fields = []
 
     if template_obj.fields:
         for field_template_obj in template_obj.fields.field:

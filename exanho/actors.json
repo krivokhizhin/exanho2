@@ -24,8 +24,8 @@
                 "maxsize": 200
             },
             {
-                "name": "nsi_protocol",
-                "maxsize": 100
+                "name": "nsi_template",
+                "maxsize": 200
             }
         ]
     },
@@ -89,7 +89,7 @@
                 {
                     "module": "exanho.eis223.workers.ds_consumer",
                     "db_key": "eis223_test",
-                    "queue_name": "nsi_protocol",
+                    "queue_name": "nsi_template",
                     "appsettings":{
                         "data_structure_module": "exanho.eis223.ds.reference",
                         "error_attempts": 2,
@@ -130,8 +130,8 @@
                         "ftp_port": 21,
                         "ftp_user": "fz223free",
                         "ftp_password": "fz223free",
-                        "parse_queues":["nsi_common", "nsi_organization", "nsi_purchase_method", "nsi_protocol"],
-                        "queue_by_filter":[22, 2, 2, 2],
+                        "parse_queues":["nsi_common", "nsi_organization", "nsi_template", "nsi_purchase_method"],
+                        "queue_by_filter":[22, 2, 4, 2],
                         "parse_filters":[
                             "nsiOkato_all_","nsiOkato_inc_",
                             "nsiOkdp_all_","nsiOkdp_inc_",
@@ -147,9 +147,10 @@
 
                             "nsiOrganization_all_", "nsiOrganization_inc_",
 
-                            "nsiPurchaseMethod_all_", "nsiPurchaseMethod_inc_",
+                            "nsiClauseType_all_", "nsiClauseType_inc_",
+                            "nsiProtocol_all_", "nsiProtocol_inc_",
 
-                            "nsiProtocol_all_", "nsiProtocol_inc_"
+                            "nsiPurchaseMethod_all_", "nsiPurchaseMethod_inc_"
                         ],
                         "max_mem_level": 0.8,
                         "with_swap": false,

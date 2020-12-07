@@ -7,4 +7,3 @@ DROP TABLE nsi_org_okved2 CASCADE;
 DROP TABLE nsi_org_okved_activity CASCADE;
 DROP TABLE nsi_org_okved CASCADE;
 DROP TABLE nsi_organization CASCADE;
-DROP TABLE nsi_org_customer CASCADE;

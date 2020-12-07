@@ -1,0 +1,1 @@
+DROP TABLE customer_main_info CASCADE;

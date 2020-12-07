@@ -1,4 +1,5 @@
 from .nsi import *
+from .nsi_customer import *
 from .nsi_organization import *
 from .nsi_template import *
 from .nsi_order_clause import *

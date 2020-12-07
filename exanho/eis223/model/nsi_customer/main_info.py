@@ -2,12 +2,10 @@ from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Index, Integer, St
 from sqlalchemy.orm import relationship
 from exanho.orm.domain import Base
 
-class NsiOrgCustomer(Base):
-    __tablename__ = 'nsi_org_customer'
+class CustomerMainInfo(Base):
+    __tablename__ = 'customer_main_info'
     
     id = Column(Integer, primary_key=True)
-
-    org = relationship('NsiOrganization', uselist=False, back_populates='customer', cascade='all, delete-orphan')
 
     full_name = Column(String(1000))
     short_name = Column(String(500))
@@ -35,5 +33,7 @@ class NsiOrgCustomer(Base):
     assessed_compliance = Column(Boolean)
     monitored_compliance = Column(Boolean)
 
-Index('idx_nsi_org_customer_ogrn_inn_kpp', NsiOrgCustomer.ogrn, NsiOrgCustomer.inn, NsiOrgCustomer.kpp, unique=True)
-Index('idx_nsi_org_customer_inn_kpp_orgn', NsiOrgCustomer.inn, NsiOrgCustomer.kpp, NsiOrgCustomer.ogrn, unique=True)
+    organization = relationship('NsiOrganization', uselist=False, back_populates='customer', cascade='all, delete-orphan')
+
+Index('idx_nsi_org_customer_ogrn_inn_kpp', CustomerMainInfo.ogrn, CustomerMainInfo.inn, CustomerMainInfo.kpp, unique=True)
+Index('idx_nsi_org_customer_inn_kpp_orgn', CustomerMainInfo.inn, CustomerMainInfo.kpp, CustomerMainInfo.ogrn, unique=True)

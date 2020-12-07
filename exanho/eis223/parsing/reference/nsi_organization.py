@@ -2,8 +2,9 @@ from datetime import datetime, timezone
 
 from exanho.core.common import Error
 
-from ...ds.reference import nsiOrganization, nsiOrganizationDataType, customerMainInfoType, activitiesType, fz223typesType, contactInfoType24, SuccessionInfo, okvedType, okved2Type, businessStatusType
+from ...ds.reference import nsiOrganization, nsiOrganizationDataType, activitiesType, fz223typesType, contactInfoType24, SuccessionInfo
 from ...model.nsi_organization import *
+from ..types.customer_main_info_type import get_customer_main_info
 
 UNDEFINED_SECTION = '?'
 NOT_VALIDATE_VALUE = '???'
@@ -19,7 +20,7 @@ def parse(session, root_obj:nsiOrganization, update=True, **kwargs):
 
 def parse_organization(session, org_obj:nsiOrganizationDataType, update=True):
 
-    customer = get_customer(session, org_obj.mainInfo, update)
+    customer = get_customer_main_info(session, org_obj.mainInfo, update)
     if customer is None:
         raise Error('customer is None')
 
@@ -136,77 +137,6 @@ def parse_organization(session, org_obj:nsiOrganizationDataType, update=True):
             fill_fz223types(session, exist_org, org_obj.classification.fz223types)
             exist_org.contact = get_contact(session, org_obj.contactInfo)
             fill_successors(session, exist_org, org_obj.successionInfo)
-
-def get_customer(session, customer_obj:customerMainInfoType, update=True) -> NsiOrgCustomer:
-    if customer_obj is None:
-        return None
-
-    inn = customer_obj.inn
-    kpp = customer_obj.kpp
-    ogrn = customer_obj.ogrn
-
-    customer = session.query(NsiOrgCustomer).filter(NsiOrgCustomer.inn == inn, NsiOrgCustomer.kpp == kpp).one_or_none()
-    if customer is None:
-        customer = session.query(NsiOrgCustomer).filter(NsiOrgCustomer.ogrn == ogrn, NsiOrgCustomer.inn == inn, NsiOrgCustomer.kpp == kpp).one_or_none()
-
-    if customer is None:
-        customer = NsiOrgCustomer(
-            full_name = customer_obj.fullName,
-            short_name = customer_obj.shortName,
-            iko = customer_obj.iko,
-
-            inn = inn,
-            kpp = kpp,
-            ogrn = ogrn,
-
-            legal_address = customer_obj.legalAddress,
-            postal_address = customer_obj.postalAddress,
-            phone = customer_obj.phone,
-            fax = customer_obj.fax,
-            email = customer_obj.email,
-
-            okato = customer_obj.okato,
-            okopf = customer_obj.okopf,
-            okopf_name = customer_obj.okopfName,
-            okpo = customer_obj.okpo,
-
-            reg_date = customer_obj.customerRegistrationDate,
-            time_zone_offset = None if customer_obj.timeZone is None else customer_obj.timeZone.offset,
-            time_zone_name = None if customer_obj.timeZone is None else customer_obj.timeZone.name,
-            region = customer_obj.region,
-            assessed_compliance = customer_obj.customerAssessedCompliance,
-            monitored_compliance = customer_obj.customerMonitoredCompliance
-        )
-
-        session.add(customer)
-    elif update:
-            customer.full_name = customer_obj.fullName
-            customer.short_name = customer_obj.shortName
-            customer.iko = customer_obj.iko
-
-            customer.ogrn = ogrn
-
-            customer.legal_address = customer_obj.legalAddress
-            customer.postal_address = customer_obj.postalAddress
-            customer.phone = customer_obj.phone
-            customer.fax = customer_obj.fax
-            customer.email = customer_obj.email
-
-            customer.okato = customer_obj.okato
-            customer.okopf = customer_obj.okopf
-            customer.okopf_name = customer_obj.okopfName
-            customer.okpo = customer_obj.okpo
-
-            customer.reg_date = customer_obj.customerRegistrationDate
-            customer.time_zone_offset = None if customer_obj.timeZone is None else customer_obj.timeZone.offset
-            customer.time_zone_name = None if customer_obj.timeZone is None else customer_obj.timeZone.name
-            customer.region = customer_obj.region
-            customer.assessed_compliance = customer_obj.customerAssessedCompliance
-            customer.monitored_compliance = customer_obj.customerMonitoredCompliance
-    else:
-        pass
-    
-    return customer
 
 def fill_okved_activities(session, owner:NsiOrganization, activities_obj:activitiesType):
     owner.okved_list = []

@@ -1,4 +1,3 @@
-from .customer import NsiOrgCustomer
 from .nsi_organization import NsiOrganization
 from .okved import NsiOrgOkved
 from .okved_activity import NsiOrgOkvedActivity

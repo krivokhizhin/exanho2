@@ -34,6 +34,7 @@ class CustomerMainInfo(Base):
     monitored_compliance = Column(Boolean)
 
     organization = relationship('NsiOrganization', uselist=False, back_populates='customer', cascade='all, delete-orphan')
+    purchase_methods = relationship('NsiPurchaseMethod', back_populates='creator', cascade='all, delete-orphan')
 
 Index('idx_nsi_org_customer_ogrn_inn_kpp', CustomerMainInfo.ogrn, CustomerMainInfo.inn, CustomerMainInfo.kpp, unique=True)
 Index('idx_nsi_org_customer_inn_kpp_orgn', CustomerMainInfo.inn, CustomerMainInfo.kpp, CustomerMainInfo.ogrn, unique=True)

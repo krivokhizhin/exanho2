@@ -10,3 +10,6 @@ DROP TABLE nsi_purchase_method CASCADE;
 
 DROP TABLE nsi_template_field_notice CASCADE;
 DROP TABLE nsi_template_notice CASCADE;
+
+DELETE FROM nsi_template_base WHERE type='notice';
+DELETE FROM nsi_template_field_base WHERE type='notice';

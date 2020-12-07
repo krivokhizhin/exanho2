@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 
 from ...ds.reference import nsiPurchaseMethod, nsiPurchaseMethodDataType, protocolListType, purchasePhaseListType, templatesType29, noticeTemplateType, noticeTemplateFieldType, purchaseProtocol, purchasePhase, phaseTransitionsListType, phaseTransition
 from .nsi_template import get_template, fill_template, fill_field_template
+from ..types.customer_main_info_type import get_customer_main_info
 from ...model.nsi_purchase_method import *
 
 NOT_VALIDATE_VALUE = '???'
@@ -33,10 +34,6 @@ def parse_purchase_method(session, method_obj:nsiPurchaseMethodDataType, update=
             order_number = method_obj.orderNumber,
             is_electronic = False if method_obj.isElectronic is None else method_obj.isElectronic,
 
-            creator_inn = None if method_obj.creator is None else method_obj.creator.inn,
-            creator_kpp = None if method_obj.creator is None else method_obj.creator.kpp,
-            creator_ogrn = None if method_obj.creator is None else method_obj.creator.ogrn,
-
             extended = method_obj.extended,
             competitive = method_obj.competitive,
 
@@ -49,6 +46,7 @@ def parse_purchase_method(session, method_obj:nsiPurchaseMethodDataType, update=
         )
 
         session.add(new_method)
+        new_method.creator = get_customer_main_info(session, method_obj.creator, False)
         fill_templates(session, new_method, method_obj.templates)
         fill_protocols(session, new_method, method_obj.protocols, get_protocol_association)
         fill_phases(session, new_method, method_obj.phases)
@@ -68,10 +66,6 @@ def parse_purchase_method(session, method_obj:nsiPurchaseMethodDataType, update=
             exist_method.order_number = method_obj.orderNumber
             exist_method.is_electronic = False if method_obj.isElectronic is None else method_obj.isElectronic
 
-            exist_method.creator_inn = None if method_obj.creator is None else method_obj.creator.inn
-            exist_method.creator_kpp = None if method_obj.creator is None else method_obj.creator.kpp
-            exist_method.creator_ogrn = None if method_obj.creator is None else method_obj.creator.ogrn
-
             exist_method.extended = method_obj.extended
             exist_method.competitive = method_obj.competitive
 
@@ -82,6 +76,7 @@ def parse_purchase_method(session, method_obj:nsiPurchaseMethodDataType, update=
             exist_method.typal_kind = method_obj.typalKind
             exist_method.lot_oriented = method_obj.lotOriented
 
+            exist_method.creator = get_customer_main_info(session, method_obj.creator, False)
             fill_templates(session, exist_method, method_obj.templates)
             fill_protocols(session, exist_method, method_obj.protocols, get_protocol_association)
             fill_phases(session, exist_method, method_obj.phases)

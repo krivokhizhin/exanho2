@@ -6,11 +6,13 @@ def get_customer_main_info(session, customer_obj:customerMainInfoType, update=Tr
     if customer_obj is None:
         return None
 
-    inn = customer_obj.inn
-    kpp = customer_obj.kpp
-    ogrn = customer_obj.ogrn
+    inn = '' if customer_obj.inn is None else customer_obj.inn
+    kpp = '' if customer_obj.kpp is None else customer_obj.kpp
+    ogrn = '' if customer_obj.ogrn is None else customer_obj.ogrn
+    customer = None
 
-    customer = session.query(CustomerMainInfo).filter(CustomerMainInfo.inn == inn, CustomerMainInfo.kpp == kpp).one_or_none()
+    if inn:
+        customer = session.query(CustomerMainInfo).filter(CustomerMainInfo.inn == inn, CustomerMainInfo.kpp == kpp).one_or_none()
     if customer is None:
         customer = session.query(CustomerMainInfo).filter(CustomerMainInfo.ogrn == ogrn, CustomerMainInfo.inn == inn, CustomerMainInfo.kpp == kpp).one_or_none()
 
@@ -49,7 +51,7 @@ def get_customer_main_info(session, customer_obj:customerMainInfoType, update=Tr
         customer.short_name = customer_obj.shortName
         customer.iko = customer_obj.iko
 
-        customer.ogrn = ogrn
+        if customer.ogrn is None: customer.ogrn = ogrn
 
         customer.legal_address = customer_obj.legalAddress
         customer.postal_address = customer_obj.postalAddress

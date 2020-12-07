@@ -16,11 +16,7 @@
                 "maxsize": 200
             },
             {
-                "name": "nsi_organization",
-                "maxsize": 100
-            },
-            {
-                "name": "nsi_purchase_method",
+                "name": "nsi_customer",
                 "maxsize": 200
             }
         ]
@@ -44,31 +40,14 @@
             ]
         },
         {
-            "name": "NsiOrgQHWorker",
+            "name": "NsiCustomerQHWorker",
             "kind": "QueueWorker",
             "daemon": true,
             "workers": [
                 {
                     "module": "exanho.eis223.workers.ds_consumer",
                     "db_key": "eis223_test",
-                    "queue_name": "nsi_organization",
-                    "appsettings":{
-                        "data_structure_module": "exanho.eis223.ds.reference",
-                        "error_attempts": 2,
-                        "update": false
-                    }
-                }
-            ]
-        },
-        {
-            "name": "NsiPurchMethodQHWorker",
-            "kind": "QueueWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.eis223.workers.ds_consumer",
-                    "db_key": "eis223_test",
-                    "queue_name": "nsi_purchase_method",
+                    "queue_name": "nsi_customer",
                     "appsettings":{
                         "data_structure_module": "exanho.eis223.ds.reference",
                         "error_attempts": 2,
@@ -109,8 +88,8 @@
                         "ftp_port": 21,
                         "ftp_user": "fz223free",
                         "ftp_password": "fz223free",
-                        "parse_queues":["nsi_common", "nsi_organization", "nsi_purchase_method"],
-                        "queue_by_filter":[26, 2, 2],
+                        "parse_queues":["nsi_common", "nsi_customer"],
+                        "queue_by_filter":[22, 8],
                         "parse_filters":[
                             "nsiOkato_all_","nsiOkato_inc_",
                             "nsiOkdp_all_","nsiOkdp_inc_",
@@ -123,12 +102,11 @@
                             "nsiOkv_all_","nsiOkv_inc_",
                             "nsiOkved_all_","nsiOkved_inc_",
                             "nsiOkved2_all_","nsiOkved2_inc_",
-                            "nsiClauseType_all_", "nsiClauseType_inc_",
-                            "nsiProtocol_all_", "nsiProtocol_inc_",
 
                             "nsiOrganization_all_", "nsiOrganization_inc_",
-
-                            "nsiPurchaseMethod_all_", "nsiPurchaseMethod_inc_"
+                            "nsiPurchaseMethod_all_", "nsiPurchaseMethod_inc_",
+                            "nsiClauseType_all_", "nsiClauseType_inc_",
+                            "nsiProtocol_all_", "nsiProtocol_inc_"
                         ],
                         "max_mem_level": 0.8,
                         "with_swap": false,

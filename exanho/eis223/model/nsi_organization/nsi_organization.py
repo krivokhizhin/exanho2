@@ -18,7 +18,7 @@ class NsiOrganization(Base):
     end_date_active = Column(Date)
 
     customer_id = Column(Integer, ForeignKey('customer_main_info.id'), nullable=False, index=True, unique=True)
-    customer = relationship('CustomerMainInfo', back_populates='organization') 
+    customer = relationship('CustomerMainInfo', back_populates='organization')
 
     status = Column(String(20))
     okfs = Column(String(10))

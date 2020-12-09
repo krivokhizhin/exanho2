@@ -12,3 +12,6 @@ VALUES('NEW', '/out/nsi/nsiPurchaseMethod/*', '*', date '2020-11-13' + time '08:
 
 INSERT INTO ftp_load_task (status, location, schedule, scheduled_date)
 VALUES('NEW', '/out/nsi/nsiProtocol/*', '*', date '2020-11-13' + time '08:00:00');
+
+INSERT INTO ftp_load_task (status, location, schedule, scheduled_date)
+VALUES('NEW', '/out/nsi/agencyRelations/*', '*', date '2020-11-13' + time '08:00:00');

@@ -36,5 +36,8 @@ class CustomerMainInfo(Base):
     organization = relationship('NsiOrganization', uselist=False, back_populates='customer', cascade='all, delete-orphan')
     purchase_methods = relationship('NsiPurchaseMethod', back_populates='creator', cascade='all, delete-orphan')
 
+    relations = relationship('NsiAgencyRelation', foreign_keys="[NsiAgencyRelation.customer_id]", back_populates='customer', cascade='all, delete-orphan')
+    agency_relations = relationship('NsiAgencyRelation', foreign_keys="[NsiAgencyRelation.agency_id]", back_populates='agency', cascade='all, delete-orphan')
+
 Index('idx_nsi_org_customer_ogrn_inn_kpp', CustomerMainInfo.ogrn, CustomerMainInfo.inn, CustomerMainInfo.kpp, unique=True)
 Index('idx_nsi_org_customer_inn_kpp_orgn', CustomerMainInfo.inn, CustomerMainInfo.kpp, CustomerMainInfo.ogrn, unique=True)

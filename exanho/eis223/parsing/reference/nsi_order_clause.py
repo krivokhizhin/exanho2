@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
 from ...ds.reference import nsiOrderClauseType, nsiOrderClauseTypeDataType, templatesType, orderClauseTemplateType, orderClauseTemplateFieldType
+from ..types.customer_main_info_type import get_customer_main_info
 from .nsi_template import get_template, fill_template, fill_field_template
 from ...model.nsi_order_clause import *
 
@@ -16,19 +17,13 @@ def parse(session, root_obj:nsiOrderClauseType, update=True, **kwargs):
 
 def parse_order_clause(session, order_clause_obj:nsiOrderClauseTypeDataType, update=True):
     
-    ogrn = order_clause_obj.creator.ogrn
-    inn = order_clause_obj.creator.inn
-    kpp = order_clause_obj.creator.kpp
+
+    creator = get_customer_main_info(session, order_clause_obj.creator, False)
     order_number = order_clause_obj.orderNumber
 
     exist_order_clause = session.query(NsiOrderClause).\
-        filter(NsiOrderClause.creator_inn == inn, NsiOrderClause.creator_kpp == kpp, NsiOrderClause.order_number == order_number).\
+        filter(NsiOrderClause.creator == creator, NsiOrderClause.order_number == order_number).\
             one_or_none()
-
-    if exist_order_clause is None:
-        exist_order_clause = session.query(NsiOrderClause).\
-            filter(NsiOrderClause.creator_ogrn == ogrn, NsiOrderClause.creator_inn == inn, NsiOrderClause.creator_kpp == kpp, NsiOrderClause.order_number == order_number).\
-                one_or_none()
 
     if exist_order_clause is None:
         new_order_clause = NsiOrderClause(
@@ -36,13 +31,9 @@ def parse_order_clause(session, order_clause_obj:nsiOrderClauseTypeDataType, upd
             change_dt = order_clause_obj.changeDateTime,
             business_status = order_clause_obj.businessStatus,
             name = order_clause_obj.name,
-            order_number = order_number,
-
-            creator_inn = inn,
-            creator_kpp = kpp,
-            creator_ogrn = ogrn
+            order_number = order_number
         )
-
+        new_order_clause.creator = creator
         session.add(new_order_clause)
         fill_templates(session, new_order_clause, order_clause_obj.templates)
     else:
@@ -54,11 +45,6 @@ def parse_order_clause(session, order_clause_obj:nsiOrderClauseTypeDataType, upd
             exist_order_clause.change_dt = order_clause_obj.changeDateTime
             exist_order_clause.business_status = order_clause_obj.businessStatus
             exist_order_clause.name = order_clause_obj.name
-            exist_order_clause.order_number = order_number
-            
-            exist_order_clause.creator_inn = inn
-            exist_order_clause.creator_kpp = kpp
-            exist_order_clause.creator_ogrn = ogrn
 
             fill_templates(session, exist_order_clause, order_clause_obj.templates)
 

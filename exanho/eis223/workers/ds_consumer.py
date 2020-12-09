@@ -11,27 +11,22 @@ from exanho.core.common import Error, Timer
 from exanho.core.manager_context import Context as ExanhoContext
 from exanho.ftp_loading.model import FtpContentStatus, FtpContent
 
+from ..ds.match_builder import match_builder
 from ..parsing import parsers
 
 log = logging.getLogger(__name__)
 
 Context = namedtuple('Context', [
-    'data_structure_module',
     'error_attempts',
     'update'
     ], defaults = [2, False])
 
 def initialize(appsettings, exanho_context:ExanhoContext):
     context = Context(**appsettings)
-
-    ds_mod = importlib.import_module(context.data_structure_module.strip())
-    context = context._replace(data_structure_module=ds_mod)
-
-    log.info(f'Initialized for {context.data_structure_module}')
+    log.info(f'Initialized')
     return context
 
 def work(context:Context, message):
-    ds_mod = context.data_structure_module
     attempt_count = context.error_attempts
     update = context.update
     content_id = int(message)
@@ -43,6 +38,8 @@ def work(context:Context, message):
             if content_to_parse is None:
                 return context
 
+            obj_builder = match_builder(content_to_parse.name)
+
             content_to_parse.status = FtpContentStatus.PARSING
             session.flush()
 
@@ -50,7 +47,7 @@ def work(context:Context, message):
             try:
                 shm = shared_memory.SharedMemory(content_to_parse.message)
                 buffer = shm.buf[:content_to_parse.size]
-                root_obj = ds_mod.parseString(buffer.tobytes(),silence = True, print_warnings=False)
+                root_obj = obj_builder(buffer.tobytes(),silence = True, print_warnings=False)
 
                 xml_root_tag = root_obj.get_xml_tag()
                 parser = parsers.get(xml_root_tag, None)

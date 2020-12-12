@@ -5,3 +5,4 @@ from .nsi_organization import *
 from .nsi_order_clause import *
 from .nsi_purchase_method import *
 from .nsi_protocol import *
+from .nsi_registry import *

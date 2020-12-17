@@ -20,8 +20,8 @@ class NsiCustomerRegistry(Base):
 
     ikuls = relationship('NsiRegIkul', back_populates='customer_registry', cascade='all, delete-orphan')
 
-    okved_list = relationship('NsiOrgOkvedActivity', back_populates='org', cascade='all, delete-orphan')
-    okved2_list = relationship('NsiOrgOkved2Activity', back_populates='org', cascade='all, delete-orphan')
+    okved_list = relationship('NsiRegOkvedActivity', back_populates='customer', cascade='all, delete-orphan')
+    okved2_list = relationship('NsiRegOkved2Activity', back_populates='customer', cascade='all, delete-orphan')
     fz223types = relationship('NsiRegClassificationFz223type', back_populates='customer', cascade='all, delete-orphan')
 
     okpo = Column(String(20))

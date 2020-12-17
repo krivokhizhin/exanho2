@@ -11,10 +11,10 @@ from .okved2 import NsiRegOkved2
 class NsiRegOkved2Activity(Base):
     __tablename__ = 'nsi_reg_okved2_activity'
 
-    org_id = Column(Integer, ForeignKey('nsi_customer_registry.id'),primary_key=True)
+    customer_id = Column(Integer, ForeignKey('nsi_customer_registry.id'),primary_key=True)
     okved2_id = Column(Integer, ForeignKey('nsi_reg_okved2.id'),primary_key=True)
 
-    org = relationship('NsiCustomerRegistry', back_populates='okved2_list')
+    customer = relationship('NsiCustomerRegistry', back_populates='okved2_list')
     okved2 = relationship('NsiRegOkved2', back_populates='customers')
 
 @listens_for(NsiRegOkved2Activity, 'after_delete')

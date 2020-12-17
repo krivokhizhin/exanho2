@@ -13,5 +13,3 @@ class NsiRegIkul(Base):
     code = Column(String(100), nullable=False)
     name = Column(String(255), nullable=False)
     assignment_dt = Column(DateTime(timezone=True))
-
-    org_list = relationship('NsiOrgOkvedActivity', back_populates='okved', cascade='all, delete-orphan')

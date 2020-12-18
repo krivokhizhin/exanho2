@@ -18,6 +18,10 @@
             {
                 "name": "nsi_customer",
                 "maxsize": 200
+            },
+            {
+                "name": "nsi_customer_registry",
+                "maxsize": 1000
             }
         ]
     },
@@ -47,6 +51,22 @@
                     "module": "exanho.eis223.workers.ds_consumer",
                     "db_key": "eis223_test",
                     "queue_name": "nsi_customer",
+                    "appsettings":{
+                        "error_attempts": 2,
+                        "update": false
+                    }
+                }
+            ]
+        },
+        {
+            "name": "NsiRegistryQHWorker",
+            "kind": "QueueWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.eis223.workers.ds_consumer",
+                    "db_key": "eis223_test",
+                    "queue_name": "nsi_customer_registry",
                     "appsettings":{
                         "error_attempts": 2,
                         "update": false
@@ -86,8 +106,8 @@
                         "ftp_port": 21,
                         "ftp_user": "fz223free",
                         "ftp_password": "fz223free",
-                        "parse_queues":["nsi_common", "nsi_customer"],
-                        "queue_by_filter":[22, 10],
+                        "parse_queues":["nsi_common", "nsi_customer", "nsi_customer_registry"],
+                        "queue_by_filter":[22, 10, 2],
                         "parse_filters":[
                             "nsiOkato_all_","nsiOkato_inc_",
                             "nsiOkdp_all_","nsiOkdp_inc_",
@@ -105,7 +125,9 @@
                             "nsiPurchaseMethod_all_", "nsiPurchaseMethod_inc_",
                             "nsiClauseType_all_", "nsiClauseType_inc_",
                             "nsiProtocol_all_", "nsiProtocol_inc_",
-                            "agencyRelations_all_", "agencyRelations_inc_"
+                            "agencyRelations_all_", "agencyRelations_inc_",
+
+                            "customerRegistry_all_", "customerRegistry_inc_"
                         ],
                         "max_mem_level": 0.8,
                         "with_swap": false,

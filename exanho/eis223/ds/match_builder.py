@@ -1,5 +1,6 @@
 from . import agency_relation as agency_relation_ms_mod
 from . import reference as reference_ds_mod
+from . import customer_registry as cust_reg_ds_mod
 
 def match_builder(filename:str):
     if filename.lower().startswith('nsiOkato_all_'.lower()):
@@ -97,4 +98,11 @@ def match_builder(filename:str):
         return agency_relation_ms_mod.parseString
     
     if filename.lower().startswith('agencyRelations_inc_'.lower()):
-        return agency_relation_ms_mod.parseString   
+        return agency_relation_ms_mod.parseString
+
+    
+    if filename.lower().startswith('customerRegistry_all_'.lower()):
+        return cust_reg_ds_mod.parseString
+    
+    if filename.lower().startswith('customerRegistry_inc'.lower()):
+        return cust_reg_ds_mod.parseString

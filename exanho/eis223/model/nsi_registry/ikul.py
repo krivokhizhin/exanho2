@@ -11,5 +11,5 @@ class NsiRegIkul(Base):
     customer_registry = relationship('NsiCustomerRegistry', back_populates='ikuls')
 
     code = Column(String(100), nullable=False)
-    name = Column(String(255), nullable=False)
+    name = Column(String(500), nullable=False)
     assignment_dt = Column(DateTime(timezone=True))

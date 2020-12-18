@@ -8,11 +8,11 @@ class NsiRegGrantedUser(Base):
     id = Column(Integer, primary_key=True)
 
     customer_registry_id = Column(Integer, ForeignKey('nsi_customer_registry.id'), nullable=False, index=True)
-    customer_registry = relationship('NsiCustomerRegistry', back_populates='contact')
+    customer_registry = relationship('NsiCustomerRegistry', back_populates='granted_users')
 
-    first_name = Column(String(300), nullable=False)
-    middle_name = Column(String(300), nullable=False)
-    last_name = Column(String(300), nullable=False)
+    first_name = Column(String(300))
+    middle_name = Column(String(300))
+    last_name = Column(String(300))
 
-    inn = Column(String(20), nullable=False)
-    position = Column(String(2000), nullable=False)
+    inn = Column(String(20))
+    position = Column(String(2000))

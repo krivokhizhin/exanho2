@@ -9,13 +9,13 @@ class NsiCustomerRegistry(Base):
 
     registration_number = Column(String(28), nullable=False, index=True, unique=True)
     version = Column(Integer, nullable=False)
-    version_creation_dt = Column(DateTime(timezone=True), nullable=False)
+    version_creation_dt = Column(DateTime(timezone=False), nullable=False)
     status = Column(String(30))
 
     added_dt = Column(DateTime(timezone=True))
     removed_dt = Column(DateTime(timezone=True))
 
-    customer_id = Column(Integer, ForeignKey('customer_registry_info.id'), nullable=False, index=True, unique=True)
+    customer_id = Column(Integer, ForeignKey('customer_registry_info.id'), nullable=False, index=True)
     customer = relationship('CustomerRegistryInfo', back_populates='customer_registry')
 
     ikuls = relationship('NsiRegIkul', back_populates='customer_registry', cascade='all, delete-orphan')

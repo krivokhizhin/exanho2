@@ -14,6 +14,7 @@ from .reference import nsi_order_clause
 from .reference import nsi_purchase_method
 from .reference import nsi_protocol
 from .agency_relation import nsi_agency_relations
+from .customer_registry import nsi_customer
 
 parsers = {
     '{http://zakupki.gov.ru/223fz/reference/1}nsiOkato' : nsi_okato.parse,
@@ -31,5 +32,6 @@ parsers = {
     '{http://zakupki.gov.ru/223fz/reference/1}nsiOrderClauseType' : nsi_order_clause.parse,
     '{http://zakupki.gov.ru/223fz/reference/1}nsiPurchaseMethod' : nsi_purchase_method.parse,
     '{http://zakupki.gov.ru/223fz/reference/1}nsiProtocolType' : nsi_protocol.parse,
-    '{http://zakupki.gov.ru/223fz/agencyRelation/1}nsiAgencyRelations' : nsi_agency_relations.parse
+    '{http://zakupki.gov.ru/223fz/agencyRelation/1}nsiAgencyRelations' : nsi_agency_relations.parse,
+    '{http://zakupki.gov.ru/223fz/customerRegistry/1}nsiCustomer' : nsi_customer.parse
 }

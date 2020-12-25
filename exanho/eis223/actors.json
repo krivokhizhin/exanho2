@@ -12,23 +12,62 @@
         ],
         "joinable_queues": [
             {
-                "name": "nsi_1",
-                "maxsize": 100
+                "name": "nsi_common",
+                "maxsize": 200
+            },
+            {
+                "name": "nsi_customer",
+                "maxsize": 200
+            },
+            {
+                "name": "nsi_customer_registry",
+                "maxsize": 1000
             }
         ]
     },
     "exanho_actors": [
         {
-            "name": "Nsi1QueueHandlerWorker",
+            "name": "NsiCommonQHWorker",
             "kind": "QueueWorker",
             "daemon": true,
             "workers": [
                 {
                     "module": "exanho.eis223.workers.ds_consumer",
                     "db_key": "eis223_test",
-                    "queue_name": "nsi_1",
+                    "queue_name": "nsi_common",
                     "appsettings":{
-                        "data_structure_module": "exanho.eis223.ds.reference",
+                        "error_attempts": 2,
+                        "update": false
+                    }
+                }
+            ]
+        },
+        {
+            "name": "NsiCustomerQHWorker",
+            "kind": "QueueWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.eis223.workers.ds_consumer",
+                    "db_key": "eis223_test",
+                    "queue_name": "nsi_customer",
+                    "appsettings":{
+                        "error_attempts": 2,
+                        "update": false
+                    }
+                }
+            ]
+        },
+        {
+            "name": "NsiRegistryQHWorker",
+            "kind": "QueueWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.eis223.workers.ds_consumer",
+                    "db_key": "eis223_test",
+                    "queue_name": "nsi_customer_registry",
+                    "appsettings":{
                         "error_attempts": 2,
                         "update": false
                     }
@@ -67,9 +106,29 @@
                         "ftp_port": 21,
                         "ftp_user": "fz223free",
                         "ftp_password": "fz223free",
-                        "parse_queues":["nsi_1"],
-                        "queue_by_filter":[1],
-                        "parse_filters":["nsiOkv_all"],
+                        "parse_queues":["nsi_common", "nsi_customer", "nsi_customer_registry"],
+                        "queue_by_filter":[22, 10, 2],
+                        "parse_filters":[
+                            "nsiOkato_all_","nsiOkato_inc_",
+                            "nsiOkdp_all_","nsiOkdp_inc_",
+                            "nsiOkei_all_","nsiOkei_inc_",
+                            "nsiOkfs_all_","nsiOkfs_inc_",
+                            "nsiOkogu_all_","nsiOkogu_inc_",
+                            "nsiOkopf_all_","nsiOkopf_inc_",
+                            "nsiOkpd2_all_","nsiOkpd2_inc_",
+                            "nsiOktmo_all_","nsiOktmo_inc_",
+                            "nsiOkv_all_","nsiOkv_inc_",
+                            "nsiOkved_all_","nsiOkved_inc_",
+                            "nsiOkved2_all_","nsiOkved2_inc_",
+
+                            "nsiOrganization_all_", "nsiOrganization_inc_",
+                            "nsiPurchaseMethod_all_", "nsiPurchaseMethod_inc_",
+                            "nsiClauseType_all_", "nsiClauseType_inc_",
+                            "nsiProtocol_all_", "nsiProtocol_inc_",
+                            "agencyRelations_all_", "agencyRelations_inc_",
+
+                            "customerRegistry_all_", "customerRegistry_inc_"
+                        ],
                         "max_mem_level": 0.8,
                         "with_swap": false,
                         "max_pool_workers": 1,

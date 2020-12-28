@@ -74,11 +74,6 @@
 							<xs:documentation>Информация об отмене исполнения (расторжения) контракта</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="contractAvailableForElAct" type="oos:zfcs_contractAvailableForElAct" maxOccurs="unbounded">
-						<xs:annotation>
-							<xs:documentation>Квитанция о доступности формирования документов электронного актирования по контракту</xs:documentation>
-						</xs:annotation>
-					</xs:element>
 					<xs:element name="fcsClarification" type="oos:zfcs_clarificationType">
 						<xs:annotation>
 							<xs:documentation>Разъяснение положений документации</xs:documentation>
@@ -1020,16 +1015,6 @@
 						<xs:complexType>
 							<xs:sequence>
 								<xs:element name="nsiOrganization" type="oos:zfcs_nsiOrganizationType" minOccurs="0" maxOccurs="unbounded"/>
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="nsiOrganizationRightsList">
-						<xs:annotation>
-							<xs:documentation>Права организаций на осуществление закупок от имени других организаций</xs:documentation>
-						</xs:annotation>
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="nsiOrganizationRights" type="oos:zfcs_nsiOrganizationRightsType" minOccurs="0" maxOccurs="unbounded"/>
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
@@ -2047,11 +2032,6 @@
 							<xs:documentation>Протокол рассмотрения и оценки вторых частей заявок на участие в ЭOK20 (открытый конкурс в электронной форме с 01.04.2021 года) с информацией об участниках. Не применяется, добавлено на развитие</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="epProtocolEOK2020Final" type="ep:protocolEOK2020FinalType">
-						<xs:annotation>
-							<xs:documentation>Протокол подведения итогов ЭOK20 (открытый конкурс в электронной форме с 01.04.2021 года). Не применяется, добавлено на развитие</xs:documentation>
-						</xs:annotation>
-					</xs:element>
 					<xs:element name="epProtocolEOK2020FinalPart" type="ep:protocolEOK2020FinalPartType">
 						<xs:annotation>
 							<xs:documentation>Протокол подведения итогов ЭOK20 (открытый конкурс в электронной форме с 01.04.2021 года) с информацией об участниках. Не применяется, добавлено на развитие</xs:documentation>
@@ -2207,11 +2187,6 @@
 					<xs:element name="cpClosedContractProjectSign" type="cp:contractProjectSignType">
 						<xs:annotation>
 							<xs:documentation>Проект контракта, подписанный поставщиком (закрытые электронные процедуры)</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-					<xs:element name="cpCloseProtocolDisagreements" type="cp:protocolDisagreementsType">
-						<xs:annotation>
-							<xs:documentation>Протокол разногласий (закрытые электронные процедуры)</xs:documentation>
 						</xs:annotation>
 					</xs:element>
 					<xs:element name="cpClosedNoticeDeviation" type="cp:noticeDeviationType">

@@ -1,1 +1,2 @@
 from .contract import ZfcsContract2015
+from .contract_procedure import ZfcsContractProcedure2015

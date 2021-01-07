@@ -1,4 +1,3 @@
-from re import S
 from sqlalchemy import BigInteger, Boolean, Column, Date, DateTime, Index, Integer, Numeric, String
 from exanho.orm.domain import Base
 

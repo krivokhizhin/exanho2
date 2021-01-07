@@ -1,0 +1,1 @@
+DROP TABLE zfcs_contract2015 CASCADE;

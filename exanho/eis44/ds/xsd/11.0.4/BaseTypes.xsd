@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- BASE_TYPES Integration Scheme, version 11.0, create date 25.12.2020 -->
 <xs:schema xmlns="http://zakupki.gov.ru/oos/base/1" xmlns:base="http://zakupki.gov.ru/oos/base/1" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://zakupki.gov.ru/oos/base/1" elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:element name="dummy" type="xs:int" minOccurs="0">
+        <xs:annotation>
+            <xs:documentation>dummy</xs:documentation>
+        </xs:annotation>
+    </xs:element>
 	<!--Ссылки на НСИ-->
 	<!--Ссылки на общие справочники-->
 	<xs:complexType name="abandonedReasonRef">

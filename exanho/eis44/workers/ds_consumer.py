@@ -11,7 +11,7 @@ from exanho.core.common import Error, Timer
 from exanho.core.manager_context import Context as ExanhoContext
 from exanho.ftp_loading.model import FtpContentStatus, FtpContent
 
-from ..ds import export as export_mod
+from ..ds import export_types as contract_mod
 from ..parsing import parsers
 
 log = logging.getLogger(__name__)
@@ -39,17 +39,17 @@ def work(context:Context, message):
                 return context
 
             content_to_parse.status = FtpContentStatus.PARSING
+            session.flush()
 
             shm = buffer = None
             try:
                 shm = shared_memory.SharedMemory(content_to_parse.message)
                 buffer = shm.buf[:content_to_parse.size]
-                export_obj = export_mod.parseString(buffer.tobytes(),silence = True, print_warnings=False)
+                export_obj = contract_mod.parseString(buffer.tobytes(),silence = True, print_warnings=False)
 
-                for root_obj in export_obj.get_children():
-                    session.flush()
+                for eis_doc_obj in export_obj.get_children():
 
-                    xml_root_tag = root_obj.get_xml_tag()
+                    xml_root_tag = eis_doc_obj.get_xml_tag()
                     parser = parsers.get(xml_root_tag, None)
                     if parser is None:
                         raise Error(f'No parser found for "{xml_root_tag}" document')
@@ -58,7 +58,8 @@ def work(context:Context, message):
                     while remain_attempt > 0:
 
                         try:
-                            parser(session, root_obj, update, **{'content_id' : content_to_parse.id}) 
+                            with session.begin_nested():
+                                parser(session, eis_doc_obj, update, **{'content_id' : content_to_parse.id}) 
                             remain_attempt = 0
                         except Exception as ex:
                             remain_attempt -= 1

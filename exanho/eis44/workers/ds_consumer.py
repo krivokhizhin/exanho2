@@ -11,19 +11,23 @@ from exanho.core.common import Error, Timer
 from exanho.core.manager_context import Context as ExanhoContext
 from exanho.ftp_loading.model import FtpContentStatus, FtpContent
 
-from ..ds import export_types as contract_mod
 from ..parsing import parsers
 
 log = logging.getLogger(__name__)
 
 Context = namedtuple('Context', [
+    'parse_module',
     'error_attempts',
     'update'
     ], defaults = [2, False])
 
 def initialize(appsettings, exanho_context:ExanhoContext):
     context = Context(**appsettings)
-    log.info(f'Initialized')
+
+    mod = importlib.import_module(context.parse_module.strip())
+    context = context._replace(parse_module=mod)
+    
+    log.info(f'Initialized for {context.parse_module}')
     return context
 
 def work(context:Context, message):
@@ -45,7 +49,7 @@ def work(context:Context, message):
             try:
                 shm = shared_memory.SharedMemory(content_to_parse.message)
                 buffer = shm.buf[:content_to_parse.size]
-                export_obj = contract_mod.parseString(buffer.tobytes(),silence = True, print_warnings=False)
+                export_obj = context.parse_module.parseString(buffer.tobytes(),silence = True, print_warnings=False)
 
                 for eis_doc_obj in export_obj.get_children():
 

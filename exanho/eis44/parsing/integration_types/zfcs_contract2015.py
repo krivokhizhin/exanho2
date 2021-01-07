@@ -5,69 +5,106 @@ def parse(session, contract_obj:zfcs_contract2015Type, update=True, **kwargs):
     doc_id = contract_obj.id
     external_id = contract_obj.externalId
 
-    if session.query(ZfcsContract2015).filter(ZfcsContract2015.doc_id == doc_id, ZfcsContract2015.external_id == external_id).count() > 0:
+    contract = session.query(ZfcsContract2015).filter(ZfcsContract2015.doc_id == doc_id, ZfcsContract2015.external_id == external_id).one_or_none()
+
+    if contract is None:
+        contract = ZfcsContract2015(
+            doc_id = doc_id,
+            external_id = external_id,
+            direct_dt = contract_obj.directDate,
+            publish_dt = contract_obj.publishDate,
+            version_number = contract_obj.versionNumber,
+
+            conclusion_st95_ch17_1 = contract_obj.conclusionContractSt95Ch17_1,
+            protocol_date = contract_obj.protocolDate,
+            doc_base = contract_obj.documentBase,
+            doc_code = contract_obj.documentCode,
+            sign_date = contract_obj.signDate,
+            reg_num = contract_obj.regNum,
+            number = contract_obj.number,
+            subject = contract_obj.contractSubject,
+
+            group_build_code = contract_obj.constructionWorksInfo.constructionWorkGroup.code if contract_obj.constructionWorksInfo else None,
+
+            defense_number = contract_obj.defenseContractNumber,
+            is_goz = contract_obj.isGOZ,
+            igk = contract_obj.IGK,
+            life_cycle = contract_obj.contractLifeCycle,
+
+            is_smpo_or_sono_tender = contract_obj.isSMPOrSONOTender,
+            is_smpo_or_sono_engage = contract_obj.isSMPOrSONOEngage,
+
+            quantity_stages = contract_obj.quantityContractStages,
+            execution_start_date = contract_obj.executionPeriod.startDate,
+            execution_end_date = contract_obj.executionPeriod.endDate,
+
+            energy_service_info = contract_obj.energyServiceContractInfo,
+            href = contract_obj.href,
+
+            current_stage = contract_obj.currentContractStage,
+            okpd2okved2 = contract_obj.okpd2okved2,
+            is_invalid = contract_obj.isInvalid,
+            scheme_version = contract_obj.schemeVersion
+        )
+        session.add(contract)
+    elif not update:
         return
+    else:
+        contract.direct_dt = contract_obj.directDate
+        contract.publish_dt = contract_obj.publishDate
+        contract.version_number = contract_obj.versionNumber
 
-    new_contract = ZfcsContract2015(
-        doc_id = doc_id,
-        external_id = external_id,
-        direct_dt = contract_obj.directDate,
-        publish_dt = contract_obj.publishDate,
-        version_number = contract_obj.versionNumber,
+        contract.conclusion_st95_ch17_1 = contract_obj.conclusionContractSt95Ch17_1
+        contract.protocol_date = contract_obj.protocolDate
+        contract.doc_base = contract_obj.documentBase
+        contract.doc_code = contract_obj.documentCode
+        contract.sign_date = contract_obj.signDate
+        contract.reg_num = contract_obj.regNum
+        contract.number = contract_obj.number
+        contract.subject = contract_obj.contractSubject
 
-        conclusion_st95_ch17_1 = contract_obj.conclusionContractSt95Ch17_1,
-        protocol_date = contract_obj.protocolDate,
-        doc_base = contract_obj.documentBase,
-        doc_code = contract_obj.documentCode,
-        sign_date = contract_obj.signDate,
-        reg_num = contract_obj.regNum,
-        number = contract_obj.number,
-        subject = contract_obj.contractSubject,
+        contract.group_build_code = contract_obj.constructionWorksInfo.constructionWorkGroup.code if contract_obj.constructionWorksInfo else None
 
-        group_build_code = contract_obj.constructionWorksInfo.constructionWorkGroup.code if contract_obj.constructionWorksInfo else None,
+        contract.defense_number = contract_obj.defenseContractNumber
+        contract.is_goz = contract_obj.isGOZ
+        contract.igk = contract_obj.IGK
+        contract.life_cycle = contract_obj.contractLifeCycle
 
-        defense_number = contract_obj.defenseContractNumber,
-        is_goz = contract_obj.isGOZ,
-        igk = contract_obj.IGK,
-        life_cycle = contract_obj.contractLifeCycle,
+        contract.is_smpo_or_sono_tender = contract_obj.isSMPOrSONOTender
+        contract.is_smpo_or_sono_engage = contract_obj.isSMPOrSONOEngage
 
-        is_smpo_or_sono_tender = contract_obj.isSMPOrSONOTender,
-        is_smpo_or_sono_engage = contract_obj.isSMPOrSONOEngage,
+        contract.quantity_stages = contract_obj.quantityContractStages
+        contract.execution_start_date = contract_obj.executionPeriod.startDate
+        contract.execution_end_date = contract_obj.executionPeriod.endDate
 
-        quantity_stages = contract_obj.quantityContractStages,
-        execution_start_date = contract_obj.executionPeriod.startDate,
-        execution_end_date = contract_obj.executionPeriod.endDate,
+        contract.energy_service_info = contract_obj.energyServiceContractInfo
+        contract.href = contract_obj.href
 
-        energy_service_info = contract_obj.energyServiceContractInfo,
-        href = contract_obj.href,
-
-        current_stage = contract_obj.currentContractStage,
-        okpd2okved2 = contract_obj.okpd2okved2,
-        is_invalid = contract_obj.isInvalid,
-        scheme_version = contract_obj.schemeVersion
-    )
-    session.add(new_contract)
+        contract.current_stage = contract_obj.currentContractStage
+        contract.okpd2okved2 = contract_obj.okpd2okved2
+        contract.is_invalid = contract_obj.isInvalid
+        contract.scheme_version = contract_obj.schemeVersion
 
     if contract_obj.priceInfo.rightToConcludeContractPriceInfo is None:
-        new_contract.price = contract_obj.priceInfo.price
-        new_contract.price_type = contract_obj.priceInfo.priceType
-        new_contract.price_formula = contract_obj.priceInfo.priceFormula
-        new_contract.price_formula_specified = contract_obj.priceInfo.maxPriceAndPriceFormulaSpecified
-        new_contract.currency_code = contract_obj.priceInfo.currency.code
-        new_contract.currency_rate = contract_obj.priceInfo.currencyRate.rate
-        new_contract.currency_raiting = contract_obj.priceInfo.currencyRate.raiting
-        new_contract.price_rur = contract_obj.priceInfo.priceRUR
-        new_contract.price_vat = contract_obj.priceInfo.priceVAT
-        new_contract.price_vat_rur = contract_obj.priceInfo.priceVATRUR
-        new_contract.reduced_by_taxes = contract_obj.priceInfo.amountsReducedByTaxes
+        contract.price = contract_obj.priceInfo.price
+        contract.price_type = contract_obj.priceInfo.priceType
+        contract.price_formula = contract_obj.priceInfo.priceFormula
+        contract.price_formula_specified = contract_obj.priceInfo.maxPriceAndPriceFormulaSpecified
+        contract.currency_code = contract_obj.priceInfo.currency.code
+        contract.currency_rate = contract_obj.priceInfo.currencyRate.rate
+        contract.currency_raiting = contract_obj.priceInfo.currencyRate.raiting
+        contract.price_rur = contract_obj.priceInfo.priceRUR
+        contract.price_vat = contract_obj.priceInfo.priceVAT
+        contract.price_vat_rur = contract_obj.priceInfo.priceVATRUR
+        contract.reduced_by_taxes = contract_obj.priceInfo.amountsReducedByTaxes
     else:
-        new_contract.right_to_conclude = True
+        contract.right_to_conclude = True
 
     if contract_obj.advancePaymentSum:
-        new_contract.advance_payment_percents = contract_obj.advancePaymentSum.sumInPercents
-        new_contract.advance_payment_value = contract_obj.advancePaymentSum.priceValue
-        new_contract.advance_payment_value_rur = contract_obj.advancePaymentSum.priceValueRUR
+        contract.advance_payment_percents = contract_obj.advancePaymentSum.sumInPercents
+        contract.advance_payment_value = contract_obj.advancePaymentSum.priceValue
+        contract.advance_payment_value_rur = contract_obj.advancePaymentSum.priceValueRUR
 
     if contract_obj.subContractorsSum:
-        new_contract.sub_contractors_percents = contract_obj.subContractorsSum.sumInPercents
-        new_contract.sub_contractors_value_rur = contract_obj.subContractorsSum.priceValueRUR
+        contract.sub_contractors_percents = contract_obj.subContractorsSum.sumInPercents
+        contract.sub_contractors_value_rur = contract_obj.subContractorsSum.priceValueRUR

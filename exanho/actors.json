@@ -28,8 +28,9 @@
                     "db_key": "eis44_test",
                     "queue_name": "contract",
                     "appsettings":{
+                        "parse_module": "exanho.eis44.ds.export_types",
                         "error_attempts": 2,
-                        "update": false
+                        "update": true
                     }
                 }
             ]

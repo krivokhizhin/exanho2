@@ -5,11 +5,11 @@ def run():
 
     # ds_mod = importlib.import_module('exanho.eis223.ds.reference')
     import exanho.eis44.ds.export_types as ds_mod
-    f = open('/home/kks/projects/eis44DS/contracts/contract_Adygeja_Resp_2020110100_2020120100_003.xml/contractProcedure_1010100225119000010_129806599.xml', 'br')
+    f = open('/home/kks/projects/eis44DS/contracts/contract_Adygeja_Resp_2020110100_2020120100_009.xml/contractProcedureCancel_1010100225119000004_115262529.xml', 'br')
     f_str = f.read()
     rootObj = ds_mod.parseString(f_str)
     
-    from exanho.eis44.parsing.integration_types.zfcs_contract_procedure2015 import parse as ds_parse
+    from exanho.eis44.parsing.integration_types.zfcs_contract_procedure_cancel2015 import parse as ds_parse
 
     for child in rootObj.get_children():
         with d.session_scope() as session:

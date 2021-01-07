@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Boolean, Column, Date, DateTime, Index, Integer, Numeric, String
+from sqlalchemy import BigInteger, Column, Date, DateTime, Index, String
 from exanho.orm.domain import Base
 
 class ZfcsContractProcedureCancel2015(Base):

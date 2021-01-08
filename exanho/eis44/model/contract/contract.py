@@ -1,4 +1,5 @@
 from sqlalchemy import BigInteger, Boolean, Column, Date, DateTime, Index, Integer, Numeric, String
+from sqlalchemy.orm import relationship
 from exanho.orm.domain import Base
 
 class ZfcsContract2015(Base):
@@ -75,7 +76,7 @@ class ZfcsContract2015(Base):
     energy_service_info = Column(String(200))
 
     # products
-    # suppliers
+    suppliers = relationship('ZfcsContract2015Supplier', back_populates='contract', cascade='all, delete-orphan')
 
     href = Column(String(1024))
     # print_form

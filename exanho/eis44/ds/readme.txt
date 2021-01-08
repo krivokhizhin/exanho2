@@ -87,3 +87,82 @@ with
 #
 # Data representation classes.
 #
+
+4 Fix classes:
+
+4.1 zfcs_contract2015Type
+
+member_data_items_ = {
+        ...
+        'suppliers': MemberSpec_('suppliers', 'suppliers', 0, 0, {'name': 'suppliers', 'type': 'contract2015suppliers'}, None),
+        ...
+    }
+
+def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        ...
+        elif nodeName_ == 'suppliers':
+            obj_ = contract2015suppliers.factory(parent_object_=self)
+            ...
+        ...
+
+5. Add classes:
+
+5.1
+class contract2015suppliers(GeneratedsSuper):
+    """Поставщики"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+        'supplier': MemberSpec_('supplier', 'supplier', 1, 0, {'maxOccurs': 'unbounded', 'name': 'supplier', 'type': 'zfcs_contract2015SupplierType'}, None),
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, supplier=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        if supplier is None:
+            self.supplier = []
+        else:
+            self.supplier = supplier
+        self.supplier_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, contract2015suppliers)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if contract2015suppliers.subclass:
+            return contract2015suppliers.subclass(*args_, **kwargs_)
+        else:
+            return contract2015suppliers(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def hasContent_(self):
+        if (
+            self.supplier
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'supplier':
+            obj_ = zfcs_contract2015SupplierType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.supplier.append(obj_)
+            obj_.original_tagname_ = 'supplier'
+# end class contract2015suppliers

@@ -1,5 +1,10 @@
 from ...ds.export_types import zfcs_contract2015Type
+from ...ds.IntegrationTypes import contract2015suppliers, zfcs_contract2015SupplierType, legalEntityRF, legalEntityForeignState, individualPersonRF, individualPersonForeignState, individualPersonRFisCulture, individualPersonForeignStateisCulture
+
+from exanho.core.common import Error
 from ...model.contract import *
+
+NOT_PUBLISHED_VALUE = '*'
 
 def parse(session, contract_obj:zfcs_contract2015Type, update=True, **kwargs):
     doc_id = contract_obj.id
@@ -108,3 +113,85 @@ def parse(session, contract_obj:zfcs_contract2015Type, update=True, **kwargs):
     if contract_obj.subContractorsSum:
         contract.sub_contractors_percents = contract_obj.subContractorsSum.sumInPercents
         contract.sub_contractors_value_rur = contract_obj.subContractorsSum.priceValueRUR
+
+    fill_suppliers(session, contract, contract_obj.suppliers)
+
+def fill_suppliers(session, owner:ZfcsContract2015, suppliers_obj:contract2015suppliers):
+    owner.suppliers = []
+    if suppliers_obj is None:
+        return
+
+    for supplier_obj in suppliers_obj.supplier:
+        supplier = get_supplier(session, supplier_obj)
+        if supplier:
+            owner.suppliers.append(supplier)
+
+def get_supplier(session, supplier_obj:zfcs_contract2015SupplierType):
+    supplier = None
+    if supplier_obj is None:
+        return supplier
+
+    if supplier_obj.legalEntityRF:
+        supplier = get_legal_entity_rf(session, supplier_obj.legalEntityRF)
+    elif supplier_obj.individualPersonRF:
+        pass
+    elif supplier_obj.legalEntityForeignState:
+        pass
+    elif supplier_obj.individualPersonForeignState:
+        pass
+    elif supplier_obj.individualPersonRFisCulture:
+        pass
+    elif supplier_obj.individualPersonForeignStateisCulture:
+        pass
+    elif supplier_obj.notPublishedOnEIS:
+        supplier = get_not_published_on_eis(session, supplier_obj.notPublishedOnEIS)
+    else:
+        raise Error(f'unknown zfcs_contract2015SupplierType')
+
+    # session.add(supplier)
+    return supplier
+
+def get_legal_entity_rf(session, supplier_obj:legalEntityRF):
+    supplier = ZfcsContract2015Supplier(
+        type = CntrSupplierType.LERF
+    )
+
+    supplier.status = supplier_obj.stat
+
+    inn = supplier_obj.INN
+    kpp = supplier_obj.KPP
+    participant = get_participant(session, CntrParticipantKind.RF, inn, kpp)
+
+def get_individual_person_rf(session, supplier_obj:individualPersonRF):
+    pass
+
+def get_legal_entity_fs(session, supplier_obj:legalEntityForeignState):
+    pass
+
+def get_individual_person_fs(session, supplier_obj:individualPersonForeignState):
+    pass
+
+def get_individual_culture_person_rf(session, supplier_obj:individualPersonRFisCulture):
+    pass
+
+def get_individual_culture_person_fs(session, supplier_obj:individualPersonForeignStateisCulture):
+    pass
+
+def get_not_published_on_eis(session, supplier_obj:bool):
+    supplier = ZfcsContract2015Supplier(
+        type = CntrSupplierType.NPEIS
+    )
+    supplier.participant = get_participant(session, CntrParticipantKind.RF, NOT_PUBLISHED_VALUE, NOT_PUBLISHED_VALUE)
+    return supplier
+
+def get_participant(session, kind:CntrParticipantKind, inn:str, kpp:str):
+    participant = session.query(CntrParticipant).filter(CntrParticipant.inn == inn, CntrParticipant.kpp == kpp).one_or_none()
+    if participant is None:
+        participant = CntrParticipant(
+            kind = kind,
+            inn = inn,
+            kpp = kpp
+        )
+        session.add(participant)
+
+    return participant

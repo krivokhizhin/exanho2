@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- FCS EXPORT Integration Scheme, version 11.0, create date 25.12.2020 -->
+<xs:schema xmlns="http://zakupki.gov.ru/oos/export/1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oos="http://zakupki.gov.ru/oos/types/1" xmlns:pp615="http://zakupki.gov.ru/oos/pprf615types/1" xmlns:ep="http://zakupki.gov.ru/oos/EPtypes/1" xmlns:cp="http://zakupki.gov.ru/oos/CPtypes/1" xmlns:tp="http://zakupki.gov.ru/oos/TPtypes/1" xmlns:sm="http://zakupki.gov.ru/oos/SMTypes/1" targetNamespace="http://zakupki.gov.ru/oos/export/1" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="http://zakupki.gov.ru/oos/types/1" schemaLocation="IntegrationTypes.xsd"/>
+	<xs:element name="export">
+		<xs:annotation>
+			<xs:documentation>Схема данных подсистемы экспорта</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice>
+					<xs:element name="contract" type="oos:zfcs_contract2015Type" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Информация (проект информации) о заключенном контракте</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="contractCancel" type="oos:zfcs_contractCancel2015Type" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Информация об анулировании контракта</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="contractProcedure" type="oos:zfcs_contractProcedure2015Type" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Информация об исполнении (расторжении) контракта</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="contractProcedureCancel" type="oos:zfcs_contractProcedureCancel2015Type" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Информация об отмене исполнения (расторжения) контракта</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

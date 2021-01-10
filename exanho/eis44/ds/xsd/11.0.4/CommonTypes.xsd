@@ -2,11 +2,6 @@
 <!-- COMMON_TYPES Integration Scheme, version 11.0, create date 25.12.2020 -->
 <xs:schema xmlns="http://zakupki.gov.ru/oos/common/1" xmlns:cmn="http://zakupki.gov.ru/oos/common/1" xmlns:base="http://zakupki.gov.ru/oos/base/1" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://zakupki.gov.ru/oos/common/1" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:import namespace="http://zakupki.gov.ru/oos/base/1" schemaLocation="BaseTypes.xsd"/>
-    <xs:element name="dummy" type="xs:int" minOccurs="0">
-        <xs:annotation>
-            <xs:documentation>dummy</xs:documentation>
-        </xs:annotation>
-    </xs:element>
 	<!--Общие типы-->
 	<xs:complexType name="attachmentListType">
 		<xs:annotation>

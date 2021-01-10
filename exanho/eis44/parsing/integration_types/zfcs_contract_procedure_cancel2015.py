@@ -1,4 +1,4 @@
-from ...ds.export_types import zfcs_contractProcedureCancel2015Type
+from ...ds.contracts.fcsExport import zfcs_contractProcedureCancel2015Type
 from ...model.contract import *
 
 def parse(session, cntr_proc_cancel_obj:zfcs_contractProcedureCancel2015Type, update=True, **kwargs):

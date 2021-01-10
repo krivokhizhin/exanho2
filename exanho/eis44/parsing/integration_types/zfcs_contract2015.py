@@ -1,5 +1,5 @@
-from ...ds.export_types import zfcs_contract2015Type
-from ...ds.IntegrationTypes import contract2015suppliers, zfcs_contract2015SupplierType, legalEntityRF, legalEntityForeignState, individualPersonRF, individualPersonForeignState, individualPersonRFisCulture, individualPersonForeignStateisCulture
+from ...ds.contracts.fcsExport import zfcs_contract2015Type
+from ...ds.contracts.IntegrationTypes import suppliers, zfcs_contract2015SupplierType, legalEntityRF, legalEntityForeignState, individualPersonRF, individualPersonForeignState, individualPersonRFisCulture, individualPersonForeignStateisCulture
 
 from exanho.core.common import Error
 from ...model.contract import *
@@ -116,7 +116,7 @@ def parse(session, contract_obj:zfcs_contract2015Type, update=True, **kwargs):
 
     fill_suppliers(session, contract, contract_obj.suppliers)
 
-def fill_suppliers(session, owner:ZfcsContract2015, suppliers_obj:contract2015suppliers):
+def fill_suppliers(session, owner:ZfcsContract2015, suppliers_obj:suppliers):
     owner.suppliers = []
     if suppliers_obj is None:
         return
@@ -156,7 +156,7 @@ def get_legal_entity_rf(session, supplier_obj:legalEntityRF):
         type = CntrSupplierType.LERF
     )
 
-    supplier.status = supplier_obj.stat
+    supplier.status = supplier_obj.status
 
     inn = supplier_obj.INN
     kpp = supplier_obj.KPP

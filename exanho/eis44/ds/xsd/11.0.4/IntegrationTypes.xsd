@@ -3,11 +3,6 @@
 <xs:schema xmlns="http://zakupki.gov.ru/oos/types/1" xmlns:oos="http://zakupki.gov.ru/oos/types/1" xmlns:base="http://zakupki.gov.ru/oos/base/1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:cmn="http://zakupki.gov.ru/oos/common/1" targetNamespace="http://zakupki.gov.ru/oos/types/1" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:import namespace="http://zakupki.gov.ru/oos/base/1" schemaLocation="BaseTypes.xsd"/>
 	<xs:import namespace="http://zakupki.gov.ru/oos/common/1" schemaLocation="CommonTypes.xsd"/>
-    <xs:element name="dummy" type="xs:int" minOccurs="0">
-        <xs:annotation>
-            <xs:documentation>dummy</xs:documentation>
-        </xs:annotation>
-    </xs:element>
 	<xs:complexType name="account">
 		<xs:annotation>
 			<xs:documentation>Банковский cчет организации</xs:documentation>

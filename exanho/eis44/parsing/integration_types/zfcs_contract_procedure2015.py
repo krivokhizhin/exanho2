@@ -1,4 +1,4 @@
-from ...ds.export_types import zfcs_contractProcedure2015Type
+from ...ds.contracts.fcsExport import zfcs_contractProcedure2015Type
 from ...model.contract import *
 
 def parse(session, cntr_proc_obj:zfcs_contractProcedure2015Type, update=True, **kwargs):

@@ -41,7 +41,7 @@ from generatedssuper import GeneratedsSuper
 with
 from ..generatedssuper import GeneratedsSuper
 
-3.2.1 IntegrationTypes.py
+5.2.1 IntegrationTypes.py
 #
 # Data representation classes.
 #
@@ -58,7 +58,7 @@ with
 from .BaseTypes import *
 from .CommonTypes import *
 
-3.2.2 CommonTypes.py
+5.2.2 CommonTypes.py
 #
 # Data representation classes.
 #
@@ -74,7 +74,7 @@ with
 
 from .BaseTypes import *
 
-3.2.3 BaseTypes.py
+5.2.3 BaseTypes.py
 #
 # Data representation classes.
 #

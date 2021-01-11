@@ -1,3 +1,4 @@
+from exanho.eis44.ds.contracts.CommonTypes import content
 from sqlalchemy import BigInteger, Boolean, Column, Date, DateTime, Index, Integer, Numeric, String
 from sqlalchemy.orm import relationship
 from exanho.orm.domain import Base
@@ -92,6 +93,7 @@ class ZfcsContract2015(Base):
     okpd2okved2 = Column(Boolean)
     is_invalid = Column(Boolean)
     scheme_version = Column(String(20))
+    content_id = Column(BigInteger)
 
 Index('idx_zfcs_contract2015_doc_id', ZfcsContract2015.doc_id, ZfcsContract2015.external_id, unique=True)
 Index('idx_zfcs_contract2015_reg_num', ZfcsContract2015.reg_num, ZfcsContract2015.number, ZfcsContract2015.version_number,unique=True)

@@ -16,6 +16,11 @@
     - <!--Разное-->
     - <!--Ссылки на общие справочники-->
     - and all group elements
+2.3 IntegrationTypes.xsd:add corrected types from file (/home/kks/git/exanho/exanho/eis44/ds/contracts/xsd/corrected_types):
+  - corr_supplierLegalEntityRF for zfcs_contract2015SupplierType -> legalEntityRF
+  - corr_supplierLegalEntityForeignState for zfcs_contract2015SupplierType -> legalEntityForeignState
+  - corr_supplierIndividualPersonRF for zfcs_contract2015SupplierType -> individualPersonRF 
+  - corr_supplierIndividualPersonForeignState for zfcs_contract2015SupplierType -> individualPersonForeignState
 
 3. cp -T exanho/eis44/ds/generateds_config.py /home/kks/git/exanho/venv/bin/generateds_config.py
 
@@ -52,7 +57,7 @@ from ...
 with
 
 #
-# Data representation classes.
+#. Data representation classes.
 #
 
 from .BaseTypes import *

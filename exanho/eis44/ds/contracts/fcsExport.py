@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Sun Jan 10 17:22:41 2021 by generateDS.py version 2.37.11.
+# Generated Mon Jan 11 11:56:28 2021 by generateDS.py version 2.37.11.
 # Python 3.8.2 (default, Apr 12 2020, 19:32:31)  [GCC 8.3.0]
 #
 # Command line options:
@@ -1371,6 +1371,10 @@ __all__ = [
     "control99ResponsibleType",
     "controlDocumentsInfo",
     "controlObjectsInfo",
+    "corr_supplierIndividualPersonForeignState",
+    "corr_supplierIndividualPersonRF",
+    "corr_supplierLegalEntityForeignState",
+    "corr_supplierLegalEntityRF",
     "countryFullName",
     "cryptoSigns",
     "currencyCBRFRef",
@@ -1463,10 +1467,8 @@ __all__ = [
     "guaranteeReturn",
     "id",
     "individualBusinessmanRF",
-    "individualPersonForeignState",
     "individualPersonForeignStateInfo",
     "individualPersonForeignStateisCulture",
-    "individualPersonRF",
     "individualPersonRFInfo",
     "individualPersonRFisCulture",
     "inn",
@@ -1476,7 +1478,6 @@ __all__ = [
     "kladr",
     "lastName",
     "lastNameLat",
-    "legalEntityForeignState",
     "legalEntityForeignStateInfo",
     "legalEntityRF",
     "legalEntityRFInfo",

@@ -15,11 +15,11 @@ class CntrSupplierType(enum.Enum):
 class ZfcsContract2015Supplier(Base):
     __tablename__ = 'zfcs_contract2015_supplier'
     
-    id = Column(BigInteger, primary_key=True)
     type = Column(Enum(CntrSupplierType), nullable=False)
 
-    contract_id = Column(Integer, ForeignKey('zfcs_contract2015.id'), primary_key=True)
-    participant_id = Column(Integer, ForeignKey('cntr_participant.id'), primary_key=True)
+    contract_id = Column(BigInteger, ForeignKey('zfcs_contract2015.id'), primary_key=True)
+    participant_id = Column(BigInteger, ForeignKey('cntr_participant.id'), primary_key=True)
+    order = Column(Integer, default=1, primary_key=True)
 
     contract = relationship('ZfcsContract2015', back_populates='suppliers')
     participant = relationship('CntrParticipant', back_populates='contracts')
@@ -42,5 +42,5 @@ class ZfcsContract2015Supplier(Base):
     contact_email = Column(String(256))
     contact_phone = Column(String(30))
 
-    is_ip = Column(Boolean, default=False)
-    is_culture = Column(Boolean, default=False)
+    is_ip = Column(Boolean)
+    is_culture = Column(Boolean)

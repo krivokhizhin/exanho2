@@ -4,7 +4,7 @@ def run():
     d = domain.Domain('postgresql+psycopg2://kks:Nata1311@localhost/eis44_test')
 
     import exanho.eis44.ds.contracts.fcsExport as ds_mod
-    f = open('/home/kks/projects/eis44DS/data/contracts/contract_Adygeja_Resp_2020110100_2020120100_002.xml/contract_1010100225119000004_61063483.xml', 'br')
+    f = open('/home/kks/projects/eis44DS/data/contracts/contract_Adygeja_Resp_2020090100_2020100100_001.xml/contract_1010101008320000007_59810726.xml', 'br')
     f_str = f.read()
     rootObj = ds_mod.parseString(f_str)
     
@@ -12,6 +12,6 @@ def run():
 
     for child in rootObj.get_children():
         with d.session_scope() as session:
-            ds_parse(session, child, False)
+            ds_parse(session, child, True)
             print(child.get_xml_tag())
             pass

@@ -1,5 +1,5 @@
 import enum
-from sqlalchemy import Column, Date, Enum, ForeignKey, Index, Integer, String
+from sqlalchemy import BigInteger, Column, Date, Enum, ForeignKey, Index, String
 from sqlalchemy.orm import relationship
 
 from exanho.orm.domain import Base
@@ -11,7 +11,7 @@ class CntrParticipantKind(enum.Enum):
 class CntrParticipant(Base):
     __tablename__ = 'cntr_participant'
     
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     kind = Column(Enum(CntrParticipantKind), nullable=False)
 
     okopf_code = Column(String(5))
@@ -37,10 +37,10 @@ class CntrParticipant(Base):
 
 Index('ix_cntr_participant_inn_kpp', CntrParticipant.inn, CntrParticipant.kpp, unique=True)
 
-class ForeignParticipant(CntrParticipant):
+class CntrParticipantForeign(CntrParticipant):
     __tablename__ = 'cntr_participant_foreign'
     
-    id = Column(Integer, ForeignKey('cntr_participant.id'), primary_key=True)
+    id = Column(BigInteger, ForeignKey('cntr_participant.id'), primary_key=True)
 
     full_name_lat = Column(String(2000))
     tax_payer_code = Column(String(100), index=True)

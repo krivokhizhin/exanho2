@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Sun Jan 10 17:22:37 2021 by generateDS.py version 2.37.11.
+# Generated Mon Jan 11 11:56:25 2021 by generateDS.py version 2.37.11.
 # Python 3.8.2 (default, Apr 12 2020, 19:32:31)  [GCC 8.3.0]
 #
 # Command line options:
@@ -980,6 +980,2232 @@ def _cast(typ, value):
 from .BaseTypes import *
 from .CommonTypes import *
 
+class corr_supplierLegalEntityRF(GeneratedsSuper):
+    """Юридическое лицо РФ"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+        'legalForm': MemberSpec_('legalForm', 'zfcs_okopfRef', 0, 0, {'name': 'legalForm', 'type': 'zfcs_okopfRef'}, None),
+        'fullName': MemberSpec_('fullName', ['zfcs_longTextMinType', 'xs:string'], 0, 0, {'name': 'fullName', 'type': 'xs:string'}, None),
+        'shortName': MemberSpec_('shortName', ['zfcs_longTextMinType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'shortName', 'type': 'xs:string'}, None),
+        'firmName': MemberSpec_('firmName', ['zfcs_longTextMinType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'firmName', 'type': 'xs:string'}, None),
+        'status': MemberSpec_('status', ['zfcs_participantStatusContract2015Type', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'status', 'type': 'xs:string'}, None),
+        'ERSMSPInclusionDate': MemberSpec_('ERSMSPInclusionDate', 'xs:date', 0, 1, {'minOccurs': '0', 'name': 'ERSMSPInclusionDate', 'type': 'xs:date'}, None),
+        'contractPrice': MemberSpec_('contractPrice', ['moneyPositiveType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'contractPrice', 'type': 'xs:string'}, None),
+        'OKPO': MemberSpec_('OKPO', ['zfcs_okpoType', 'xs:string'], 0, 0, {'name': 'OKPO', 'type': 'xs:string'}, None),
+        'INN': MemberSpec_('INN', ['innType', 'xs:string'], 0, 0, {'name': 'INN', 'type': 'xs:string'}, None),
+        'KPP': MemberSpec_('KPP', ['kppType', 'xs:string'], 0, 0, {'name': 'KPP', 'type': 'xs:string'}, None),
+        'registrationDate': MemberSpec_('registrationDate', 'xs:date', 0, 0, {'name': 'registrationDate', 'type': 'xs:date'}, None),
+        'OKTMO': MemberSpec_('OKTMO', 'zfcs_OKTMORef', 0, 0, {'name': 'OKTMO', 'type': 'zfcs_OKTMORef'}, None),
+        'personalAccount': MemberSpec_('personalAccount', ['zfcs_personalAccountType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'personalAccount', 'type': 'xs:string'}, None),
+        'address': MemberSpec_('address', ['zfcs_contract2015AddressType', 'xs:string'], 0, 0, {'name': 'address', 'type': 'xs:string'}, None),
+        'postAdressInfo': MemberSpec_('postAdressInfo', 'postAdressInfo', 0, 1, {'minOccurs': '0', 'name': 'postAdressInfo', 'type': 'postAdressInfo'}, None),
+        'postAddress': MemberSpec_('postAddress', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'postAddress', 'type': 'xs:string'}, None),
+        'contactInfo': MemberSpec_('contactInfo', 'contactInfo', 0, 1, {'minOccurs': '0', 'name': 'contactInfo', 'type': 'zfcs_contactPersonType'}, None),
+        'contactEMail': MemberSpec_('contactEMail', ['eMailType', 'xs:string'], 0, 0, {'name': 'contactEMail', 'type': 'xs:string'}, None),
+        'contactPhone': MemberSpec_('contactPhone', ['phoneType', 'xs:string'], 0, 0, {'name': 'contactPhone', 'type': 'xs:string'}, None),
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, legalForm=None, fullName=None, shortName=None, firmName=None, status=None, ERSMSPInclusionDate=None, contractPrice=None, OKPO=None, INN=None, KPP=None, registrationDate=None, OKTMO=None, personalAccount=None, address=None, postAdressInfo=None, postAddress=None, contactInfo=None, contactEMail=None, contactPhone=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.legalForm = legalForm
+        self.legalForm_nsprefix_ = None
+        self.fullName = fullName
+        self.validate_zfcs_longTextMinType(self.fullName)
+        self.fullName_nsprefix_ = None
+        self.shortName = shortName
+        self.validate_zfcs_longTextMinType(self.shortName)
+        self.shortName_nsprefix_ = None
+        self.firmName = firmName
+        self.validate_zfcs_longTextMinType(self.firmName)
+        self.firmName_nsprefix_ = None
+        self.status = status
+        self.validate_zfcs_participantStatusContract2015Type(self.status)
+        self.status_nsprefix_ = None
+        if isinstance(ERSMSPInclusionDate, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(ERSMSPInclusionDate, '%Y-%m-%d').date()
+        else:
+            initvalue_ = ERSMSPInclusionDate
+        self.ERSMSPInclusionDate = initvalue_
+        self.ERSMSPInclusionDate_nsprefix_ = None
+        self.contractPrice = contractPrice
+        self.validate_moneyPositiveType(self.contractPrice)
+        self.contractPrice_nsprefix_ = None
+        self.OKPO = OKPO
+        self.validate_zfcs_okpoType(self.OKPO)
+        self.OKPO_nsprefix_ = None
+        self.INN = INN
+        self.validate_innType(self.INN)
+        self.INN_nsprefix_ = None
+        self.KPP = KPP
+        self.validate_kppType(self.KPP)
+        self.KPP_nsprefix_ = None
+        if isinstance(registrationDate, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(registrationDate, '%Y-%m-%d').date()
+        else:
+            initvalue_ = registrationDate
+        self.registrationDate = initvalue_
+        self.registrationDate_nsprefix_ = None
+        self.OKTMO = OKTMO
+        self.OKTMO_nsprefix_ = None
+        self.personalAccount = personalAccount
+        self.validate_zfcs_personalAccountType(self.personalAccount)
+        self.personalAccount_nsprefix_ = None
+        self.address = address
+        self.validate_zfcs_contract2015AddressType(self.address)
+        self.address_nsprefix_ = None
+        self.postAdressInfo = postAdressInfo
+        self.postAdressInfo_nsprefix_ = None
+        self.postAddress = postAddress
+        self.validate_zfcs_contract2015AddressType(self.postAddress)
+        self.postAddress_nsprefix_ = None
+        self.contactInfo = contactInfo
+        self.contactInfo_nsprefix_ = None
+        self.contactEMail = contactEMail
+        self.validate_eMailType(self.contactEMail)
+        self.contactEMail_nsprefix_ = None
+        self.contactPhone = contactPhone
+        self.validate_phoneType(self.contactPhone)
+        self.contactPhone_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, corr_supplierLegalEntityRF)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if corr_supplierLegalEntityRF.subclass:
+            return corr_supplierLegalEntityRF.subclass(*args_, **kwargs_)
+        else:
+            return corr_supplierLegalEntityRF(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_zfcs_longTextMinType(self, value):
+        result = True
+        # Validate type zfcs_longTextMinType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 2000:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_longTextMinType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_longTextMinType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_zfcs_participantStatusContract2015Type(self, value):
+        result = True
+        # Validate type zfcs_participantStatusContract2015Type, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['10', '20', '30', '31', '40', '41']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on zfcs_participantStatusContract2015Type' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_moneyPositiveType(self, value):
+        result = True
+        # Validate type moneyPositiveType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 21:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on moneyPositiveType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on moneyPositiveType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_moneyPositiveType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_moneyPositiveType_patterns_, ))
+                result = False
+        return result
+    validate_moneyPositiveType_patterns_ = [['^(\\d+(\\.\\d{1,2})?)$']]
+    def validate_zfcs_okpoType(self, value):
+        result = True
+        # Validate type zfcs_okpoType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 10:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_okpoType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_okpoType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_innType(self, value):
+        result = True
+        # Validate type innType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 12:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on innType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_innType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_innType_patterns_, ))
+                result = False
+        return result
+    validate_innType_patterns_ = [['^(\\d{1,12})$']]
+    def validate_kppType(self, value):
+        result = True
+        # Validate type kppType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) != 9:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd length restriction on kppType' % {"value": encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_zfcs_personalAccountType(self, value):
+        result = True
+        # Validate type zfcs_personalAccountType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) != 11:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd length restriction on zfcs_personalAccountType' % {"value": encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_zfcs_contract2015AddressType(self, value):
+        result = True
+        # Validate type zfcs_contract2015AddressType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 1024:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_eMailType(self, value):
+        result = True
+        # Validate type eMailType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 256:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on eMailType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on eMailType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_phoneType(self, value):
+        result = True
+        # Validate type phoneType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 30:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on phoneType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on phoneType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.legalForm is not None or
+            self.fullName is not None or
+            self.shortName is not None or
+            self.firmName is not None or
+            self.status is not None or
+            self.ERSMSPInclusionDate is not None or
+            self.contractPrice is not None or
+            self.OKPO is not None or
+            self.INN is not None or
+            self.KPP is not None or
+            self.registrationDate is not None or
+            self.OKTMO is not None or
+            self.personalAccount is not None or
+            self.address is not None or
+            self.postAdressInfo is not None or
+            self.postAddress is not None or
+            self.contactInfo is not None or
+            self.contactEMail is not None or
+            self.contactPhone is not None
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'legalForm':
+            obj_ = zfcs_okopfRef.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.legalForm = obj_
+            obj_.original_tagname_ = 'legalForm'
+        elif nodeName_ == 'fullName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'fullName')
+            value_ = self.gds_validate_string(value_, node, 'fullName')
+            self.fullName = value_
+            self.fullName_nsprefix_ = child_.prefix
+            # validate type zfcs_longTextMinType
+            self.validate_zfcs_longTextMinType(self.fullName)
+        elif nodeName_ == 'shortName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'shortName')
+            value_ = self.gds_validate_string(value_, node, 'shortName')
+            self.shortName = value_
+            self.shortName_nsprefix_ = child_.prefix
+            # validate type zfcs_longTextMinType
+            self.validate_zfcs_longTextMinType(self.shortName)
+        elif nodeName_ == 'firmName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'firmName')
+            value_ = self.gds_validate_string(value_, node, 'firmName')
+            self.firmName = value_
+            self.firmName_nsprefix_ = child_.prefix
+            # validate type zfcs_longTextMinType
+            self.validate_zfcs_longTextMinType(self.firmName)
+        elif nodeName_ == 'status':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'status')
+            value_ = self.gds_validate_string(value_, node, 'status')
+            self.status = value_
+            self.status_nsprefix_ = child_.prefix
+            # validate type zfcs_participantStatusContract2015Type
+            self.validate_zfcs_participantStatusContract2015Type(self.status)
+        elif nodeName_ == 'ERSMSPInclusionDate':
+            sval_ = child_.text
+            dval_ = self.gds_parse_date(sval_)
+            self.ERSMSPInclusionDate = dval_
+            self.ERSMSPInclusionDate_nsprefix_ = child_.prefix
+        elif nodeName_ == 'contractPrice':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'contractPrice')
+            value_ = self.gds_validate_string(value_, node, 'contractPrice')
+            self.contractPrice = value_
+            self.contractPrice_nsprefix_ = child_.prefix
+            # validate type moneyPositiveType
+            self.validate_moneyPositiveType(self.contractPrice)
+        elif nodeName_ == 'OKPO':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'OKPO')
+            value_ = self.gds_validate_string(value_, node, 'OKPO')
+            self.OKPO = value_
+            self.OKPO_nsprefix_ = child_.prefix
+            # validate type zfcs_okpoType
+            self.validate_zfcs_okpoType(self.OKPO)
+        elif nodeName_ == 'INN':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'INN')
+            value_ = self.gds_validate_string(value_, node, 'INN')
+            self.INN = value_
+            self.INN_nsprefix_ = child_.prefix
+            # validate type innType
+            self.validate_innType(self.INN)
+        elif nodeName_ == 'KPP':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'KPP')
+            value_ = self.gds_validate_string(value_, node, 'KPP')
+            self.KPP = value_
+            self.KPP_nsprefix_ = child_.prefix
+            # validate type kppType
+            self.validate_kppType(self.KPP)
+        elif nodeName_ == 'registrationDate':
+            sval_ = child_.text
+            dval_ = self.gds_parse_date(sval_)
+            self.registrationDate = dval_
+            self.registrationDate_nsprefix_ = child_.prefix
+        elif nodeName_ == 'OKTMO':
+            obj_ = zfcs_OKTMORef.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.OKTMO = obj_
+            obj_.original_tagname_ = 'OKTMO'
+        elif nodeName_ == 'personalAccount':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'personalAccount')
+            value_ = self.gds_validate_string(value_, node, 'personalAccount')
+            self.personalAccount = value_
+            self.personalAccount_nsprefix_ = child_.prefix
+            # validate type zfcs_personalAccountType
+            self.validate_zfcs_personalAccountType(self.personalAccount)
+        elif nodeName_ == 'address':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'address')
+            value_ = self.gds_validate_string(value_, node, 'address')
+            self.address = value_
+            self.address_nsprefix_ = child_.prefix
+            # validate type zfcs_contract2015AddressType
+            self.validate_zfcs_contract2015AddressType(self.address)
+        elif nodeName_ == 'postAdressInfo':
+            obj_ = postAdressInfo.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.postAdressInfo = obj_
+            obj_.original_tagname_ = 'postAdressInfo'
+        elif nodeName_ == 'postAddress':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'postAddress')
+            value_ = self.gds_validate_string(value_, node, 'postAddress')
+            self.postAddress = value_
+            self.postAddress_nsprefix_ = child_.prefix
+            # validate type zfcs_contract2015AddressType
+            self.validate_zfcs_contract2015AddressType(self.postAddress)
+        elif nodeName_ == 'contactInfo':
+            obj_ = zfcs_contactPersonType.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.contactInfo = obj_
+            obj_.original_tagname_ = 'contactInfo'
+        elif nodeName_ == 'contactEMail':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'contactEMail')
+            value_ = self.gds_validate_string(value_, node, 'contactEMail')
+            self.contactEMail = value_
+            self.contactEMail_nsprefix_ = child_.prefix
+            # validate type eMailType
+            self.validate_eMailType(self.contactEMail)
+        elif nodeName_ == 'contactPhone':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'contactPhone')
+            value_ = self.gds_validate_string(value_, node, 'contactPhone')
+            self.contactPhone = value_
+            self.contactPhone_nsprefix_ = child_.prefix
+            # validate type phoneType
+            self.validate_phoneType(self.contactPhone)
+# end class corr_supplierLegalEntityRF
+
+
+class postAdressInfo(GeneratedsSuper):
+    """Почтовый адрес.
+    При приеме контролируется, что поля mailFacilityName и postBoxNumber
+    заполняются/не заполняются парой"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+        'mailingAdress': MemberSpec_('mailingAdress', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'mailingAdress', 'type': 'xs:string'}, None),
+        'mailFacilityName': MemberSpec_('mailFacilityName', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'mailFacilityName', 'type': 'xs:string'}, None),
+        'postBoxNumber': MemberSpec_('postBoxNumber', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'postBoxNumber', 'type': 'xs:string'}, None),
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, mailingAdress=None, mailFacilityName=None, postBoxNumber=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.mailingAdress = mailingAdress
+        self.validate_zfcs_contract2015AddressType(self.mailingAdress)
+        self.mailingAdress_nsprefix_ = None
+        self.mailFacilityName = mailFacilityName
+        self.validate_zfcs_contract2015AddressType(self.mailFacilityName)
+        self.mailFacilityName_nsprefix_ = None
+        self.postBoxNumber = postBoxNumber
+        self.validate_zfcs_contract2015AddressType(self.postBoxNumber)
+        self.postBoxNumber_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, postAdressInfo)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if postAdressInfo.subclass:
+            return postAdressInfo.subclass(*args_, **kwargs_)
+        else:
+            return postAdressInfo(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_zfcs_contract2015AddressType(self, value):
+        result = True
+        # Validate type zfcs_contract2015AddressType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 1024:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.mailingAdress is not None or
+            self.mailFacilityName is not None or
+            self.postBoxNumber is not None
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'mailingAdress':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'mailingAdress')
+            value_ = self.gds_validate_string(value_, node, 'mailingAdress')
+            self.mailingAdress = value_
+            self.mailingAdress_nsprefix_ = child_.prefix
+            # validate type zfcs_contract2015AddressType
+            self.validate_zfcs_contract2015AddressType(self.mailingAdress)
+        elif nodeName_ == 'mailFacilityName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'mailFacilityName')
+            value_ = self.gds_validate_string(value_, node, 'mailFacilityName')
+            self.mailFacilityName = value_
+            self.mailFacilityName_nsprefix_ = child_.prefix
+            # validate type zfcs_contract2015AddressType
+            self.validate_zfcs_contract2015AddressType(self.mailFacilityName)
+        elif nodeName_ == 'postBoxNumber':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'postBoxNumber')
+            value_ = self.gds_validate_string(value_, node, 'postBoxNumber')
+            self.postBoxNumber = value_
+            self.postBoxNumber_nsprefix_ = child_.prefix
+            # validate type zfcs_contract2015AddressType
+            self.validate_zfcs_contract2015AddressType(self.postBoxNumber)
+# end class postAdressInfo
+
+
+class corr_supplierLegalEntityForeignState(GeneratedsSuper):
+    """Юридическое лицо иностранного государства"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+        'fullName': MemberSpec_('fullName', ['zfcs_longTextMinType', 'xs:string'], 0, 0, {'name': 'fullName', 'type': 'xs:string'}, None),
+        'shortName': MemberSpec_('shortName', ['zfcs_longTextMinType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'shortName', 'type': 'xs:string'}, None),
+        'firmName': MemberSpec_('firmName', ['zfcs_longTextMinType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'firmName', 'type': 'xs:string'}, None),
+        'fullNameLat': MemberSpec_('fullNameLat', ['zfcs_longTextMinType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'fullNameLat', 'type': 'xs:string'}, None),
+        'status': MemberSpec_('status', ['zfcs_participantStatusContract2015Type', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'status', 'type': 'xs:string'}, None),
+        'taxPayerCode': MemberSpec_('taxPayerCode', ['taxPayerCode', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'taxPayerCode', 'type': 'xs:string'}, None),
+        'personalAccount': MemberSpec_('personalAccount', ['zfcs_personalAccountType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'personalAccount', 'type': 'xs:string'}, None),
+        'registerInRFTaxBodies': MemberSpec_('registerInRFTaxBodies', 'registerInRFTaxBodies', 0, 1, {'minOccurs': '0', 'name': 'registerInRFTaxBodies', 'type': 'registerInRFTaxBodies'}, None),
+        'placeOfStayInRegCountry': MemberSpec_('placeOfStayInRegCountry', 'placeOfStayInRegCountry', 0, 0, {'name': 'placeOfStayInRegCountry', 'type': 'placeOfStayInRegCountry'}, None),
+        'placeOfStayInRF': MemberSpec_('placeOfStayInRF', 'placeOfStayInRF', 0, 1, {'minOccurs': '0', 'name': 'placeOfStayInRF', 'type': 'placeOfStayInRF'}, None),
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, fullName=None, shortName=None, firmName=None, fullNameLat=None, status=None, taxPayerCode=None, personalAccount=None, registerInRFTaxBodies=None, placeOfStayInRegCountry=None, placeOfStayInRF=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.fullName = fullName
+        self.validate_zfcs_longTextMinType(self.fullName)
+        self.fullName_nsprefix_ = None
+        self.shortName = shortName
+        self.validate_zfcs_longTextMinType(self.shortName)
+        self.shortName_nsprefix_ = None
+        self.firmName = firmName
+        self.validate_zfcs_longTextMinType(self.firmName)
+        self.firmName_nsprefix_ = None
+        self.fullNameLat = fullNameLat
+        self.validate_zfcs_longTextMinType(self.fullNameLat)
+        self.fullNameLat_nsprefix_ = None
+        self.status = status
+        self.validate_zfcs_participantStatusContract2015Type(self.status)
+        self.status_nsprefix_ = None
+        self.taxPayerCode = taxPayerCode
+        self.taxPayerCode_nsprefix_ = None
+        self.personalAccount = personalAccount
+        self.validate_zfcs_personalAccountType(self.personalAccount)
+        self.personalAccount_nsprefix_ = None
+        self.registerInRFTaxBodies = registerInRFTaxBodies
+        self.registerInRFTaxBodies_nsprefix_ = None
+        self.placeOfStayInRegCountry = placeOfStayInRegCountry
+        self.placeOfStayInRegCountry_nsprefix_ = None
+        self.placeOfStayInRF = placeOfStayInRF
+        self.placeOfStayInRF_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, corr_supplierLegalEntityForeignState)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if corr_supplierLegalEntityForeignState.subclass:
+            return corr_supplierLegalEntityForeignState.subclass(*args_, **kwargs_)
+        else:
+            return corr_supplierLegalEntityForeignState(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_zfcs_longTextMinType(self, value):
+        result = True
+        # Validate type zfcs_longTextMinType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 2000:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_longTextMinType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_longTextMinType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_zfcs_participantStatusContract2015Type(self, value):
+        result = True
+        # Validate type zfcs_participantStatusContract2015Type, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['10', '20', '30', '31', '40', '41']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on zfcs_participantStatusContract2015Type' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_zfcs_personalAccountType(self, value):
+        result = True
+        # Validate type zfcs_personalAccountType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) != 11:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd length restriction on zfcs_personalAccountType' % {"value": encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.fullName is not None or
+            self.shortName is not None or
+            self.firmName is not None or
+            self.fullNameLat is not None or
+            self.status is not None or
+            self.taxPayerCode is not None or
+            self.personalAccount is not None or
+            self.registerInRFTaxBodies is not None or
+            self.placeOfStayInRegCountry is not None or
+            self.placeOfStayInRF is not None
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'fullName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'fullName')
+            value_ = self.gds_validate_string(value_, node, 'fullName')
+            self.fullName = value_
+            self.fullName_nsprefix_ = child_.prefix
+            # validate type zfcs_longTextMinType
+            self.validate_zfcs_longTextMinType(self.fullName)
+        elif nodeName_ == 'shortName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'shortName')
+            value_ = self.gds_validate_string(value_, node, 'shortName')
+            self.shortName = value_
+            self.shortName_nsprefix_ = child_.prefix
+            # validate type zfcs_longTextMinType
+            self.validate_zfcs_longTextMinType(self.shortName)
+        elif nodeName_ == 'firmName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'firmName')
+            value_ = self.gds_validate_string(value_, node, 'firmName')
+            self.firmName = value_
+            self.firmName_nsprefix_ = child_.prefix
+            # validate type zfcs_longTextMinType
+            self.validate_zfcs_longTextMinType(self.firmName)
+        elif nodeName_ == 'fullNameLat':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'fullNameLat')
+            value_ = self.gds_validate_string(value_, node, 'fullNameLat')
+            self.fullNameLat = value_
+            self.fullNameLat_nsprefix_ = child_.prefix
+            # validate type zfcs_longTextMinType
+            self.validate_zfcs_longTextMinType(self.fullNameLat)
+        elif nodeName_ == 'status':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'status')
+            value_ = self.gds_validate_string(value_, node, 'status')
+            self.status = value_
+            self.status_nsprefix_ = child_.prefix
+            # validate type zfcs_participantStatusContract2015Type
+            self.validate_zfcs_participantStatusContract2015Type(self.status)
+        elif nodeName_ == 'taxPayerCode':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'taxPayerCode')
+            value_ = self.gds_validate_string(value_, node, 'taxPayerCode')
+            self.taxPayerCode = value_
+            self.taxPayerCode_nsprefix_ = child_.prefix
+        elif nodeName_ == 'personalAccount':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'personalAccount')
+            value_ = self.gds_validate_string(value_, node, 'personalAccount')
+            self.personalAccount = value_
+            self.personalAccount_nsprefix_ = child_.prefix
+            # validate type zfcs_personalAccountType
+            self.validate_zfcs_personalAccountType(self.personalAccount)
+        elif nodeName_ == 'registerInRFTaxBodies':
+            obj_ = registerInRFTaxBodies.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.registerInRFTaxBodies = obj_
+            obj_.original_tagname_ = 'registerInRFTaxBodies'
+        elif nodeName_ == 'placeOfStayInRegCountry':
+            obj_ = placeOfStayInRegCountry.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.placeOfStayInRegCountry = obj_
+            obj_.original_tagname_ = 'placeOfStayInRegCountry'
+        elif nodeName_ == 'placeOfStayInRF':
+            obj_ = placeOfStayInRF.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.placeOfStayInRF = obj_
+            obj_.original_tagname_ = 'placeOfStayInRF'
+# end class corr_supplierLegalEntityForeignState
+
+
+class taxPayerCode(GeneratedsSuper):
+    """Код налогоплательщика в стране регистрации или его аналог.
+    При приеме контролируется заполнение данного поля или\и блока "Поставщик
+    состоит на учете в налоговых органах на территории РФ"
+    (legalEntityForeignState/registerInRFTaxBodies)"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, taxPayerCode)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if taxPayerCode.subclass:
+            return taxPayerCode.subclass(*args_, **kwargs_)
+        else:
+            return taxPayerCode(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_taxPayerCode(self, value):
+        result = True
+        # Validate type taxPayerCode, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 100:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on taxPayerCode' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on taxPayerCode' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class taxPayerCode
+
+
+class registerInRFTaxBodies(GeneratedsSuper):
+    """Поставщик состоит на учете в налоговых органах на территории РФ.
+    При приеме контролируется заполнение данного блока или\и поля "Код
+    налогоплательщика в стране регистрации или его аналог"
+    (/legalEntityForeignState/taxPayerCode)"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+        'INN': MemberSpec_('INN', ['innType', 'xs:string'], 0, 0, {'name': 'INN', 'type': 'xs:string'}, None),
+        'KPP': MemberSpec_('KPP', ['kppType', 'xs:string'], 0, 0, {'name': 'KPP', 'type': 'xs:string'}, None),
+        'registrationDate': MemberSpec_('registrationDate', 'xs:date', 0, 0, {'name': 'registrationDate', 'type': 'xs:date'}, None),
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, INN=None, KPP=None, registrationDate=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.INN = INN
+        self.validate_innType(self.INN)
+        self.INN_nsprefix_ = None
+        self.KPP = KPP
+        self.validate_kppType(self.KPP)
+        self.KPP_nsprefix_ = None
+        if isinstance(registrationDate, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(registrationDate, '%Y-%m-%d').date()
+        else:
+            initvalue_ = registrationDate
+        self.registrationDate = initvalue_
+        self.registrationDate_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, registerInRFTaxBodies)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if registerInRFTaxBodies.subclass:
+            return registerInRFTaxBodies.subclass(*args_, **kwargs_)
+        else:
+            return registerInRFTaxBodies(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_innType(self, value):
+        result = True
+        # Validate type innType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 12:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on innType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_innType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_innType_patterns_, ))
+                result = False
+        return result
+    validate_innType_patterns_ = [['^(\\d{1,12})$']]
+    def validate_kppType(self, value):
+        result = True
+        # Validate type kppType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) != 9:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd length restriction on kppType' % {"value": encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.INN is not None or
+            self.KPP is not None or
+            self.registrationDate is not None
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'INN':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'INN')
+            value_ = self.gds_validate_string(value_, node, 'INN')
+            self.INN = value_
+            self.INN_nsprefix_ = child_.prefix
+            # validate type innType
+            self.validate_innType(self.INN)
+        elif nodeName_ == 'KPP':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'KPP')
+            value_ = self.gds_validate_string(value_, node, 'KPP')
+            self.KPP = value_
+            self.KPP_nsprefix_ = child_.prefix
+            # validate type kppType
+            self.validate_kppType(self.KPP)
+        elif nodeName_ == 'registrationDate':
+            sval_ = child_.text
+            dval_ = self.gds_parse_date(sval_)
+            self.registrationDate = dval_
+            self.registrationDate_nsprefix_ = child_.prefix
+# end class registerInRFTaxBodies
+
+
+class placeOfStayInRegCountry(GeneratedsSuper):
+    """Место нахождения в стране регистрации"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+        'country': MemberSpec_('country', 'zfcs_countryRef', 0, 1, {'minOccurs': '0', 'name': 'country', 'type': 'zfcs_countryRef'}, None),
+        'address': MemberSpec_('address', ['zfcs_contract2015AddressType', 'xs:string'], 0, 0, {'name': 'address', 'type': 'xs:string'}, None),
+        'postAddress': MemberSpec_('postAddress', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'postAddress', 'type': 'xs:string'}, None),
+        'contactEMail': MemberSpec_('contactEMail', ['eMailType', 'xs:string'], 0, 0, {'name': 'contactEMail', 'type': 'xs:string'}, None),
+        'contactPhone': MemberSpec_('contactPhone', ['phoneType', 'xs:string'], 0, 0, {'name': 'contactPhone', 'type': 'xs:string'}, None),
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, country=None, address=None, postAddress=None, contactEMail=None, contactPhone=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.country = country
+        self.country_nsprefix_ = None
+        self.address = address
+        self.validate_zfcs_contract2015AddressType(self.address)
+        self.address_nsprefix_ = None
+        self.postAddress = postAddress
+        self.validate_zfcs_contract2015AddressType(self.postAddress)
+        self.postAddress_nsprefix_ = None
+        self.contactEMail = contactEMail
+        self.validate_eMailType(self.contactEMail)
+        self.contactEMail_nsprefix_ = None
+        self.contactPhone = contactPhone
+        self.validate_phoneType(self.contactPhone)
+        self.contactPhone_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, placeOfStayInRegCountry)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if placeOfStayInRegCountry.subclass:
+            return placeOfStayInRegCountry.subclass(*args_, **kwargs_)
+        else:
+            return placeOfStayInRegCountry(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_zfcs_contract2015AddressType(self, value):
+        result = True
+        # Validate type zfcs_contract2015AddressType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 1024:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_eMailType(self, value):
+        result = True
+        # Validate type eMailType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 256:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on eMailType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on eMailType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_phoneType(self, value):
+        result = True
+        # Validate type phoneType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 30:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on phoneType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on phoneType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.country is not None or
+            self.address is not None or
+            self.postAddress is not None or
+            self.contactEMail is not None or
+            self.contactPhone is not None
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'country':
+            obj_ = zfcs_countryRef.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.country = obj_
+            obj_.original_tagname_ = 'country'
+        elif nodeName_ == 'address':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'address')
+            value_ = self.gds_validate_string(value_, node, 'address')
+            self.address = value_
+            self.address_nsprefix_ = child_.prefix
+            # validate type zfcs_contract2015AddressType
+            self.validate_zfcs_contract2015AddressType(self.address)
+        elif nodeName_ == 'postAddress':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'postAddress')
+            value_ = self.gds_validate_string(value_, node, 'postAddress')
+            self.postAddress = value_
+            self.postAddress_nsprefix_ = child_.prefix
+            # validate type zfcs_contract2015AddressType
+            self.validate_zfcs_contract2015AddressType(self.postAddress)
+        elif nodeName_ == 'contactEMail':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'contactEMail')
+            value_ = self.gds_validate_string(value_, node, 'contactEMail')
+            self.contactEMail = value_
+            self.contactEMail_nsprefix_ = child_.prefix
+            # validate type eMailType
+            self.validate_eMailType(self.contactEMail)
+        elif nodeName_ == 'contactPhone':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'contactPhone')
+            value_ = self.gds_validate_string(value_, node, 'contactPhone')
+            self.contactPhone = value_
+            self.contactPhone_nsprefix_ = child_.prefix
+            # validate type phoneType
+            self.validate_phoneType(self.contactPhone)
+# end class placeOfStayInRegCountry
+
+
+class placeOfStayInRF(GeneratedsSuper):
+    """Наличие у поставщика места пребывания на территории РФ"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+        'OKTMO': MemberSpec_('OKTMO', 'zfcs_OKTMORef', 0, 0, {'name': 'OKTMO', 'type': 'zfcs_OKTMORef'}, None),
+        'address': MemberSpec_('address', ['zfcs_contract2015AddressType', 'xs:string'], 0, 0, {'name': 'address', 'type': 'xs:string'}, None),
+        'postAdressInfo': MemberSpec_('postAdressInfo', 'postAdressInfo', 0, 1, {'minOccurs': '0', 'name': 'postAdressInfo', 'type': 'postAdressInfo'}, None),
+        'postAddress': MemberSpec_('postAddress', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'postAddress', 'type': 'xs:string'}, None),
+        'contactEMail': MemberSpec_('contactEMail', ['eMailType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'contactEMail', 'type': 'xs:string'}, None),
+        'contactPhone': MemberSpec_('contactPhone', ['phoneType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'contactPhone', 'type': 'xs:string'}, None),
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, OKTMO=None, address=None, postAdressInfo=None, postAddress=None, contactEMail=None, contactPhone=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.OKTMO = OKTMO
+        self.OKTMO_nsprefix_ = None
+        self.address = address
+        self.validate_zfcs_contract2015AddressType(self.address)
+        self.address_nsprefix_ = None
+        self.postAdressInfo = postAdressInfo
+        self.postAdressInfo_nsprefix_ = None
+        self.postAddress = postAddress
+        self.validate_zfcs_contract2015AddressType(self.postAddress)
+        self.postAddress_nsprefix_ = None
+        self.contactEMail = contactEMail
+        self.validate_eMailType(self.contactEMail)
+        self.contactEMail_nsprefix_ = None
+        self.contactPhone = contactPhone
+        self.validate_phoneType(self.contactPhone)
+        self.contactPhone_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, placeOfStayInRF)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if placeOfStayInRF.subclass:
+            return placeOfStayInRF.subclass(*args_, **kwargs_)
+        else:
+            return placeOfStayInRF(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_zfcs_contract2015AddressType(self, value):
+        result = True
+        # Validate type zfcs_contract2015AddressType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 1024:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_eMailType(self, value):
+        result = True
+        # Validate type eMailType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 256:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on eMailType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on eMailType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_phoneType(self, value):
+        result = True
+        # Validate type phoneType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 30:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on phoneType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on phoneType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.OKTMO is not None or
+            self.address is not None or
+            self.postAdressInfo is not None or
+            self.postAddress is not None or
+            self.contactEMail is not None or
+            self.contactPhone is not None
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'OKTMO':
+            obj_ = zfcs_OKTMORef.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.OKTMO = obj_
+            obj_.original_tagname_ = 'OKTMO'
+        elif nodeName_ == 'address':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'address')
+            value_ = self.gds_validate_string(value_, node, 'address')
+            self.address = value_
+            self.address_nsprefix_ = child_.prefix
+            # validate type zfcs_contract2015AddressType
+            self.validate_zfcs_contract2015AddressType(self.address)
+        elif nodeName_ == 'postAdressInfo':
+            obj_ = postAdressInfo.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.postAdressInfo = obj_
+            obj_.original_tagname_ = 'postAdressInfo'
+        elif nodeName_ == 'postAddress':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'postAddress')
+            value_ = self.gds_validate_string(value_, node, 'postAddress')
+            self.postAddress = value_
+            self.postAddress_nsprefix_ = child_.prefix
+            # validate type zfcs_contract2015AddressType
+            self.validate_zfcs_contract2015AddressType(self.postAddress)
+        elif nodeName_ == 'contactEMail':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'contactEMail')
+            value_ = self.gds_validate_string(value_, node, 'contactEMail')
+            self.contactEMail = value_
+            self.contactEMail_nsprefix_ = child_.prefix
+            # validate type eMailType
+            self.validate_eMailType(self.contactEMail)
+        elif nodeName_ == 'contactPhone':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'contactPhone')
+            value_ = self.gds_validate_string(value_, node, 'contactPhone')
+            self.contactPhone = value_
+            self.contactPhone_nsprefix_ = child_.prefix
+            # validate type phoneType
+            self.validate_phoneType(self.contactPhone)
+# end class placeOfStayInRF
+
+
+class corr_supplierIndividualPersonRF(GeneratedsSuper):
+    """Физическое лицо РФ"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+        'lastName': MemberSpec_('lastName', ['lastName', 'xs:string'], 0, 0, {'name': 'lastName', 'type': 'xs:string'}, None),
+        'firstName': MemberSpec_('firstName', ['firstName', 'xs:string'], 0, 0, {'name': 'firstName', 'type': 'xs:string'}, None),
+        'middleName': MemberSpec_('middleName', ['middleName', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'middleName', 'type': 'xs:string'}, None),
+        'INN': MemberSpec_('INN', ['innType', 'xs:string'], 0, 0, {'name': 'INN', 'type': 'xs:string'}, None),
+        'isIP': MemberSpec_('isIP', 'xs:boolean', 0, 1, {'minOccurs': '0', 'name': 'isIP', 'type': 'xs:boolean'}, None),
+        'registrationDate': MemberSpec_('registrationDate', 'xs:date', 0, 0, {'name': 'registrationDate', 'type': 'xs:date'}, None),
+        'status': MemberSpec_('status', ['zfcs_participantStatusContract2015Type', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'status', 'type': 'xs:string'}, None),
+        'ERSMSPInclusionDate': MemberSpec_('ERSMSPInclusionDate', 'xs:date', 0, 1, {'minOccurs': '0', 'name': 'ERSMSPInclusionDate', 'type': 'xs:date'}, None),
+        'OKTMO': MemberSpec_('OKTMO', 'zfcs_OKTMORef', 0, 0, {'name': 'OKTMO', 'type': 'zfcs_OKTMORef'}, None),
+        'personalAccount': MemberSpec_('personalAccount', ['zfcs_personalAccountType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'personalAccount', 'type': 'xs:string'}, None),
+        'address': MemberSpec_('address', ['zfcs_contract2015AddressType', 'xs:string'], 0, 0, {'name': 'address', 'type': 'xs:string'}, None),
+        'postAddressInfo': MemberSpec_('postAddressInfo', 'postAddressInfo', 0, 1, {'minOccurs': '0', 'name': 'postAddressInfo', 'type': 'postAddressInfo'}, None),
+        'postAddress': MemberSpec_('postAddress', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'postAddress', 'type': 'xs:string'}, None),
+        'contactEMail': MemberSpec_('contactEMail', ['eMailType', 'xs:string'], 0, 0, {'name': 'contactEMail', 'type': 'xs:string'}, None),
+        'contactPhone': MemberSpec_('contactPhone', ['phoneType', 'xs:string'], 0, 0, {'name': 'contactPhone', 'type': 'xs:string'}, None),
+        'isCulture': MemberSpec_('isCulture', 'xs:boolean', 0, 1, {'minOccurs': '0', 'name': 'isCulture', 'type': 'xs:boolean'}, None),
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, lastName=None, firstName=None, middleName=None, INN=None, isIP=None, registrationDate=None, status=None, ERSMSPInclusionDate=None, OKTMO=None, personalAccount=None, address=None, postAddressInfo=None, postAddress=None, contactEMail=None, contactPhone=None, isCulture=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.lastName = lastName
+        self.lastName_nsprefix_ = None
+        self.firstName = firstName
+        self.firstName_nsprefix_ = None
+        self.middleName = middleName
+        self.middleName_nsprefix_ = None
+        self.INN = INN
+        self.validate_innType(self.INN)
+        self.INN_nsprefix_ = None
+        self.isIP = isIP
+        self.isIP_nsprefix_ = None
+        if isinstance(registrationDate, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(registrationDate, '%Y-%m-%d').date()
+        else:
+            initvalue_ = registrationDate
+        self.registrationDate = initvalue_
+        self.registrationDate_nsprefix_ = None
+        self.status = status
+        self.validate_zfcs_participantStatusContract2015Type(self.status)
+        self.status_nsprefix_ = None
+        if isinstance(ERSMSPInclusionDate, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(ERSMSPInclusionDate, '%Y-%m-%d').date()
+        else:
+            initvalue_ = ERSMSPInclusionDate
+        self.ERSMSPInclusionDate = initvalue_
+        self.ERSMSPInclusionDate_nsprefix_ = None
+        self.OKTMO = OKTMO
+        self.OKTMO_nsprefix_ = None
+        self.personalAccount = personalAccount
+        self.validate_zfcs_personalAccountType(self.personalAccount)
+        self.personalAccount_nsprefix_ = None
+        self.address = address
+        self.validate_zfcs_contract2015AddressType(self.address)
+        self.address_nsprefix_ = None
+        self.postAddressInfo = postAddressInfo
+        self.postAddressInfo_nsprefix_ = None
+        self.postAddress = postAddress
+        self.validate_zfcs_contract2015AddressType(self.postAddress)
+        self.postAddress_nsprefix_ = None
+        self.contactEMail = contactEMail
+        self.validate_eMailType(self.contactEMail)
+        self.contactEMail_nsprefix_ = None
+        self.contactPhone = contactPhone
+        self.validate_phoneType(self.contactPhone)
+        self.contactPhone_nsprefix_ = None
+        self.isCulture = isCulture
+        self.isCulture_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, corr_supplierIndividualPersonRF)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if corr_supplierIndividualPersonRF.subclass:
+            return corr_supplierIndividualPersonRF.subclass(*args_, **kwargs_)
+        else:
+            return corr_supplierIndividualPersonRF(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_innType(self, value):
+        result = True
+        # Validate type innType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 12:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on innType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if not self.gds_validate_simple_patterns(
+                    self.validate_innType_patterns_, value):
+                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_innType_patterns_, ))
+                result = False
+        return result
+    validate_innType_patterns_ = [['^(\\d{1,12})$']]
+    def validate_zfcs_participantStatusContract2015Type(self, value):
+        result = True
+        # Validate type zfcs_participantStatusContract2015Type, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['10', '20', '30', '31', '40', '41']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on zfcs_participantStatusContract2015Type' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_zfcs_personalAccountType(self, value):
+        result = True
+        # Validate type zfcs_personalAccountType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) != 11:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd length restriction on zfcs_personalAccountType' % {"value": encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_zfcs_contract2015AddressType(self, value):
+        result = True
+        # Validate type zfcs_contract2015AddressType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 1024:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_eMailType(self, value):
+        result = True
+        # Validate type eMailType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 256:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on eMailType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on eMailType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_phoneType(self, value):
+        result = True
+        # Validate type phoneType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 30:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on phoneType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on phoneType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.lastName is not None or
+            self.firstName is not None or
+            self.middleName is not None or
+            self.INN is not None or
+            self.isIP is not None or
+            self.registrationDate is not None or
+            self.status is not None or
+            self.ERSMSPInclusionDate is not None or
+            self.OKTMO is not None or
+            self.personalAccount is not None or
+            self.address is not None or
+            self.postAddressInfo is not None or
+            self.postAddress is not None or
+            self.contactEMail is not None or
+            self.contactPhone is not None or
+            self.isCulture is not None
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'lastName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'lastName')
+            value_ = self.gds_validate_string(value_, node, 'lastName')
+            self.lastName = value_
+            self.lastName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'firstName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'firstName')
+            value_ = self.gds_validate_string(value_, node, 'firstName')
+            self.firstName = value_
+            self.firstName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'middleName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'middleName')
+            value_ = self.gds_validate_string(value_, node, 'middleName')
+            self.middleName = value_
+            self.middleName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'INN':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'INN')
+            value_ = self.gds_validate_string(value_, node, 'INN')
+            self.INN = value_
+            self.INN_nsprefix_ = child_.prefix
+            # validate type innType
+            self.validate_innType(self.INN)
+        elif nodeName_ == 'isIP':
+            sval_ = child_.text
+            ival_ = self.gds_parse_boolean(sval_, node, 'isIP')
+            ival_ = self.gds_validate_boolean(ival_, node, 'isIP')
+            self.isIP = ival_
+            self.isIP_nsprefix_ = child_.prefix
+        elif nodeName_ == 'registrationDate':
+            sval_ = child_.text
+            dval_ = self.gds_parse_date(sval_)
+            self.registrationDate = dval_
+            self.registrationDate_nsprefix_ = child_.prefix
+        elif nodeName_ == 'status':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'status')
+            value_ = self.gds_validate_string(value_, node, 'status')
+            self.status = value_
+            self.status_nsprefix_ = child_.prefix
+            # validate type zfcs_participantStatusContract2015Type
+            self.validate_zfcs_participantStatusContract2015Type(self.status)
+        elif nodeName_ == 'ERSMSPInclusionDate':
+            sval_ = child_.text
+            dval_ = self.gds_parse_date(sval_)
+            self.ERSMSPInclusionDate = dval_
+            self.ERSMSPInclusionDate_nsprefix_ = child_.prefix
+        elif nodeName_ == 'OKTMO':
+            obj_ = zfcs_OKTMORef.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.OKTMO = obj_
+            obj_.original_tagname_ = 'OKTMO'
+        elif nodeName_ == 'personalAccount':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'personalAccount')
+            value_ = self.gds_validate_string(value_, node, 'personalAccount')
+            self.personalAccount = value_
+            self.personalAccount_nsprefix_ = child_.prefix
+            # validate type zfcs_personalAccountType
+            self.validate_zfcs_personalAccountType(self.personalAccount)
+        elif nodeName_ == 'address':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'address')
+            value_ = self.gds_validate_string(value_, node, 'address')
+            self.address = value_
+            self.address_nsprefix_ = child_.prefix
+            # validate type zfcs_contract2015AddressType
+            self.validate_zfcs_contract2015AddressType(self.address)
+        elif nodeName_ == 'postAddressInfo':
+            obj_ = postAddressInfo.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.postAddressInfo = obj_
+            obj_.original_tagname_ = 'postAddressInfo'
+        elif nodeName_ == 'postAddress':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'postAddress')
+            value_ = self.gds_validate_string(value_, node, 'postAddress')
+            self.postAddress = value_
+            self.postAddress_nsprefix_ = child_.prefix
+            # validate type zfcs_contract2015AddressType
+            self.validate_zfcs_contract2015AddressType(self.postAddress)
+        elif nodeName_ == 'contactEMail':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'contactEMail')
+            value_ = self.gds_validate_string(value_, node, 'contactEMail')
+            self.contactEMail = value_
+            self.contactEMail_nsprefix_ = child_.prefix
+            # validate type eMailType
+            self.validate_eMailType(self.contactEMail)
+        elif nodeName_ == 'contactPhone':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'contactPhone')
+            value_ = self.gds_validate_string(value_, node, 'contactPhone')
+            self.contactPhone = value_
+            self.contactPhone_nsprefix_ = child_.prefix
+            # validate type phoneType
+            self.validate_phoneType(self.contactPhone)
+        elif nodeName_ == 'isCulture':
+            sval_ = child_.text
+            ival_ = self.gds_parse_boolean(sval_, node, 'isCulture')
+            ival_ = self.gds_validate_boolean(ival_, node, 'isCulture')
+            self.isCulture = ival_
+            self.isCulture_nsprefix_ = child_.prefix
+# end class corr_supplierIndividualPersonRF
+
+
+class lastName(GeneratedsSuper):
+    """Фамилия"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, lastName)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if lastName.subclass:
+            return lastName.subclass(*args_, **kwargs_)
+        else:
+            return lastName(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_lastName(self, value):
+        result = True
+        # Validate type lastName, a restriction on xs:string.
+        pass
+        return result
+    def hasContent_(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class lastName
+
+
+class firstName(GeneratedsSuper):
+    """Имя"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, firstName)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if firstName.subclass:
+            return firstName.subclass(*args_, **kwargs_)
+        else:
+            return firstName(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_firstName(self, value):
+        result = True
+        # Validate type firstName, a restriction on xs:string.
+        pass
+        return result
+    def hasContent_(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class firstName
+
+
+class middleName(GeneratedsSuper):
+    """Отчество"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, middleName)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if middleName.subclass:
+            return middleName.subclass(*args_, **kwargs_)
+        else:
+            return middleName(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_middleName(self, value):
+        result = True
+        # Validate type middleName, a restriction on xs:string.
+        pass
+        return result
+    def hasContent_(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class middleName
+
+
+class postAddressInfo(GeneratedsSuper):
+    """Почтовый адрес.
+    При приеме контролируется, что поля mailFacilityName и postBoxNumber
+    заполняются/не заполняются парой"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+        'mailingAdress': MemberSpec_('mailingAdress', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'mailingAdress', 'type': 'xs:string'}, None),
+        'mailFacilityName': MemberSpec_('mailFacilityName', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'mailFacilityName', 'type': 'xs:string'}, None),
+        'postBoxNumber': MemberSpec_('postBoxNumber', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'postBoxNumber', 'type': 'xs:string'}, None),
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, mailingAdress=None, mailFacilityName=None, postBoxNumber=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.mailingAdress = mailingAdress
+        self.validate_zfcs_contract2015AddressType(self.mailingAdress)
+        self.mailingAdress_nsprefix_ = None
+        self.mailFacilityName = mailFacilityName
+        self.validate_zfcs_contract2015AddressType(self.mailFacilityName)
+        self.mailFacilityName_nsprefix_ = None
+        self.postBoxNumber = postBoxNumber
+        self.validate_zfcs_contract2015AddressType(self.postBoxNumber)
+        self.postBoxNumber_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, postAddressInfo)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if postAddressInfo.subclass:
+            return postAddressInfo.subclass(*args_, **kwargs_)
+        else:
+            return postAddressInfo(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_zfcs_contract2015AddressType(self, value):
+        result = True
+        # Validate type zfcs_contract2015AddressType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) > 1024:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+            if len(value) < 1:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.mailingAdress is not None or
+            self.mailFacilityName is not None or
+            self.postBoxNumber is not None
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'mailingAdress':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'mailingAdress')
+            value_ = self.gds_validate_string(value_, node, 'mailingAdress')
+            self.mailingAdress = value_
+            self.mailingAdress_nsprefix_ = child_.prefix
+            # validate type zfcs_contract2015AddressType
+            self.validate_zfcs_contract2015AddressType(self.mailingAdress)
+        elif nodeName_ == 'mailFacilityName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'mailFacilityName')
+            value_ = self.gds_validate_string(value_, node, 'mailFacilityName')
+            self.mailFacilityName = value_
+            self.mailFacilityName_nsprefix_ = child_.prefix
+            # validate type zfcs_contract2015AddressType
+            self.validate_zfcs_contract2015AddressType(self.mailFacilityName)
+        elif nodeName_ == 'postBoxNumber':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'postBoxNumber')
+            value_ = self.gds_validate_string(value_, node, 'postBoxNumber')
+            self.postBoxNumber = value_
+            self.postBoxNumber_nsprefix_ = child_.prefix
+            # validate type zfcs_contract2015AddressType
+            self.validate_zfcs_contract2015AddressType(self.postBoxNumber)
+# end class postAddressInfo
+
+
+class corr_supplierIndividualPersonForeignState(GeneratedsSuper):
+    """Физическое лицо иностранного государства"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+        'lastName': MemberSpec_('lastName', ['lastName', 'xs:string'], 0, 0, {'name': 'lastName', 'type': 'xs:string'}, None),
+        'firstName': MemberSpec_('firstName', ['firstName', 'xs:string'], 0, 0, {'name': 'firstName', 'type': 'xs:string'}, None),
+        'middleName': MemberSpec_('middleName', ['middleName', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'middleName', 'type': 'xs:string'}, None),
+        'lastNameLat': MemberSpec_('lastNameLat', ['lastNameLat', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'lastNameLat', 'type': 'xs:string'}, None),
+        'firstNameLat': MemberSpec_('firstNameLat', ['firstNameLat', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'firstNameLat', 'type': 'xs:string'}, None),
+        'middleNameLat': MemberSpec_('middleNameLat', ['middleNameLat', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'middleNameLat', 'type': 'xs:string'}, None),
+        'taxPayerCode': MemberSpec_('taxPayerCode', ['taxPayerCode', 'xs:string'], 0, 0, {'name': 'taxPayerCode', 'type': 'xs:string'}, None),
+        'personalAccount': MemberSpec_('personalAccount', ['zfcs_personalAccountType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'personalAccount', 'type': 'xs:string'}, None),
+        'registerInRFTaxBodies': MemberSpec_('registerInRFTaxBodies', 'registerInRFTaxBodies', 0, 1, {'minOccurs': '0', 'name': 'registerInRFTaxBodies', 'type': 'registerInRFTaxBodies'}, None),
+        'placeOfStayInRegCountry': MemberSpec_('placeOfStayInRegCountry', 'placeOfStayInRegCountry', 0, 0, {'name': 'placeOfStayInRegCountry', 'type': 'placeOfStayInRegCountry'}, None),
+        'placeOfStayInRF': MemberSpec_('placeOfStayInRF', 'placeOfStayInRF', 0, 1, {'minOccurs': '0', 'name': 'placeOfStayInRF', 'type': 'placeOfStayInRF'}, None),
+        'isCulture': MemberSpec_('isCulture', 'xs:boolean', 0, 1, {'minOccurs': '0', 'name': 'isCulture', 'type': 'xs:boolean'}, None),
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, lastName=None, firstName=None, middleName=None, lastNameLat=None, firstNameLat=None, middleNameLat=None, taxPayerCode=None, personalAccount=None, registerInRFTaxBodies=None, placeOfStayInRegCountry=None, placeOfStayInRF=None, isCulture=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.lastName = lastName
+        self.lastName_nsprefix_ = None
+        self.firstName = firstName
+        self.firstName_nsprefix_ = None
+        self.middleName = middleName
+        self.middleName_nsprefix_ = None
+        self.lastNameLat = lastNameLat
+        self.lastNameLat_nsprefix_ = None
+        self.firstNameLat = firstNameLat
+        self.firstNameLat_nsprefix_ = None
+        self.middleNameLat = middleNameLat
+        self.middleNameLat_nsprefix_ = None
+        self.taxPayerCode = taxPayerCode
+        self.taxPayerCode_nsprefix_ = None
+        self.personalAccount = personalAccount
+        self.validate_zfcs_personalAccountType(self.personalAccount)
+        self.personalAccount_nsprefix_ = None
+        self.registerInRFTaxBodies = registerInRFTaxBodies
+        self.registerInRFTaxBodies_nsprefix_ = None
+        self.placeOfStayInRegCountry = placeOfStayInRegCountry
+        self.placeOfStayInRegCountry_nsprefix_ = None
+        self.placeOfStayInRF = placeOfStayInRF
+        self.placeOfStayInRF_nsprefix_ = None
+        self.isCulture = isCulture
+        self.isCulture_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, corr_supplierIndividualPersonForeignState)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if corr_supplierIndividualPersonForeignState.subclass:
+            return corr_supplierIndividualPersonForeignState.subclass(*args_, **kwargs_)
+        else:
+            return corr_supplierIndividualPersonForeignState(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_zfcs_personalAccountType(self, value):
+        result = True
+        # Validate type zfcs_personalAccountType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            if len(value) != 11:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd length restriction on zfcs_personalAccountType' % {"value": encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.lastName is not None or
+            self.firstName is not None or
+            self.middleName is not None or
+            self.lastNameLat is not None or
+            self.firstNameLat is not None or
+            self.middleNameLat is not None or
+            self.taxPayerCode is not None or
+            self.personalAccount is not None or
+            self.registerInRFTaxBodies is not None or
+            self.placeOfStayInRegCountry is not None or
+            self.placeOfStayInRF is not None or
+            self.isCulture is not None
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'lastName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'lastName')
+            value_ = self.gds_validate_string(value_, node, 'lastName')
+            self.lastName = value_
+            self.lastName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'firstName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'firstName')
+            value_ = self.gds_validate_string(value_, node, 'firstName')
+            self.firstName = value_
+            self.firstName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'middleName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'middleName')
+            value_ = self.gds_validate_string(value_, node, 'middleName')
+            self.middleName = value_
+            self.middleName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'lastNameLat':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'lastNameLat')
+            value_ = self.gds_validate_string(value_, node, 'lastNameLat')
+            self.lastNameLat = value_
+            self.lastNameLat_nsprefix_ = child_.prefix
+        elif nodeName_ == 'firstNameLat':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'firstNameLat')
+            value_ = self.gds_validate_string(value_, node, 'firstNameLat')
+            self.firstNameLat = value_
+            self.firstNameLat_nsprefix_ = child_.prefix
+        elif nodeName_ == 'middleNameLat':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'middleNameLat')
+            value_ = self.gds_validate_string(value_, node, 'middleNameLat')
+            self.middleNameLat = value_
+            self.middleNameLat_nsprefix_ = child_.prefix
+        elif nodeName_ == 'taxPayerCode':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'taxPayerCode')
+            value_ = self.gds_validate_string(value_, node, 'taxPayerCode')
+            self.taxPayerCode = value_
+            self.taxPayerCode_nsprefix_ = child_.prefix
+        elif nodeName_ == 'personalAccount':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'personalAccount')
+            value_ = self.gds_validate_string(value_, node, 'personalAccount')
+            self.personalAccount = value_
+            self.personalAccount_nsprefix_ = child_.prefix
+            # validate type zfcs_personalAccountType
+            self.validate_zfcs_personalAccountType(self.personalAccount)
+        elif nodeName_ == 'registerInRFTaxBodies':
+            obj_ = registerInRFTaxBodies.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.registerInRFTaxBodies = obj_
+            obj_.original_tagname_ = 'registerInRFTaxBodies'
+        elif nodeName_ == 'placeOfStayInRegCountry':
+            obj_ = placeOfStayInRegCountry.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.placeOfStayInRegCountry = obj_
+            obj_.original_tagname_ = 'placeOfStayInRegCountry'
+        elif nodeName_ == 'placeOfStayInRF':
+            obj_ = placeOfStayInRF.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.placeOfStayInRF = obj_
+            obj_.original_tagname_ = 'placeOfStayInRF'
+        elif nodeName_ == 'isCulture':
+            sval_ = child_.text
+            ival_ = self.gds_parse_boolean(sval_, node, 'isCulture')
+            ival_ = self.gds_validate_boolean(ival_, node, 'isCulture')
+            self.isCulture = ival_
+            self.isCulture_nsprefix_ = child_.prefix
+# end class corr_supplierIndividualPersonForeignState
+
+
+class lastNameLat(GeneratedsSuper):
+    """Фамилия (латинскими буквами)"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, lastNameLat)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if lastNameLat.subclass:
+            return lastNameLat.subclass(*args_, **kwargs_)
+        else:
+            return lastNameLat(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_lastNameLat(self, value):
+        result = True
+        # Validate type lastNameLat, a restriction on xs:string.
+        pass
+        return result
+    def hasContent_(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class lastNameLat
+
+
+class firstNameLat(GeneratedsSuper):
+    """Имя (латинскими буквами)"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, firstNameLat)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if firstNameLat.subclass:
+            return firstNameLat.subclass(*args_, **kwargs_)
+        else:
+            return firstNameLat(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_firstNameLat(self, value):
+        result = True
+        # Validate type firstNameLat, a restriction on xs:string.
+        pass
+        return result
+    def hasContent_(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class firstNameLat
+
+
+class middleNameLat(GeneratedsSuper):
+    """Отчество (латинскими буквами)"""
+    __hash__ = GeneratedsSuper.__hash__
+    member_data_items_ = {
+    }
+    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
+    subclass = None
+    superclass = None
+    def __init__(self, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, middleNameLat)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if middleNameLat.subclass:
+            return middleNameLat.subclass(*args_, **kwargs_)
+        else:
+            return middleNameLat(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def validate_middleNameLat(self, value):
+        result = True
+        # Validate type middleNameLat, a restriction on xs:string.
+        pass
+        return result
+    def hasContent_(self):
+        if (
+
+        ):
+            return True
+        else:
+            return False
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        pass
+# end class middleNameLat
+
+
 class zfcs_attachmentListType(GeneratedsSuper):
     """Прикрепленные документы"""
     __hash__ = GeneratedsSuper.__hash__
@@ -1877,171 +4103,6 @@ class zfcs_contactPersonType(GeneratedsSuper):
             self.middleName = value_
             self.middleName_nsprefix_ = child_.prefix
 # end class zfcs_contactPersonType
-
-
-class lastName(GeneratedsSuper):
-    """Фамилия"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, lastName)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if lastName.subclass:
-            return lastName.subclass(*args_, **kwargs_)
-        else:
-            return lastName(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_lastName(self, value):
-        result = True
-        # Validate type lastName, a restriction on xs:string.
-        pass
-        return result
-    def hasContent_(self):
-        if (
-
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        pass
-# end class lastName
-
-
-class firstName(GeneratedsSuper):
-    """Имя"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, firstName)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if firstName.subclass:
-            return firstName.subclass(*args_, **kwargs_)
-        else:
-            return firstName(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_firstName(self, value):
-        result = True
-        # Validate type firstName, a restriction on xs:string.
-        pass
-        return result
-    def hasContent_(self):
-        if (
-
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        pass
-# end class firstName
-
-
-class middleName(GeneratedsSuper):
-    """Отчество"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, middleName)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if middleName.subclass:
-            return middleName.subclass(*args_, **kwargs_)
-        else:
-            return middleName(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_middleName(self, value):
-        result = True
-        # Validate type middleName, a restriction on xs:string.
-        pass
-        return result
-    def hasContent_(self):
-        if (
-
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        pass
-# end class middleName
 
 
 class zfcs_abandonedReasonType(GeneratedsSuper):
@@ -17713,10 +19774,10 @@ class zfcs_contract2015SupplierType(GeneratedsSuper):
     """Поставщик в информации о контракте с 01.01.01.2015"""
     __hash__ = GeneratedsSuper.__hash__
     member_data_items_ = {
-        'legalEntityRF': MemberSpec_('legalEntityRF', 'legalEntityRF', 0, 0, {'name': 'legalEntityRF', 'type': 'legalEntityRF'}, 42),
-        'legalEntityForeignState': MemberSpec_('legalEntityForeignState', 'legalEntityForeignState', 0, 0, {'name': 'legalEntityForeignState', 'type': 'legalEntityForeignState'}, 42),
-        'individualPersonRF': MemberSpec_('individualPersonRF', 'individualPersonRF', 0, 0, {'name': 'individualPersonRF', 'type': 'individualPersonRF'}, 42),
-        'individualPersonForeignState': MemberSpec_('individualPersonForeignState', 'individualPersonForeignState', 0, 0, {'name': 'individualPersonForeignState', 'type': 'individualPersonForeignState'}, 42),
+        'legalEntityRF': MemberSpec_('legalEntityRF', 'legalEntityRF', 0, 0, {'name': 'legalEntityRF', 'type': 'corr_supplierLegalEntityRF'}, 42),
+        'legalEntityForeignState': MemberSpec_('legalEntityForeignState', 'corr_supplierLegalEntityForeignState', 0, 0, {'name': 'legalEntityForeignState', 'type': 'corr_supplierLegalEntityForeignState'}, 42),
+        'individualPersonRF': MemberSpec_('individualPersonRF', 'corr_supplierIndividualPersonRF', 0, 0, {'name': 'individualPersonRF', 'type': 'corr_supplierIndividualPersonRF'}, 42),
+        'individualPersonForeignState': MemberSpec_('individualPersonForeignState', 'corr_supplierIndividualPersonForeignState', 0, 0, {'name': 'individualPersonForeignState', 'type': 'corr_supplierIndividualPersonForeignState'}, 42),
         'individualPersonRFisCulture': MemberSpec_('individualPersonRFisCulture', 'individualPersonRFisCulture', 0, 0, {'name': 'individualPersonRFisCulture', 'type': 'individualPersonRFisCulture'}, 42),
         'individualPersonForeignStateisCulture': MemberSpec_('individualPersonForeignStateisCulture', 'individualPersonForeignStateisCulture', 0, 0, {'name': 'individualPersonForeignStateisCulture', 'type': 'individualPersonForeignStateisCulture'}, 42),
         'notPublishedOnEIS': MemberSpec_('notPublishedOnEIS', 'xs:boolean', 0, 0, {'fixed': 'true', 'name': 'notPublishedOnEIS', 'type': 'xs:boolean'}, 42),
@@ -17783,22 +19844,22 @@ class zfcs_contract2015SupplierType(GeneratedsSuper):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'legalEntityRF':
-            obj_ = legalEntityRF.factory(parent_object_=self)
+            obj_ = corr_supplierLegalEntityRF.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.legalEntityRF = obj_
             obj_.original_tagname_ = 'legalEntityRF'
         elif nodeName_ == 'legalEntityForeignState':
-            obj_ = legalEntityForeignState.factory(parent_object_=self)
+            obj_ = corr_supplierLegalEntityForeignState.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.legalEntityForeignState = obj_
             obj_.original_tagname_ = 'legalEntityForeignState'
         elif nodeName_ == 'individualPersonRF':
-            obj_ = individualPersonRF.factory(parent_object_=self)
+            obj_ = corr_supplierIndividualPersonRF.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.individualPersonRF = obj_
             obj_.original_tagname_ = 'individualPersonRF'
         elif nodeName_ == 'individualPersonForeignState':
-            obj_ = individualPersonForeignState.factory(parent_object_=self)
+            obj_ = corr_supplierIndividualPersonForeignState.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.individualPersonForeignState = obj_
             obj_.original_tagname_ = 'individualPersonForeignState'
@@ -17819,1622 +19880,6 @@ class zfcs_contract2015SupplierType(GeneratedsSuper):
             self.notPublishedOnEIS = ival_
             self.notPublishedOnEIS_nsprefix_ = child_.prefix
 # end class zfcs_contract2015SupplierType
-
-
-class postAdressInfo(GeneratedsSuper):
-    """Почтовый адрес.
-    При приеме контролируется, что поля mailFacilityName и postBoxNumber
-    заполняются/не заполняются парой"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-        'mailingAdress': MemberSpec_('mailingAdress', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'mailingAdress', 'type': 'xs:string'}, 42),
-        'mailFacilityName': MemberSpec_('mailFacilityName', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'mailFacilityName', 'type': 'xs:string'}, 42),
-        'postBoxNumber': MemberSpec_('postBoxNumber', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'postBoxNumber', 'type': 'xs:string'}, 42),
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, mailingAdress=None, mailFacilityName=None, postBoxNumber=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-        self.mailingAdress = mailingAdress
-        self.validate_zfcs_contract2015AddressType(self.mailingAdress)
-        self.mailingAdress_nsprefix_ = None
-        self.mailFacilityName = mailFacilityName
-        self.validate_zfcs_contract2015AddressType(self.mailFacilityName)
-        self.mailFacilityName_nsprefix_ = None
-        self.postBoxNumber = postBoxNumber
-        self.validate_zfcs_contract2015AddressType(self.postBoxNumber)
-        self.postBoxNumber_nsprefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, postAdressInfo)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if postAdressInfo.subclass:
-            return postAdressInfo.subclass(*args_, **kwargs_)
-        else:
-            return postAdressInfo(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_zfcs_contract2015AddressType(self, value):
-        result = True
-        # Validate type zfcs_contract2015AddressType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 1024:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if len(value) < 1:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def hasContent_(self):
-        if (
-            self.mailingAdress is not None or
-            self.mailFacilityName is not None or
-            self.postBoxNumber is not None
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'mailingAdress':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'mailingAdress')
-            value_ = self.gds_validate_string(value_, node, 'mailingAdress')
-            self.mailingAdress = value_
-            self.mailingAdress_nsprefix_ = child_.prefix
-            # validate type zfcs_contract2015AddressType
-            self.validate_zfcs_contract2015AddressType(self.mailingAdress)
-        elif nodeName_ == 'mailFacilityName':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'mailFacilityName')
-            value_ = self.gds_validate_string(value_, node, 'mailFacilityName')
-            self.mailFacilityName = value_
-            self.mailFacilityName_nsprefix_ = child_.prefix
-            # validate type zfcs_contract2015AddressType
-            self.validate_zfcs_contract2015AddressType(self.mailFacilityName)
-        elif nodeName_ == 'postBoxNumber':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'postBoxNumber')
-            value_ = self.gds_validate_string(value_, node, 'postBoxNumber')
-            self.postBoxNumber = value_
-            self.postBoxNumber_nsprefix_ = child_.prefix
-            # validate type zfcs_contract2015AddressType
-            self.validate_zfcs_contract2015AddressType(self.postBoxNumber)
-# end class postAdressInfo
-
-
-class legalEntityForeignState(GeneratedsSuper):
-    """Юридическое лицо иностранного государства"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-        'fullName': MemberSpec_('fullName', ['zfcs_longTextMinType', 'xs:string'], 0, 0, {'name': 'fullName', 'type': 'xs:string'}, 42),
-        'shortName': MemberSpec_('shortName', ['zfcs_longTextMinType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'shortName', 'type': 'xs:string'}, 42),
-        'firmName': MemberSpec_('firmName', ['zfcs_longTextMinType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'firmName', 'type': 'xs:string'}, 42),
-        'fullNameLat': MemberSpec_('fullNameLat', ['zfcs_longTextMinType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'fullNameLat', 'type': 'xs:string'}, 42),
-        'status': MemberSpec_('status', ['zfcs_participantStatusContract2015Type', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'status', 'type': 'xs:string'}, 42),
-        'taxPayerCode': MemberSpec_('taxPayerCode', ['taxPayerCode', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'taxPayerCode', 'type': 'xs:string'}, 42),
-        'personalAccount': MemberSpec_('personalAccount', ['zfcs_personalAccountType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'personalAccount', 'type': 'xs:string'}, 42),
-        'registerInRFTaxBodies': MemberSpec_('registerInRFTaxBodies', 'registerInRFTaxBodies', 0, 1, {'minOccurs': '0', 'name': 'registerInRFTaxBodies', 'type': 'registerInRFTaxBodies'}, 42),
-        'placeOfStayInRegCountry': MemberSpec_('placeOfStayInRegCountry', 'placeOfStayInRegCountry', 0, 0, {'name': 'placeOfStayInRegCountry', 'type': 'placeOfStayInRegCountry'}, 42),
-        'placeOfStayInRF': MemberSpec_('placeOfStayInRF', 'placeOfStayInRF', 0, 1, {'minOccurs': '0', 'name': 'placeOfStayInRF', 'type': 'placeOfStayInRF'}, 42),
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, fullName=None, shortName=None, firmName=None, fullNameLat=None, status=None, taxPayerCode=None, personalAccount=None, registerInRFTaxBodies=None, placeOfStayInRegCountry=None, placeOfStayInRF=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-        self.fullName = fullName
-        self.validate_zfcs_longTextMinType(self.fullName)
-        self.fullName_nsprefix_ = None
-        self.shortName = shortName
-        self.validate_zfcs_longTextMinType(self.shortName)
-        self.shortName_nsprefix_ = None
-        self.firmName = firmName
-        self.validate_zfcs_longTextMinType(self.firmName)
-        self.firmName_nsprefix_ = None
-        self.fullNameLat = fullNameLat
-        self.validate_zfcs_longTextMinType(self.fullNameLat)
-        self.fullNameLat_nsprefix_ = None
-        self.status = status
-        self.validate_zfcs_participantStatusContract2015Type(self.status)
-        self.status_nsprefix_ = None
-        self.taxPayerCode = taxPayerCode
-        self.taxPayerCode_nsprefix_ = None
-        self.personalAccount = personalAccount
-        self.validate_zfcs_personalAccountType(self.personalAccount)
-        self.personalAccount_nsprefix_ = None
-        self.registerInRFTaxBodies = registerInRFTaxBodies
-        self.registerInRFTaxBodies_nsprefix_ = None
-        self.placeOfStayInRegCountry = placeOfStayInRegCountry
-        self.placeOfStayInRegCountry_nsprefix_ = None
-        self.placeOfStayInRF = placeOfStayInRF
-        self.placeOfStayInRF_nsprefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, legalEntityForeignState)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if legalEntityForeignState.subclass:
-            return legalEntityForeignState.subclass(*args_, **kwargs_)
-        else:
-            return legalEntityForeignState(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_zfcs_longTextMinType(self, value):
-        result = True
-        # Validate type zfcs_longTextMinType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 2000:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_longTextMinType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if len(value) < 1:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_longTextMinType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def validate_zfcs_participantStatusContract2015Type(self, value):
-        result = True
-        # Validate type zfcs_participantStatusContract2015Type, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            value = value
-            enumerations = ['10', '20', '30', '31', '40', '41']
-            if value not in enumerations:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on zfcs_participantStatusContract2015Type' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def validate_zfcs_personalAccountType(self, value):
-        result = True
-        # Validate type zfcs_personalAccountType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) != 11:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd length restriction on zfcs_personalAccountType' % {"value": encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def hasContent_(self):
-        if (
-            self.fullName is not None or
-            self.shortName is not None or
-            self.firmName is not None or
-            self.fullNameLat is not None or
-            self.status is not None or
-            self.taxPayerCode is not None or
-            self.personalAccount is not None or
-            self.registerInRFTaxBodies is not None or
-            self.placeOfStayInRegCountry is not None or
-            self.placeOfStayInRF is not None
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'fullName':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'fullName')
-            value_ = self.gds_validate_string(value_, node, 'fullName')
-            self.fullName = value_
-            self.fullName_nsprefix_ = child_.prefix
-            # validate type zfcs_longTextMinType
-            self.validate_zfcs_longTextMinType(self.fullName)
-        elif nodeName_ == 'shortName':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'shortName')
-            value_ = self.gds_validate_string(value_, node, 'shortName')
-            self.shortName = value_
-            self.shortName_nsprefix_ = child_.prefix
-            # validate type zfcs_longTextMinType
-            self.validate_zfcs_longTextMinType(self.shortName)
-        elif nodeName_ == 'firmName':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'firmName')
-            value_ = self.gds_validate_string(value_, node, 'firmName')
-            self.firmName = value_
-            self.firmName_nsprefix_ = child_.prefix
-            # validate type zfcs_longTextMinType
-            self.validate_zfcs_longTextMinType(self.firmName)
-        elif nodeName_ == 'fullNameLat':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'fullNameLat')
-            value_ = self.gds_validate_string(value_, node, 'fullNameLat')
-            self.fullNameLat = value_
-            self.fullNameLat_nsprefix_ = child_.prefix
-            # validate type zfcs_longTextMinType
-            self.validate_zfcs_longTextMinType(self.fullNameLat)
-        elif nodeName_ == 'status':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'status')
-            value_ = self.gds_validate_string(value_, node, 'status')
-            self.status = value_
-            self.status_nsprefix_ = child_.prefix
-            # validate type zfcs_participantStatusContract2015Type
-            self.validate_zfcs_participantStatusContract2015Type(self.status)
-        elif nodeName_ == 'taxPayerCode':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'taxPayerCode')
-            value_ = self.gds_validate_string(value_, node, 'taxPayerCode')
-            self.taxPayerCode = value_
-            self.taxPayerCode_nsprefix_ = child_.prefix
-        elif nodeName_ == 'personalAccount':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'personalAccount')
-            value_ = self.gds_validate_string(value_, node, 'personalAccount')
-            self.personalAccount = value_
-            self.personalAccount_nsprefix_ = child_.prefix
-            # validate type zfcs_personalAccountType
-            self.validate_zfcs_personalAccountType(self.personalAccount)
-        elif nodeName_ == 'registerInRFTaxBodies':
-            obj_ = registerInRFTaxBodies.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.registerInRFTaxBodies = obj_
-            obj_.original_tagname_ = 'registerInRFTaxBodies'
-        elif nodeName_ == 'placeOfStayInRegCountry':
-            obj_ = placeOfStayInRegCountry.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.placeOfStayInRegCountry = obj_
-            obj_.original_tagname_ = 'placeOfStayInRegCountry'
-        elif nodeName_ == 'placeOfStayInRF':
-            obj_ = placeOfStayInRF.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.placeOfStayInRF = obj_
-            obj_.original_tagname_ = 'placeOfStayInRF'
-# end class legalEntityForeignState
-
-
-class taxPayerCode(GeneratedsSuper):
-    """Код налогоплательщика в стране регистрации или его аналог.
-    При приеме контролируется заполнение данного поля или\и блока "Поставщик
-    состоит на учете в налоговых органах на территории РФ"
-    (legalEntityForeignState/registerInRFTaxBodies)"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, taxPayerCode)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if taxPayerCode.subclass:
-            return taxPayerCode.subclass(*args_, **kwargs_)
-        else:
-            return taxPayerCode(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_taxPayerCode(self, value):
-        result = True
-        # Validate type taxPayerCode, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 100:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on taxPayerCode' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if len(value) < 1:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on taxPayerCode' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def hasContent_(self):
-        if (
-
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        pass
-# end class taxPayerCode
-
-
-class registerInRFTaxBodies(GeneratedsSuper):
-    """Поставщик состоит на учете в налоговых органах на территории РФ.
-    При приеме контролируется заполнение данного блока или\и поля "Код
-    налогоплательщика в стране регистрации или его аналог"
-    (/legalEntityForeignState/taxPayerCode)"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-        'INN': MemberSpec_('INN', ['innType', 'xs:string'], 0, 0, {'name': 'INN', 'type': 'xs:string'}, 42),
-        'KPP': MemberSpec_('KPP', ['kppType', 'xs:string'], 0, 0, {'name': 'KPP', 'type': 'xs:string'}, 42),
-        'registrationDate': MemberSpec_('registrationDate', 'xs:date', 0, 0, {'name': 'registrationDate', 'type': 'xs:date'}, 42),
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, INN=None, KPP=None, registrationDate=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-        self.INN = INN
-        self.validate_innType(self.INN)
-        self.INN_nsprefix_ = None
-        self.KPP = KPP
-        self.validate_kppType(self.KPP)
-        self.KPP_nsprefix_ = None
-        if isinstance(registrationDate, BaseStrType_):
-            initvalue_ = datetime_.datetime.strptime(registrationDate, '%Y-%m-%d').date()
-        else:
-            initvalue_ = registrationDate
-        self.registrationDate = initvalue_
-        self.registrationDate_nsprefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, registerInRFTaxBodies)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if registerInRFTaxBodies.subclass:
-            return registerInRFTaxBodies.subclass(*args_, **kwargs_)
-        else:
-            return registerInRFTaxBodies(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_innType(self, value):
-        result = True
-        # Validate type innType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 12:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on innType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_innType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_innType_patterns_, ))
-                result = False
-        return result
-    validate_innType_patterns_ = [['^(\\d{1,12})$']]
-    def validate_kppType(self, value):
-        result = True
-        # Validate type kppType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) != 9:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd length restriction on kppType' % {"value": encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def hasContent_(self):
-        if (
-            self.INN is not None or
-            self.KPP is not None or
-            self.registrationDate is not None
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'INN':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'INN')
-            value_ = self.gds_validate_string(value_, node, 'INN')
-            self.INN = value_
-            self.INN_nsprefix_ = child_.prefix
-            # validate type innType
-            self.validate_innType(self.INN)
-        elif nodeName_ == 'KPP':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'KPP')
-            value_ = self.gds_validate_string(value_, node, 'KPP')
-            self.KPP = value_
-            self.KPP_nsprefix_ = child_.prefix
-            # validate type kppType
-            self.validate_kppType(self.KPP)
-        elif nodeName_ == 'registrationDate':
-            sval_ = child_.text
-            dval_ = self.gds_parse_date(sval_)
-            self.registrationDate = dval_
-            self.registrationDate_nsprefix_ = child_.prefix
-# end class registerInRFTaxBodies
-
-
-class placeOfStayInRegCountry(GeneratedsSuper):
-    """Место нахождения в стране регистрации"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-        'country': MemberSpec_('country', 'zfcs_countryRef', 0, 1, {'minOccurs': '0', 'name': 'country', 'type': 'zfcs_countryRef'}, 42),
-        'address': MemberSpec_('address', ['zfcs_contract2015AddressType', 'xs:string'], 0, 0, {'name': 'address', 'type': 'xs:string'}, 42),
-        'postAddress': MemberSpec_('postAddress', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'postAddress', 'type': 'xs:string'}, 42),
-        'contactEMail': MemberSpec_('contactEMail', ['eMailType', 'xs:string'], 0, 0, {'name': 'contactEMail', 'type': 'xs:string'}, 42),
-        'contactPhone': MemberSpec_('contactPhone', ['phoneType', 'xs:string'], 0, 0, {'name': 'contactPhone', 'type': 'xs:string'}, 42),
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, country=None, address=None, postAddress=None, contactEMail=None, contactPhone=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-        self.country = country
-        self.country_nsprefix_ = None
-        self.address = address
-        self.validate_zfcs_contract2015AddressType(self.address)
-        self.address_nsprefix_ = None
-        self.postAddress = postAddress
-        self.validate_zfcs_contract2015AddressType(self.postAddress)
-        self.postAddress_nsprefix_ = None
-        self.contactEMail = contactEMail
-        self.validate_eMailType(self.contactEMail)
-        self.contactEMail_nsprefix_ = None
-        self.contactPhone = contactPhone
-        self.validate_phoneType(self.contactPhone)
-        self.contactPhone_nsprefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, placeOfStayInRegCountry)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if placeOfStayInRegCountry.subclass:
-            return placeOfStayInRegCountry.subclass(*args_, **kwargs_)
-        else:
-            return placeOfStayInRegCountry(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_zfcs_contract2015AddressType(self, value):
-        result = True
-        # Validate type zfcs_contract2015AddressType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 1024:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if len(value) < 1:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def validate_eMailType(self, value):
-        result = True
-        # Validate type eMailType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 256:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on eMailType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if len(value) < 1:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on eMailType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def validate_phoneType(self, value):
-        result = True
-        # Validate type phoneType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 30:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on phoneType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if len(value) < 1:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on phoneType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def hasContent_(self):
-        if (
-            self.country is not None or
-            self.address is not None or
-            self.postAddress is not None or
-            self.contactEMail is not None or
-            self.contactPhone is not None
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'country':
-            obj_ = zfcs_countryRef.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.country = obj_
-            obj_.original_tagname_ = 'country'
-        elif nodeName_ == 'address':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'address')
-            value_ = self.gds_validate_string(value_, node, 'address')
-            self.address = value_
-            self.address_nsprefix_ = child_.prefix
-            # validate type zfcs_contract2015AddressType
-            self.validate_zfcs_contract2015AddressType(self.address)
-        elif nodeName_ == 'postAddress':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'postAddress')
-            value_ = self.gds_validate_string(value_, node, 'postAddress')
-            self.postAddress = value_
-            self.postAddress_nsprefix_ = child_.prefix
-            # validate type zfcs_contract2015AddressType
-            self.validate_zfcs_contract2015AddressType(self.postAddress)
-        elif nodeName_ == 'contactEMail':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'contactEMail')
-            value_ = self.gds_validate_string(value_, node, 'contactEMail')
-            self.contactEMail = value_
-            self.contactEMail_nsprefix_ = child_.prefix
-            # validate type eMailType
-            self.validate_eMailType(self.contactEMail)
-        elif nodeName_ == 'contactPhone':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'contactPhone')
-            value_ = self.gds_validate_string(value_, node, 'contactPhone')
-            self.contactPhone = value_
-            self.contactPhone_nsprefix_ = child_.prefix
-            # validate type phoneType
-            self.validate_phoneType(self.contactPhone)
-# end class placeOfStayInRegCountry
-
-
-class placeOfStayInRF(GeneratedsSuper):
-    """Наличие у поставщика места пребывания на территории РФ"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-        'OKTMO': MemberSpec_('OKTMO', 'zfcs_OKTMORef', 0, 0, {'name': 'OKTMO', 'type': 'zfcs_OKTMORef'}, 42),
-        'address': MemberSpec_('address', ['zfcs_contract2015AddressType', 'xs:string'], 0, 0, {'name': 'address', 'type': 'xs:string'}, 42),
-        'postAdressInfo': MemberSpec_('postAdressInfo', 'postAdressInfo', 0, 1, {'minOccurs': '0', 'name': 'postAdressInfo', 'type': 'postAdressInfo'}, 42),
-        'postAddress': MemberSpec_('postAddress', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'postAddress', 'type': 'xs:string'}, 42),
-        'contactEMail': MemberSpec_('contactEMail', ['eMailType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'contactEMail', 'type': 'xs:string'}, 42),
-        'contactPhone': MemberSpec_('contactPhone', ['phoneType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'contactPhone', 'type': 'xs:string'}, 42),
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, OKTMO=None, address=None, postAdressInfo=None, postAddress=None, contactEMail=None, contactPhone=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-        self.OKTMO = OKTMO
-        self.OKTMO_nsprefix_ = None
-        self.address = address
-        self.validate_zfcs_contract2015AddressType(self.address)
-        self.address_nsprefix_ = None
-        self.postAdressInfo = postAdressInfo
-        self.postAdressInfo_nsprefix_ = None
-        self.postAddress = postAddress
-        self.validate_zfcs_contract2015AddressType(self.postAddress)
-        self.postAddress_nsprefix_ = None
-        self.contactEMail = contactEMail
-        self.validate_eMailType(self.contactEMail)
-        self.contactEMail_nsprefix_ = None
-        self.contactPhone = contactPhone
-        self.validate_phoneType(self.contactPhone)
-        self.contactPhone_nsprefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, placeOfStayInRF)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if placeOfStayInRF.subclass:
-            return placeOfStayInRF.subclass(*args_, **kwargs_)
-        else:
-            return placeOfStayInRF(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_zfcs_contract2015AddressType(self, value):
-        result = True
-        # Validate type zfcs_contract2015AddressType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 1024:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if len(value) < 1:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def validate_eMailType(self, value):
-        result = True
-        # Validate type eMailType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 256:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on eMailType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if len(value) < 1:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on eMailType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def validate_phoneType(self, value):
-        result = True
-        # Validate type phoneType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 30:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on phoneType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if len(value) < 1:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on phoneType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def hasContent_(self):
-        if (
-            self.OKTMO is not None or
-            self.address is not None or
-            self.postAdressInfo is not None or
-            self.postAddress is not None or
-            self.contactEMail is not None or
-            self.contactPhone is not None
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'OKTMO':
-            obj_ = zfcs_OKTMORef.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.OKTMO = obj_
-            obj_.original_tagname_ = 'OKTMO'
-        elif nodeName_ == 'address':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'address')
-            value_ = self.gds_validate_string(value_, node, 'address')
-            self.address = value_
-            self.address_nsprefix_ = child_.prefix
-            # validate type zfcs_contract2015AddressType
-            self.validate_zfcs_contract2015AddressType(self.address)
-        elif nodeName_ == 'postAdressInfo':
-            obj_ = postAdressInfo.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.postAdressInfo = obj_
-            obj_.original_tagname_ = 'postAdressInfo'
-        elif nodeName_ == 'postAddress':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'postAddress')
-            value_ = self.gds_validate_string(value_, node, 'postAddress')
-            self.postAddress = value_
-            self.postAddress_nsprefix_ = child_.prefix
-            # validate type zfcs_contract2015AddressType
-            self.validate_zfcs_contract2015AddressType(self.postAddress)
-        elif nodeName_ == 'contactEMail':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'contactEMail')
-            value_ = self.gds_validate_string(value_, node, 'contactEMail')
-            self.contactEMail = value_
-            self.contactEMail_nsprefix_ = child_.prefix
-            # validate type eMailType
-            self.validate_eMailType(self.contactEMail)
-        elif nodeName_ == 'contactPhone':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'contactPhone')
-            value_ = self.gds_validate_string(value_, node, 'contactPhone')
-            self.contactPhone = value_
-            self.contactPhone_nsprefix_ = child_.prefix
-            # validate type phoneType
-            self.validate_phoneType(self.contactPhone)
-# end class placeOfStayInRF
-
-
-class individualPersonRF(GeneratedsSuper):
-    """Физическое лицо РФ"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-        'lastName': MemberSpec_('lastName', ['lastName', 'xs:string'], 0, 0, {'name': 'lastName', 'type': 'xs:string'}, 42),
-        'firstName': MemberSpec_('firstName', ['firstName', 'xs:string'], 0, 0, {'name': 'firstName', 'type': 'xs:string'}, 42),
-        'middleName': MemberSpec_('middleName', ['middleName', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'middleName', 'type': 'xs:string'}, 42),
-        'INN': MemberSpec_('INN', ['innType', 'xs:string'], 0, 0, {'name': 'INN', 'type': 'xs:string'}, 42),
-        'isIP': MemberSpec_('isIP', 'xs:boolean', 0, 1, {'minOccurs': '0', 'name': 'isIP', 'type': 'xs:boolean'}, 42),
-        'registrationDate': MemberSpec_('registrationDate', 'xs:date', 0, 0, {'name': 'registrationDate', 'type': 'xs:date'}, 42),
-        'status': MemberSpec_('status', ['zfcs_participantStatusContract2015Type', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'status', 'type': 'xs:string'}, 42),
-        'ERSMSPInclusionDate': MemberSpec_('ERSMSPInclusionDate', 'xs:date', 0, 1, {'minOccurs': '0', 'name': 'ERSMSPInclusionDate', 'type': 'xs:date'}, 42),
-        'OKTMO': MemberSpec_('OKTMO', 'zfcs_OKTMORef', 0, 0, {'name': 'OKTMO', 'type': 'zfcs_OKTMORef'}, 42),
-        'personalAccount': MemberSpec_('personalAccount', ['zfcs_personalAccountType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'personalAccount', 'type': 'xs:string'}, 42),
-        'address': MemberSpec_('address', ['zfcs_contract2015AddressType', 'xs:string'], 0, 0, {'name': 'address', 'type': 'xs:string'}, 42),
-        'postAddressInfo': MemberSpec_('postAddressInfo', 'postAddressInfo', 0, 1, {'minOccurs': '0', 'name': 'postAddressInfo', 'type': 'postAddressInfo'}, 42),
-        'postAddress': MemberSpec_('postAddress', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'postAddress', 'type': 'xs:string'}, 42),
-        'contactEMail': MemberSpec_('contactEMail', ['eMailType', 'xs:string'], 0, 0, {'name': 'contactEMail', 'type': 'xs:string'}, 42),
-        'contactPhone': MemberSpec_('contactPhone', ['phoneType', 'xs:string'], 0, 0, {'name': 'contactPhone', 'type': 'xs:string'}, 42),
-        'isCulture': MemberSpec_('isCulture', 'xs:boolean', 0, 1, {'minOccurs': '0', 'name': 'isCulture', 'type': 'xs:boolean'}, 42),
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, lastName=None, firstName=None, middleName=None, INN=None, isIP=None, registrationDate=None, status=None, ERSMSPInclusionDate=None, OKTMO=None, personalAccount=None, address=None, postAddressInfo=None, postAddress=None, contactEMail=None, contactPhone=None, isCulture=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-        self.lastName = lastName
-        self.lastName_nsprefix_ = None
-        self.firstName = firstName
-        self.firstName_nsprefix_ = None
-        self.middleName = middleName
-        self.middleName_nsprefix_ = None
-        self.INN = INN
-        self.validate_innType(self.INN)
-        self.INN_nsprefix_ = None
-        self.isIP = isIP
-        self.isIP_nsprefix_ = None
-        if isinstance(registrationDate, BaseStrType_):
-            initvalue_ = datetime_.datetime.strptime(registrationDate, '%Y-%m-%d').date()
-        else:
-            initvalue_ = registrationDate
-        self.registrationDate = initvalue_
-        self.registrationDate_nsprefix_ = None
-        self.status = status
-        self.validate_zfcs_participantStatusContract2015Type(self.status)
-        self.status_nsprefix_ = None
-        if isinstance(ERSMSPInclusionDate, BaseStrType_):
-            initvalue_ = datetime_.datetime.strptime(ERSMSPInclusionDate, '%Y-%m-%d').date()
-        else:
-            initvalue_ = ERSMSPInclusionDate
-        self.ERSMSPInclusionDate = initvalue_
-        self.ERSMSPInclusionDate_nsprefix_ = None
-        self.OKTMO = OKTMO
-        self.OKTMO_nsprefix_ = None
-        self.personalAccount = personalAccount
-        self.validate_zfcs_personalAccountType(self.personalAccount)
-        self.personalAccount_nsprefix_ = None
-        self.address = address
-        self.validate_zfcs_contract2015AddressType(self.address)
-        self.address_nsprefix_ = None
-        self.postAddressInfo = postAddressInfo
-        self.postAddressInfo_nsprefix_ = None
-        self.postAddress = postAddress
-        self.validate_zfcs_contract2015AddressType(self.postAddress)
-        self.postAddress_nsprefix_ = None
-        self.contactEMail = contactEMail
-        self.validate_eMailType(self.contactEMail)
-        self.contactEMail_nsprefix_ = None
-        self.contactPhone = contactPhone
-        self.validate_phoneType(self.contactPhone)
-        self.contactPhone_nsprefix_ = None
-        self.isCulture = isCulture
-        self.isCulture_nsprefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, individualPersonRF)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if individualPersonRF.subclass:
-            return individualPersonRF.subclass(*args_, **kwargs_)
-        else:
-            return individualPersonRF(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_innType(self, value):
-        result = True
-        # Validate type innType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 12:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on innType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if not self.gds_validate_simple_patterns(
-                    self.validate_innType_patterns_, value):
-                self.gds_collector_.add_message('Value "%s" does not match xsd pattern restrictions: %s' % (encode_str_2_3(value), self.validate_innType_patterns_, ))
-                result = False
-        return result
-    validate_innType_patterns_ = [['^(\\d{1,12})$']]
-    def validate_zfcs_participantStatusContract2015Type(self, value):
-        result = True
-        # Validate type zfcs_participantStatusContract2015Type, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            value = value
-            enumerations = ['10', '20', '30', '31', '40', '41']
-            if value not in enumerations:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on zfcs_participantStatusContract2015Type' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def validate_zfcs_personalAccountType(self, value):
-        result = True
-        # Validate type zfcs_personalAccountType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) != 11:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd length restriction on zfcs_personalAccountType' % {"value": encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def validate_zfcs_contract2015AddressType(self, value):
-        result = True
-        # Validate type zfcs_contract2015AddressType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 1024:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if len(value) < 1:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def validate_eMailType(self, value):
-        result = True
-        # Validate type eMailType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 256:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on eMailType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if len(value) < 1:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on eMailType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def validate_phoneType(self, value):
-        result = True
-        # Validate type phoneType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 30:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on phoneType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if len(value) < 1:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on phoneType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def hasContent_(self):
-        if (
-            self.lastName is not None or
-            self.firstName is not None or
-            self.middleName is not None or
-            self.INN is not None or
-            self.isIP is not None or
-            self.registrationDate is not None or
-            self.status is not None or
-            self.ERSMSPInclusionDate is not None or
-            self.OKTMO is not None or
-            self.personalAccount is not None or
-            self.address is not None or
-            self.postAddressInfo is not None or
-            self.postAddress is not None or
-            self.contactEMail is not None or
-            self.contactPhone is not None or
-            self.isCulture is not None
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'lastName':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'lastName')
-            value_ = self.gds_validate_string(value_, node, 'lastName')
-            self.lastName = value_
-            self.lastName_nsprefix_ = child_.prefix
-        elif nodeName_ == 'firstName':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'firstName')
-            value_ = self.gds_validate_string(value_, node, 'firstName')
-            self.firstName = value_
-            self.firstName_nsprefix_ = child_.prefix
-        elif nodeName_ == 'middleName':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'middleName')
-            value_ = self.gds_validate_string(value_, node, 'middleName')
-            self.middleName = value_
-            self.middleName_nsprefix_ = child_.prefix
-        elif nodeName_ == 'INN':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'INN')
-            value_ = self.gds_validate_string(value_, node, 'INN')
-            self.INN = value_
-            self.INN_nsprefix_ = child_.prefix
-            # validate type innType
-            self.validate_innType(self.INN)
-        elif nodeName_ == 'isIP':
-            sval_ = child_.text
-            ival_ = self.gds_parse_boolean(sval_, node, 'isIP')
-            ival_ = self.gds_validate_boolean(ival_, node, 'isIP')
-            self.isIP = ival_
-            self.isIP_nsprefix_ = child_.prefix
-        elif nodeName_ == 'registrationDate':
-            sval_ = child_.text
-            dval_ = self.gds_parse_date(sval_)
-            self.registrationDate = dval_
-            self.registrationDate_nsprefix_ = child_.prefix
-        elif nodeName_ == 'status':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'status')
-            value_ = self.gds_validate_string(value_, node, 'status')
-            self.status = value_
-            self.status_nsprefix_ = child_.prefix
-            # validate type zfcs_participantStatusContract2015Type
-            self.validate_zfcs_participantStatusContract2015Type(self.status)
-        elif nodeName_ == 'ERSMSPInclusionDate':
-            sval_ = child_.text
-            dval_ = self.gds_parse_date(sval_)
-            self.ERSMSPInclusionDate = dval_
-            self.ERSMSPInclusionDate_nsprefix_ = child_.prefix
-        elif nodeName_ == 'OKTMO':
-            obj_ = zfcs_OKTMORef.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.OKTMO = obj_
-            obj_.original_tagname_ = 'OKTMO'
-        elif nodeName_ == 'personalAccount':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'personalAccount')
-            value_ = self.gds_validate_string(value_, node, 'personalAccount')
-            self.personalAccount = value_
-            self.personalAccount_nsprefix_ = child_.prefix
-            # validate type zfcs_personalAccountType
-            self.validate_zfcs_personalAccountType(self.personalAccount)
-        elif nodeName_ == 'address':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'address')
-            value_ = self.gds_validate_string(value_, node, 'address')
-            self.address = value_
-            self.address_nsprefix_ = child_.prefix
-            # validate type zfcs_contract2015AddressType
-            self.validate_zfcs_contract2015AddressType(self.address)
-        elif nodeName_ == 'postAddressInfo':
-            obj_ = postAddressInfo.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.postAddressInfo = obj_
-            obj_.original_tagname_ = 'postAddressInfo'
-        elif nodeName_ == 'postAddress':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'postAddress')
-            value_ = self.gds_validate_string(value_, node, 'postAddress')
-            self.postAddress = value_
-            self.postAddress_nsprefix_ = child_.prefix
-            # validate type zfcs_contract2015AddressType
-            self.validate_zfcs_contract2015AddressType(self.postAddress)
-        elif nodeName_ == 'contactEMail':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'contactEMail')
-            value_ = self.gds_validate_string(value_, node, 'contactEMail')
-            self.contactEMail = value_
-            self.contactEMail_nsprefix_ = child_.prefix
-            # validate type eMailType
-            self.validate_eMailType(self.contactEMail)
-        elif nodeName_ == 'contactPhone':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'contactPhone')
-            value_ = self.gds_validate_string(value_, node, 'contactPhone')
-            self.contactPhone = value_
-            self.contactPhone_nsprefix_ = child_.prefix
-            # validate type phoneType
-            self.validate_phoneType(self.contactPhone)
-        elif nodeName_ == 'isCulture':
-            sval_ = child_.text
-            ival_ = self.gds_parse_boolean(sval_, node, 'isCulture')
-            ival_ = self.gds_validate_boolean(ival_, node, 'isCulture')
-            self.isCulture = ival_
-            self.isCulture_nsprefix_ = child_.prefix
-# end class individualPersonRF
-
-
-class postAddressInfo(GeneratedsSuper):
-    """Почтовый адрес.
-    При приеме контролируется, что поля mailFacilityName и postBoxNumber
-    заполняются/не заполняются парой"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-        'mailingAdress': MemberSpec_('mailingAdress', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'mailingAdress', 'type': 'xs:string'}, 42),
-        'mailFacilityName': MemberSpec_('mailFacilityName', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'mailFacilityName', 'type': 'xs:string'}, 42),
-        'postBoxNumber': MemberSpec_('postBoxNumber', ['zfcs_contract2015AddressType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'postBoxNumber', 'type': 'xs:string'}, 42),
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, mailingAdress=None, mailFacilityName=None, postBoxNumber=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-        self.mailingAdress = mailingAdress
-        self.validate_zfcs_contract2015AddressType(self.mailingAdress)
-        self.mailingAdress_nsprefix_ = None
-        self.mailFacilityName = mailFacilityName
-        self.validate_zfcs_contract2015AddressType(self.mailFacilityName)
-        self.mailFacilityName_nsprefix_ = None
-        self.postBoxNumber = postBoxNumber
-        self.validate_zfcs_contract2015AddressType(self.postBoxNumber)
-        self.postBoxNumber_nsprefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, postAddressInfo)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if postAddressInfo.subclass:
-            return postAddressInfo.subclass(*args_, **kwargs_)
-        else:
-            return postAddressInfo(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_zfcs_contract2015AddressType(self, value):
-        result = True
-        # Validate type zfcs_contract2015AddressType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) > 1024:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd maxLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-            if len(value) < 1:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd minLength restriction on zfcs_contract2015AddressType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def hasContent_(self):
-        if (
-            self.mailingAdress is not None or
-            self.mailFacilityName is not None or
-            self.postBoxNumber is not None
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'mailingAdress':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'mailingAdress')
-            value_ = self.gds_validate_string(value_, node, 'mailingAdress')
-            self.mailingAdress = value_
-            self.mailingAdress_nsprefix_ = child_.prefix
-            # validate type zfcs_contract2015AddressType
-            self.validate_zfcs_contract2015AddressType(self.mailingAdress)
-        elif nodeName_ == 'mailFacilityName':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'mailFacilityName')
-            value_ = self.gds_validate_string(value_, node, 'mailFacilityName')
-            self.mailFacilityName = value_
-            self.mailFacilityName_nsprefix_ = child_.prefix
-            # validate type zfcs_contract2015AddressType
-            self.validate_zfcs_contract2015AddressType(self.mailFacilityName)
-        elif nodeName_ == 'postBoxNumber':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'postBoxNumber')
-            value_ = self.gds_validate_string(value_, node, 'postBoxNumber')
-            self.postBoxNumber = value_
-            self.postBoxNumber_nsprefix_ = child_.prefix
-            # validate type zfcs_contract2015AddressType
-            self.validate_zfcs_contract2015AddressType(self.postBoxNumber)
-# end class postAddressInfo
-
-
-class individualPersonForeignState(GeneratedsSuper):
-    """Физическое лицо иностранного государства"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-        'lastName': MemberSpec_('lastName', ['lastName', 'xs:string'], 0, 0, {'name': 'lastName', 'type': 'xs:string'}, 42),
-        'firstName': MemberSpec_('firstName', ['firstName', 'xs:string'], 0, 0, {'name': 'firstName', 'type': 'xs:string'}, 42),
-        'middleName': MemberSpec_('middleName', ['middleName', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'middleName', 'type': 'xs:string'}, 42),
-        'lastNameLat': MemberSpec_('lastNameLat', ['lastNameLat', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'lastNameLat', 'type': 'xs:string'}, 42),
-        'firstNameLat': MemberSpec_('firstNameLat', ['firstNameLat', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'firstNameLat', 'type': 'xs:string'}, 42),
-        'middleNameLat': MemberSpec_('middleNameLat', ['middleNameLat', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'middleNameLat', 'type': 'xs:string'}, 42),
-        'taxPayerCode': MemberSpec_('taxPayerCode', ['taxPayerCode', 'xs:string'], 0, 0, {'name': 'taxPayerCode', 'type': 'xs:string'}, 42),
-        'personalAccount': MemberSpec_('personalAccount', ['zfcs_personalAccountType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'personalAccount', 'type': 'xs:string'}, 42),
-        'registerInRFTaxBodies': MemberSpec_('registerInRFTaxBodies', 'registerInRFTaxBodies', 0, 1, {'minOccurs': '0', 'name': 'registerInRFTaxBodies', 'type': 'registerInRFTaxBodies'}, 42),
-        'placeOfStayInRegCountry': MemberSpec_('placeOfStayInRegCountry', 'placeOfStayInRegCountry', 0, 0, {'name': 'placeOfStayInRegCountry', 'type': 'placeOfStayInRegCountry'}, 42),
-        'placeOfStayInRF': MemberSpec_('placeOfStayInRF', 'placeOfStayInRF', 0, 1, {'minOccurs': '0', 'name': 'placeOfStayInRF', 'type': 'placeOfStayInRF'}, 42),
-        'isCulture': MemberSpec_('isCulture', 'xs:boolean', 0, 1, {'minOccurs': '0', 'name': 'isCulture', 'type': 'xs:boolean'}, 42),
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, lastName=None, firstName=None, middleName=None, lastNameLat=None, firstNameLat=None, middleNameLat=None, taxPayerCode=None, personalAccount=None, registerInRFTaxBodies=None, placeOfStayInRegCountry=None, placeOfStayInRF=None, isCulture=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-        self.lastName = lastName
-        self.lastName_nsprefix_ = None
-        self.firstName = firstName
-        self.firstName_nsprefix_ = None
-        self.middleName = middleName
-        self.middleName_nsprefix_ = None
-        self.lastNameLat = lastNameLat
-        self.lastNameLat_nsprefix_ = None
-        self.firstNameLat = firstNameLat
-        self.firstNameLat_nsprefix_ = None
-        self.middleNameLat = middleNameLat
-        self.middleNameLat_nsprefix_ = None
-        self.taxPayerCode = taxPayerCode
-        self.taxPayerCode_nsprefix_ = None
-        self.personalAccount = personalAccount
-        self.validate_zfcs_personalAccountType(self.personalAccount)
-        self.personalAccount_nsprefix_ = None
-        self.registerInRFTaxBodies = registerInRFTaxBodies
-        self.registerInRFTaxBodies_nsprefix_ = None
-        self.placeOfStayInRegCountry = placeOfStayInRegCountry
-        self.placeOfStayInRegCountry_nsprefix_ = None
-        self.placeOfStayInRF = placeOfStayInRF
-        self.placeOfStayInRF_nsprefix_ = None
-        self.isCulture = isCulture
-        self.isCulture_nsprefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, individualPersonForeignState)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if individualPersonForeignState.subclass:
-            return individualPersonForeignState.subclass(*args_, **kwargs_)
-        else:
-            return individualPersonForeignState(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_zfcs_personalAccountType(self, value):
-        result = True
-        # Validate type zfcs_personalAccountType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            if len(value) != 11:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd length restriction on zfcs_personalAccountType' % {"value": encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def hasContent_(self):
-        if (
-            self.lastName is not None or
-            self.firstName is not None or
-            self.middleName is not None or
-            self.lastNameLat is not None or
-            self.firstNameLat is not None or
-            self.middleNameLat is not None or
-            self.taxPayerCode is not None or
-            self.personalAccount is not None or
-            self.registerInRFTaxBodies is not None or
-            self.placeOfStayInRegCountry is not None or
-            self.placeOfStayInRF is not None or
-            self.isCulture is not None
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'lastName':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'lastName')
-            value_ = self.gds_validate_string(value_, node, 'lastName')
-            self.lastName = value_
-            self.lastName_nsprefix_ = child_.prefix
-        elif nodeName_ == 'firstName':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'firstName')
-            value_ = self.gds_validate_string(value_, node, 'firstName')
-            self.firstName = value_
-            self.firstName_nsprefix_ = child_.prefix
-        elif nodeName_ == 'middleName':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'middleName')
-            value_ = self.gds_validate_string(value_, node, 'middleName')
-            self.middleName = value_
-            self.middleName_nsprefix_ = child_.prefix
-        elif nodeName_ == 'lastNameLat':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'lastNameLat')
-            value_ = self.gds_validate_string(value_, node, 'lastNameLat')
-            self.lastNameLat = value_
-            self.lastNameLat_nsprefix_ = child_.prefix
-        elif nodeName_ == 'firstNameLat':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'firstNameLat')
-            value_ = self.gds_validate_string(value_, node, 'firstNameLat')
-            self.firstNameLat = value_
-            self.firstNameLat_nsprefix_ = child_.prefix
-        elif nodeName_ == 'middleNameLat':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'middleNameLat')
-            value_ = self.gds_validate_string(value_, node, 'middleNameLat')
-            self.middleNameLat = value_
-            self.middleNameLat_nsprefix_ = child_.prefix
-        elif nodeName_ == 'taxPayerCode':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'taxPayerCode')
-            value_ = self.gds_validate_string(value_, node, 'taxPayerCode')
-            self.taxPayerCode = value_
-            self.taxPayerCode_nsprefix_ = child_.prefix
-        elif nodeName_ == 'personalAccount':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'personalAccount')
-            value_ = self.gds_validate_string(value_, node, 'personalAccount')
-            self.personalAccount = value_
-            self.personalAccount_nsprefix_ = child_.prefix
-            # validate type zfcs_personalAccountType
-            self.validate_zfcs_personalAccountType(self.personalAccount)
-        elif nodeName_ == 'registerInRFTaxBodies':
-            obj_ = registerInRFTaxBodies.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.registerInRFTaxBodies = obj_
-            obj_.original_tagname_ = 'registerInRFTaxBodies'
-        elif nodeName_ == 'placeOfStayInRegCountry':
-            obj_ = placeOfStayInRegCountry.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.placeOfStayInRegCountry = obj_
-            obj_.original_tagname_ = 'placeOfStayInRegCountry'
-        elif nodeName_ == 'placeOfStayInRF':
-            obj_ = placeOfStayInRF.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.placeOfStayInRF = obj_
-            obj_.original_tagname_ = 'placeOfStayInRF'
-        elif nodeName_ == 'isCulture':
-            sval_ = child_.text
-            ival_ = self.gds_parse_boolean(sval_, node, 'isCulture')
-            ival_ = self.gds_validate_boolean(ival_, node, 'isCulture')
-            self.isCulture = ival_
-            self.isCulture_nsprefix_ = child_.prefix
-# end class individualPersonForeignState
-
-
-class lastNameLat(GeneratedsSuper):
-    """Фамилия (латинскими буквами)"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, lastNameLat)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if lastNameLat.subclass:
-            return lastNameLat.subclass(*args_, **kwargs_)
-        else:
-            return lastNameLat(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_lastNameLat(self, value):
-        result = True
-        # Validate type lastNameLat, a restriction on xs:string.
-        pass
-        return result
-    def hasContent_(self):
-        if (
-
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        pass
-# end class lastNameLat
-
-
-class firstNameLat(GeneratedsSuper):
-    """Имя (латинскими буквами)"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, firstNameLat)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if firstNameLat.subclass:
-            return firstNameLat.subclass(*args_, **kwargs_)
-        else:
-            return firstNameLat(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_firstNameLat(self, value):
-        result = True
-        # Validate type firstNameLat, a restriction on xs:string.
-        pass
-        return result
-    def hasContent_(self):
-        if (
-
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        pass
-# end class firstNameLat
-
-
-class middleNameLat(GeneratedsSuper):
-    """Отчество (латинскими буквами)"""
-    __hash__ = GeneratedsSuper.__hash__
-    member_data_items_ = {
-    }
-    __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
-    subclass = None
-    superclass = None
-    def __init__(self, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, middleNameLat)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if middleNameLat.subclass:
-            return middleNameLat.subclass(*args_, **kwargs_)
-        else:
-            return middleNameLat(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def validate_middleNameLat(self, value):
-        result = True
-        # Validate type middleNameLat, a restriction on xs:string.
-        pass
-        return result
-    def hasContent_(self):
-        if (
-
-        ):
-            return True
-        else:
-            return False
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        pass
-# end class middleNameLat
 
 
 class individualPersonRFisCulture(GeneratedsSuper):
@@ -32106,8 +32551,8 @@ def parse(inFileName, silence=False, print_warnings=True):
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = 'zfcs_attachmentListType'
-        rootClass = zfcs_attachmentListType
+        rootTag = 'corr_supplierLegalEntityRF'
+        rootClass = corr_supplierLegalEntityRF
     rootObj = rootClass.factory()
     rootObj.build(rootNode, gds_collector_=gds_collector)
     CapturedNsmap_, namespacedefs = get_required_ns_prefix_defs(rootNode)
@@ -32138,8 +32583,8 @@ def parseEtree(inFileName, silence=False, print_warnings=True,
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = 'zfcs_attachmentListType'
-        rootClass = zfcs_attachmentListType
+        rootTag = 'corr_supplierLegalEntityRF'
+        rootClass = corr_supplierLegalEntityRF
     rootObj = rootClass.factory()
     rootObj.build(rootNode, gds_collector_=gds_collector)
     # Enable Python to collect the space used by the DOM.
@@ -32181,8 +32626,8 @@ def parseString(inString, silence=False, print_warnings=True):
     gds_collector = GdsCollector_()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = 'zfcs_attachmentListType'
-        rootClass = zfcs_attachmentListType
+        rootTag = 'corr_supplierLegalEntityRF'
+        rootClass = corr_supplierLegalEntityRF
     rootObj = rootClass.factory()
     rootObj.build(rootNode, gds_collector_=gds_collector)
     if not SaveElementTreeNode:
@@ -32209,8 +32654,8 @@ def parseLiteral(inFileName, silence=False, print_warnings=True):
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = 'zfcs_attachmentListType'
-        rootClass = zfcs_attachmentListType
+        rootTag = 'corr_supplierLegalEntityRF'
+        rootClass = corr_supplierLegalEntityRF
     rootObj = rootClass.factory()
     rootObj.build(rootNode, gds_collector_=gds_collector)
     # Enable Python to collect the space used by the DOM.
@@ -32352,6 +32797,10 @@ __all__ = [
     "control99ResponsibleType",
     "controlDocumentsInfo",
     "controlObjectsInfo",
+    "corr_supplierIndividualPersonForeignState",
+    "corr_supplierIndividualPersonRF",
+    "corr_supplierLegalEntityForeignState",
+    "corr_supplierLegalEntityRF",
     "countryFullName",
     "cryptoSigns",
     "currencyCBRFRef",
@@ -32443,10 +32892,8 @@ __all__ = [
     "guaranteeReturn",
     "id",
     "individualBusinessmanRF",
-    "individualPersonForeignState",
     "individualPersonForeignStateInfo",
     "individualPersonForeignStateisCulture",
-    "individualPersonRF",
     "individualPersonRFInfo",
     "individualPersonRFisCulture",
     "inn",
@@ -32456,7 +32903,6 @@ __all__ = [
     "kladr",
     "lastName",
     "lastNameLat",
-    "legalEntityForeignState",
     "legalEntityForeignStateInfo",
     "legalEntityRF",
     "legalEntityRFInfo",

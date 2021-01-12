@@ -2,6 +2,7 @@ from ...ds.contracts.fcsExport import zfcs_contractProcedureCancel2015Type
 from ...model.contract import *
 
 def parse(session, cntr_proc_cancel_obj:zfcs_contractProcedureCancel2015Type, update=True, **kwargs):
+    content_id = kwargs.get('content_id')
     cancelled_id = cntr_proc_cancel_obj.cancelledProcedureId
     cancel_dt = cntr_proc_cancel_obj.cancelDate
     court_doc_date = None if cntr_proc_cancel_obj.contractInvalidationCancel is None else cntr_proc_cancel_obj.contractInvalidationCancel.cancelReason.docDate
@@ -19,7 +20,8 @@ def parse(session, cntr_proc_cancel_obj:zfcs_contractProcedureCancel2015Type, up
             reason = cntr_proc_cancel_obj.reason,
             court_doc_date = court_doc_date,
             current_stage = current_stage,
-            scheme_version = cntr_proc_cancel_obj.schemeVersion
+            scheme_version = cntr_proc_cancel_obj.schemeVersion,
+            content_id = content_id
         )
         session.add(cancel)
     elif not update:
@@ -33,3 +35,4 @@ def parse(session, cntr_proc_cancel_obj:zfcs_contractProcedureCancel2015Type, up
         cancel.court_name = cntr_proc_cancel_obj.contractInvalidationCancel.cancelReason.courtName
         cancel.court_doc_name = cntr_proc_cancel_obj.contractInvalidationCancel.cancelReason.docName
         cancel.court_doc_number = cntr_proc_cancel_obj.contractInvalidationCancel.cancelReason.docNumber
+        cancel.content_id = content_id

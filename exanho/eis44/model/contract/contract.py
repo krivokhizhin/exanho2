@@ -1,4 +1,3 @@
-from exanho.eis44.ds.contracts.CommonTypes import content
 from sqlalchemy import BigInteger, Boolean, Column, Date, DateTime, Index, Integer, Numeric, String
 from sqlalchemy.orm import relationship
 from exanho.orm.domain import Base

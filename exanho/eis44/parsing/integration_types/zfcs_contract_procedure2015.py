@@ -2,6 +2,7 @@ from ...ds.contracts.fcsExport import zfcs_contractProcedure2015Type
 from ...model.contract import *
 
 def parse(session, cntr_proc_obj:zfcs_contractProcedure2015Type, update=True, **kwargs):
+    content_id = kwargs.get('content_id')
     doc_id = cntr_proc_obj.id
     external_id = cntr_proc_obj.externalId
 
@@ -20,7 +21,8 @@ def parse(session, cntr_proc_obj:zfcs_contractProcedure2015Type, update=True, **
             modification_reason = cntr_proc_obj.modificationReason,
             current_stage = cntr_proc_obj.currentContractStage,
             okpd2okved2 = cntr_proc_obj.okpd2okved2,
-            scheme_version = cntr_proc_obj.schemeVersion
+            scheme_version = cntr_proc_obj.schemeVersion,
+            content_id = content_id
         )
         session.add(procedure)
     elif not update:
@@ -36,3 +38,4 @@ def parse(session, cntr_proc_obj:zfcs_contractProcedure2015Type, update=True, **
         procedure.current_stage = cntr_proc_obj.currentContractStage
         procedure.okpd2okved2 = cntr_proc_obj.okpd2okved2
         procedure.scheme_version = cntr_proc_obj.schemeVersion
+        procedure.content_id = content_id

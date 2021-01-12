@@ -24,6 +24,7 @@ class ZfcsContractProcedureCancel2015(Base):
 
     current_stage = Column(String(5))
     scheme_version = Column(String(20))
+    content_id = Column(BigInteger)
 
 Index('idx_zfcs_contract_procedure_cancel2015_cancelled_id', ZfcsContractProcedureCancel2015.cancelled_id, ZfcsContractProcedureCancel2015.current_stage, ZfcsContractProcedureCancel2015.cancel_dt, ZfcsContractProcedureCancel2015.court_doc_date, unique=True)
 Index('idx_zfcs_contract_procedure_cancel2015_reg_num', ZfcsContractProcedureCancel2015.reg_num)

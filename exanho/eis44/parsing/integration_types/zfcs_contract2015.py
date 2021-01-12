@@ -234,8 +234,12 @@ def get_individual_person_rf(session, supplier_obj:corr_supplierIndividualPerson
     inn = supplier_obj.INN
     participant = get_participant(session, CntrParticipantKind.RF, inn)
 
-    participant.full_name = '{0} {1} {2}'.format(IP_FORM, contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
-    participant.short_name = '{0} {1} {2}.'.format(IP_SHORT_FORM, contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
+    if supplier_obj.isIP:
+        participant.full_name = '{0} {1} {2}'.format(IP_FORM, contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
+        participant.short_name = '{0} {1} {2}.'.format(IP_SHORT_FORM, contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
+    else:
+        participant.full_name = '{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
+        participant.short_name = '{0} {1}.'.format(contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
 
     if supplier_obj.registrationDate: participant.registration_date = supplier_obj.registrationDate
     if supplier_obj.OKTMO:
@@ -386,8 +390,12 @@ def get_individual_culture_person_rf(session, supplier_obj:individualPersonRFisC
     inn = supplier_obj.INN
     participant = get_participant(session, CntrParticipantKind.RF, inn)
 
-    participant.full_name = '{0} {1} {2}'.format(IP_FORM, contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
-    participant.short_name = '{0} {1} {2}.'.format(IP_SHORT_FORM, contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
+    if supplier_obj.isIP:
+        participant.full_name = '{0} {1} {2}'.format(IP_FORM, contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
+        participant.short_name = '{0} {1} {2}.'.format(IP_SHORT_FORM, contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
+    else:
+        participant.full_name = '{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
+        participant.short_name = '{0} {1}.'.format(contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
 
     if supplier_obj.registrationDate: participant.registration_date = supplier_obj.registrationDate
     if supplier_obj.OKTMO:

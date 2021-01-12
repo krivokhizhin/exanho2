@@ -1,0 +1,35 @@
+{
+    "exanho_context":{
+        "db_connectings":[
+            {
+                "name": "purchbot_test",
+                "url": "postgresql+psycopg2://kks:Nata1311@localhost/purchbot_test",
+                "models": [
+                    "exanho.purchbot.model.__init__"
+                ]
+            }
+        ],
+        "joinable_queues": [
+            {
+                "name": "contract",
+                "maxsize": 200
+            }
+        ]
+    },
+    "exanho_actors": [
+        {
+            "name": "PollVkWorker",
+            "kind": "SleepWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.eis44.workers.ds_consumer",
+                    "db_key": "purchbot_test",
+                    "appsettings":{
+                        "handle_queues":["contract"]
+                    }
+                }
+            ]
+        }
+    ]
+}

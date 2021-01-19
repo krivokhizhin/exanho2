@@ -2,31 +2,28 @@
     "exanho_context":{
         "db_connectings":[
             {
-                "name": "purchbot_test",
-                "url": "postgresql+psycopg2://kks:Nata1311@localhost/purchbot_test",
+                "name": "eis44_test",
+                "url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44_test",
                 "models": [
+                    "exanho.eis44.model.__init__",
                     "exanho.purchbot.model.__init__"
                 ]
-            }
-        ],
-        "joinable_queues": [
-            {
-                "name": "contract",
-                "maxsize": 200
             }
         ]
     },
     "exanho_actors": [
         {
-            "name": "PollVkWorker",
+            "name": "ContractPlaceholder",
             "kind": "SleepWorker",
             "daemon": true,
             "workers": [
                 {
-                    "module": "exanho.eis44.workers.ds_consumer",
-                    "db_key": "purchbot_test",
+                    "module": "exanho.purchbot.workers.placeholder",
+                    "db_key": "eis44_test",
+                    "sleep": 5.0,
                     "appsettings":{
-                        "handle_queues":["contract"]
+                        "placeholder_module": "exanho.purchbot.placeholders.contract",
+                        "source_db_key": "eis44_test"
                     }
                 }
             ]

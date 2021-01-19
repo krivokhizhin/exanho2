@@ -1,4 +1,5 @@
-from .structure import Sctructure
+from .singleton import Singleton
+from .structure import Structure
 from .timer import Timer
 from .try_logged_method import try_logged
 from .exceptions import Error

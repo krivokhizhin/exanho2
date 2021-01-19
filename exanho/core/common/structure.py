@@ -1,4 +1,4 @@
-class Sctructure:
+class Structure:
     _fields = []
 
     def __init__(self, *args, **kwargs):

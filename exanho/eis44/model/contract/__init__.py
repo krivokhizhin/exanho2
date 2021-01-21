@@ -1,4 +1,4 @@
-from .participant import CntrParticipantKind, CntrParticipant
+from .participant import CntrParticipantKind, CntrParticipant, CntrParticipantForeign
 from .contact import CntrContact
 from .contract import ZfcsContract2015
 from .contract_procedure import ZfcsContractProcedure2015

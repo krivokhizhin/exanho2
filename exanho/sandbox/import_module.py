@@ -1,15 +1,17 @@
 import importlib
 
-# from abc import ABCMeta
-# from exanho.core.actors import ServiceBase
+from exanho.orm.domain import Domain, Sessional
 
 
-module_path = 'exanho.workers.ftp_task_run' # 'exanho.services.nsi.organization_type' # 'exanho.orm.domain'
-url = 'postgresql+psycopg2://kks:Nata1311@localhost/eis44'
+module_path = 'exanho.purchbot.placeholders.contract' # 'exanho.services.nsi.organization_type' # 'exanho.orm.domain'
+url = 'postgresql+psycopg2://kks:Nata1311@localhost/eis44_test'
 
 
 def run():
+    Sessional.domain = Domain(url)
     mod = importlib.import_module(module_path)
+    mod.initialize(Domain(url))
+    mod.perform()
 
     # hosting_service = None   
     # for service_name, service_class in vars(mod).items():
@@ -23,7 +25,7 @@ def run():
     # service = hosting_service()
     # print(service.put('Dd', 'ddddd'))
 
-    mod.domain.configure(url)
-    print(mod.domain.validate(url))
-    mod.domain.recreate(url)
+    # mod.domain.configure(url)
+    # print(mod.domain.validate(url))
+    # mod.domain.recreate(url)
     print('complete')

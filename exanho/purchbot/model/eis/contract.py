@@ -7,6 +7,7 @@ from exanho.orm.domain import Base
 from exanho.orm.mixin import ExaObjectMixin
 
 class EisContractState(enum.Enum):
+    UNKNOWN = 0
     EXECUTION = 1
     DISCONTINUED = 2
     COMPLETED = 3

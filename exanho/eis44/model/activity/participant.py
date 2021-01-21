@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Column, Index, String
+from sqlalchemy import Column, Index, String
 from sqlalchemy.orm import relationship
 
 from exanho.orm.domain import Base

@@ -1,4 +1,3 @@
-import enum
 from sqlalchemy import BigInteger, Column, ForeignKey
 from sqlalchemy.orm import relationship
 from exanho.orm.domain import Base

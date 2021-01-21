@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import BigInteger, Boolean, Column, Date, DateTime, Enum, Integer, Numeric, String
+from sqlalchemy import Boolean, Column, Date, DateTime, Enum, Integer, Numeric, String
 from sqlalchemy.orm import relationship
 
 from exanho.orm.domain import Base
@@ -13,13 +13,8 @@ class EisContractState(enum.Enum):
     COMPLETED = 3
     CANCELED = 4
 
-class EisContractKind(enum.Enum):
-    FZ44 = 1
-    FZ223 = 2
-
 class EisContract(ExaObjectMixin, Base):
 
-    kind = Column(Enum(EisContractKind), nullable=False)
     publish_dt = Column(DateTime(timezone=True))
     reg_num = Column(String(30), nullable=False, unique=True, index=True)
     subject = Column(String(2000))

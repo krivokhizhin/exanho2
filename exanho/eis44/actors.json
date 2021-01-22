@@ -79,6 +79,21 @@
                     }
                 }
             ]
+        },
+        {
+            "name": "ContractPlaceholder",
+            "kind": "SleepWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.eis44.workers.placeholder",
+                    "db_key": "eis44_test",
+                    "sleep": 5.0,
+                    "appsettings":{
+                        "log_placeholders": ["exanho.eis44.placeholders.zfcs_contract2015"]
+                    }
+                }
+            ]
         }
     ]
 }

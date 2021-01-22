@@ -1,9 +1,10 @@
 from .contract import *
-from .activity import *
+from .aggregate import *
 
 type_matching = {
     'cntrsuppliertype': 'VARCHAR(5)',
     'cntrparticipantkind': 'VARCHAR(2)',
 
-    'eiscontractstate': 'VARCHAR(12)'
+    'eistablename': 'VARCHAR(34)',
+    'aggcontractstate': 'VARCHAR(12)'
 }

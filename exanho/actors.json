@@ -5,25 +5,92 @@
                 "name": "eis44_test",
                 "url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44_test",
                 "models": [
-                    "exanho.eis44.model.__init__",
-                    "exanho.purchbot.model.__init__"
+                    "exanho.ftp_loading.model.__init__",
+                    "exanho.eis44.model.__init__"
                 ]
+            }
+        ],
+        "joinable_queues": [
+            {
+                "name": "contract",
+                "maxsize": 200
             }
         ]
     },
     "exanho_actors": [
+        {
+            "name": "ContractQHWorker",
+            "kind": "QueueWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.eis44.workers.ds_consumer",
+                    "db_key": "eis44_test",
+                    "queue_name": "contract",
+                    "appsettings":{
+                        "parse_module": "exanho.eis44.ds.contracts.fcsExport",
+                        "error_attempts": 2,
+                        "update": true
+                    }
+                }
+            ]
+        },
+        {
+            "name": "RunFtpTaskWorker",
+            "kind": "SleepWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.ftp_loading.workers.task_run",
+                    "db_key": "eis44_test",
+                    "sleep": 5.0,
+                    "appsettings":{
+                        "ftp_host": "ftp.zakupki.gov.ru",
+                        "ftp_port": 21,
+                        "ftp_user": "free",
+                        "ftp_password": "free"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "LoadFtpFileWorker",
+            "kind": "SleepWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.ftp_loading.workers.file_load",
+                    "db_key": "eis44_test",
+                    "sleep": 5.0,
+                    "appsettings":{
+                        "ftp_host": "ftp.zakupki.gov.ru",
+                        "ftp_port": 21,
+                        "ftp_user": "free",
+                        "ftp_password": "free",
+                        "parse_queues":["contract"],
+                        "queue_by_filter":[1],
+                        "parse_filters":[
+                            "contract_"
+                        ],
+                        "max_mem_level": 0.8,
+                        "with_swap": false,
+                        "max_pool_workers": 1,
+                        "block_timeout": 60
+                    }
+                }
+            ]
+        },
         {
             "name": "ContractPlaceholder",
             "kind": "SleepWorker",
             "daemon": true,
             "workers": [
                 {
-                    "module": "exanho.purchbot.workers.placeholder",
+                    "module": "exanho.eis44.workers.placeholder",
                     "db_key": "eis44_test",
                     "sleep": 5.0,
                     "appsettings":{
-                        "placeholder_module": "exanho.purchbot.placeholders.contract",
-                        "source_db_key": "eis44_test"
+                        "log_placeholders": ["exanho.eis44.placeholders.zfcs_contract2015"]
                     }
                 }
             ]

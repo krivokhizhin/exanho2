@@ -81,7 +81,7 @@
             ]
         },
         {
-            "name": "ContractPlaceholder",
+            "name": "ContractLogPlaceholder",
             "kind": "SleepWorker",
             "daemon": true,
             "workers": [
@@ -91,6 +91,21 @@
                     "sleep": 5.0,
                     "appsettings":{
                         "log_placeholders": ["exanho.eis44.placeholders.zfcs_contract2015", "exanho.eis44.placeholders.zfcs_contract_procedure2015", "exanho.eis44.placeholders.zfcs_contract_procedure_cancel2015"]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "ContractLogParser",
+            "kind": "SleepWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.eis44.workers.log_parser",
+                    "db_key": "eis44_test",
+                    "sleep": 5.0,
+                    "appsettings":{
+                        "log_parser": "exanho.eis44.log_parsers.contract"
                     }
                 }
             ]

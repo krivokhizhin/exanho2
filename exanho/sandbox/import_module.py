@@ -4,14 +4,15 @@ from exanho.orm.domain import Domain, Sessional
 from exanho.core.manager_context import Context as ExanhoContext
 
 
-module_path = 'exanho.eis44.workers.placeholder' # 'exanho.services.nsi.organization_type' # 'exanho.orm.domain'
+module_path = 'exanho.eis44.workers.log_parser' # 'exanho.services.nsi.organization_type' # 'exanho.orm.domain'
 url = 'postgresql+psycopg2://kks:Nata1311@localhost/eis44_test'
 
 
 def run():
     Sessional.domain = Domain(url)
-    appsettings = {'log_placeholders': ['exanho.eis44.placeholders.zfcs_contract2015', 'exanho.eis44.placeholders.zfcs_contract_procedure2015', 'exanho.eis44.placeholders.zfcs_contract_procedure_cancel2015']}
+    appsettings = {'log_parser': 'exanho.eis44.log_parsers.contract'}
     mod = importlib.import_module(module_path)
+    print(mod.__name__)
 
     context = mod.initialize(appsettings, ExanhoContext(object()))
     context = mod.work(context)

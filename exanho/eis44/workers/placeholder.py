@@ -60,6 +60,7 @@ def work(context:Context):
                     log.debug(f'The document id={last_id} from {table_name} was placed in a log')
                     current_dto = log_placeholder.module.get_current_dto(session, last_id)
             except Exception as ex:
+                session.rollback()
                 log.exception('log_placeholder: ', ex)
 
     return context 

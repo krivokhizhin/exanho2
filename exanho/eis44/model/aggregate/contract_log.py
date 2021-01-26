@@ -18,6 +18,6 @@ class EisContractLog(Base):
 
     handled = Column(Boolean, default=False, nullable=False)
 
-UniqueConstraint(EisContractLog.source, EisContractLog.doc_id, name='uix_eis_contract_log_source_doc_id')
-
 Index('idx_eis_contract_log_reg_num_publish_dt', EisContractLog.reg_num, EisContractLog.publish_dt.asc())
+Index('idx_eis_contract_log_source_doc_id', EisContractLog.source, EisContractLog.doc_id, unique=True)
+UniqueConstraint(EisContractLog.source, EisContractLog.doc_id, EisContractLog.reg_num, name='uix_eis_contract_log')

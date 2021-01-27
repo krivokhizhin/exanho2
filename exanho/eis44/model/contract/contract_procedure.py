@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Boolean, Column, DateTime, Index, Integer, String
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, Index, Integer, String, UniqueConstraint
 from exanho.orm.domain import Base
 
 class ZfcsContractProcedure2015(Base):
@@ -39,5 +39,5 @@ class ZfcsContractProcedure2015(Base):
     scheme_version = Column(String(20))
     content_id = Column(BigInteger)
 
-Index('idx_zfcs_contract_procedure2015_doc_id', ZfcsContractProcedure2015.doc_id, ZfcsContractProcedure2015.external_id, unique=True)
 Index('idx_zfcs_contract_procedure2015_reg_num', ZfcsContractProcedure2015.reg_num)
+UniqueConstraint(ZfcsContractProcedure2015.doc_id, ZfcsContractProcedure2015.external_id, name='uix_zfcs_contract_procedure2015_doc_id')

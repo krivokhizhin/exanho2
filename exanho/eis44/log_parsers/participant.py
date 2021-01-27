@@ -21,9 +21,9 @@ def fill_participant_by_zfcs_contract2015(session:OrmSession, participant:AggPar
         if supp_obj.participant.inn != inn or supp_obj.participant.kpp != kpp:
             continue
 
-        part_fs_obj = None
+        participant_fs_obj = None
         if supp_obj.participant.kind == CntrParticipantKind.FS:
-            part_fs_obj = session.query(CntrParticipantForeign).filter(CntrParticipantForeign.id == supp_obj.participant.id).one()
+            participant_fs_obj = session.query(CntrParticipantForeign).filter(CntrParticipantForeign.id == supp_obj.participant.id).one()
 
         if participant is None:
 
@@ -34,25 +34,26 @@ def fill_participant_by_zfcs_contract2015(session:OrmSession, participant:AggPar
             )
             session.add(participant)
             
-            if part_fs_obj:
-                participant.name_lat = part_fs_obj.full_name_lat
-                participant.tax_payer_code = part_fs_obj.tax_payer_code
-                participant.country_full_name = part_fs_obj.country_full_name
+            if participant_fs_obj:
+                participant.name_lat = participant_fs_obj.full_name_lat
+                participant.tax_payer_code = participant_fs_obj.tax_payer_code
+                participant.country_full_name = participant_fs_obj.country_full_name
 
         elif addition_only:
 
             if participant.name is None: participant.name = supp_obj.participant.short_name if supp_obj.participant.short_name else supp_obj.participant.full_name
-            if part_fs_obj and participant.name_lat is None: participant.name_lat = part_fs_obj.full_name_lat
-            if part_fs_obj and participant.tax_payer_code is None: participant.tax_payer_code = part_fs_obj.tax_payer_code
-            if part_fs_obj and participant.country_full_name is None: participant.country_full_name = part_fs_obj.country_full_name
+            if participant_fs_obj and participant.name_lat is None: participant.name_lat = participant_fs_obj.full_name_lat
+            if participant_fs_obj and participant.tax_payer_code is None: participant.tax_payer_code = participant_fs_obj.tax_payer_code
+            if participant_fs_obj and participant.country_full_name is None: participant.country_full_name = participant_fs_obj.country_full_name
 
         else:
 
             participant.name = supp_obj.participant.short_name if supp_obj.participant.short_name else supp_obj.participant.full_name
-            if part_fs_obj:
-                participant.name_lat = part_fs_obj.full_name_lat
-                participant.tax_payer_code = part_fs_obj.tax_payer_code
-                participant.country_full_name = part_fs_obj.country_full_name
+            if participant_fs_obj:
+                participant.name_lat = participant_fs_obj.full_name_lat
+                participant.tax_payer_code = participant_fs_obj.tax_payer_code
+                participant.country_full_name = participant_fs_obj.country_full_name
+            participant.updated_by = obj.id
 
         cntr_prtc = session.query(AggContractParticipant).\
             filter(AggContractParticipant.contract == contract).filter(AggContractParticipant.participant == participant).\

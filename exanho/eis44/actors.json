@@ -96,6 +96,21 @@
             ]
         },
         {
+            "name": "ParticipantLogParser",
+            "kind": "SleepWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.eis44.workers.log_parser",
+                    "db_key": "eis44_test",
+                    "sleep": 5.0,
+                    "appsettings":{
+                        "log_parser": "exanho.eis44.log_parsers.participant"
+                    }
+                }
+            ]
+        },
+        {
             "name": "ContractLogParser",
             "kind": "SleepWorker",
             "daemon": true,

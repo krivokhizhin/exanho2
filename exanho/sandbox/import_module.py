@@ -10,7 +10,7 @@ url = 'postgresql+psycopg2://kks:Nata1311@localhost/eis44_test'
 
 def run():
     Sessional.domain = Domain(url)
-    appsettings = {'log_parser': 'exanho.eis44.log_parsers.contract'}
+    appsettings = {'log_parser': 'exanho.eis44.log_parsers.participant'}
     mod = importlib.import_module(module_path)
     print(mod.__name__)
 

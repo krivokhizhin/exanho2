@@ -8,7 +8,7 @@ from sqlalchemy.orm.session import Session as OrmSession
 from exanho.core.common import Error
 
 from ..model.aggregate import EisTableName, EisContractLog, EisParticipantLog, AggContractState, AggContract
-from ..model.contract import ZfcsContract2015, ZfcsContractProcedure2015, ZfcsContractProcedureCancel2015
+from ..model.contract import ZfcsContract2015, ZfcsContractCancel2015, ZfcsContractProcedure2015, ZfcsContractProcedureCancel2015
 
 log = logging.getLogger(__name__)
 
@@ -63,6 +63,22 @@ def fill_contract_by_zfcs_contract2015(session:OrmSession, cntr:AggContract, obj
         cntr.state = get_contract_state(obj.current_stage)
         cntr.start_date = obj.execution_start_date
         cntr.end_date = obj.execution_end_date
+        cntr.updated_by = obj.id
+
+def fill_contract_by_zfcs_contract_cancel2015(session:OrmSession, cntr:AggContract, obj:ZfcsContractCancel2015, addition_only:bool):
+
+    if cntr is None:
+        cntr = AggContract(
+            reg_num = obj.reg_num,
+            publish_dt = obj.publish_dt,
+            state = get_contract_state(obj.current_stage)
+        )
+        session.add(cntr)
+    elif addition_only:
+        if cntr.state is None: cntr.state = get_contract_state(obj.current_stage)
+    else:
+        if cntr.publish_dt is None: cntr.publish_dt = obj.publish_dt
+        cntr.state = get_contract_state(obj.current_stage)
         cntr.updated_by = obj.id
 
 def fill_contract_by_zfcs_contract_procedure2015(session:OrmSession, cntr:AggContract, obj:ZfcsContractProcedure2015, addition_only:bool):
@@ -150,6 +166,14 @@ def handle(session:OrmSession, source:EisTableName, doc_id:int, addition_only:bo
             #     part_dto.tax_payer_code = part_fs_obj.tax_payer_code
             #     part_dto.country_full_name = part_fs_obj.country_full_name
 
+    elif source == EisTableName.zfcs_contract_cancel2015:
+        obj = session.query(ZfcsContractCancel2015).get(doc_id)
+        if obj is None:
+            log.error(f'There is not document id={doc_id} in zfcs_contract_cancel2015. The log is marked as handled')
+            return
+
+        fill_contract_by_zfcs_contract_cancel2015(session, cntr, obj, addition_only)
+        
     elif source == EisTableName.zfcs_contract_procedure2015:
         obj = session.query(ZfcsContractProcedure2015).get(doc_id)
         if obj is None:

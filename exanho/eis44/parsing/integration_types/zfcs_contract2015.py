@@ -1,5 +1,6 @@
 from exanho.eis44.model.contract.participant import CntrParticipantForeign
 from sqlalchemy.orm import with_polymorphic
+from sqlalchemy.orm.session import Session as OrmSession
 
 from ...ds.contracts.fcsExport import zfcs_contract2015Type
 from ...ds.contracts.IntegrationTypes import suppliers, zfcs_contract2015SupplierType, corr_supplierLegalEntityRF, corr_supplierLegalEntityForeignState, corr_supplierIndividualPersonRF, corr_supplierIndividualPersonForeignState, individualPersonRFisCulture, individualPersonForeignStateisCulture
@@ -151,11 +152,11 @@ def get_supplier(session, supplier_obj:zfcs_contract2015SupplierType):
     elif supplier_obj.legalEntityForeignState:
         supplier = get_legal_entity_fs(session, supplier_obj.legalEntityForeignState)
     elif supplier_obj.individualPersonForeignState:
-        pass
+        supplier = get_individual_person_fs(session, supplier_obj.individualPersonForeignState)
     elif supplier_obj.individualPersonRFisCulture:
-        pass
+        supplier = get_individual_culture_person_rf(session, supplier_obj.individualPersonForeignState)
     elif supplier_obj.individualPersonForeignStateisCulture:
-        pass
+        supplier = get_individual_culture_person_fs(session, supplier_obj.individualPersonForeignState)
     elif supplier_obj.notPublishedOnEIS:
         supplier = get_not_published_on_eis(session, supplier_obj.notPublishedOnEIS)
     else:
@@ -253,10 +254,6 @@ def get_individual_person_rf(session, supplier_obj:corr_supplierIndividualPerson
 
 def get_legal_entity_fs(session, supplier_obj:corr_supplierLegalEntityForeignState):
 
-    contact = None
-    if supplier_obj.contactInfo:
-        contact = get_contact(session, supplier_obj.contactInfo.lastName, supplier_obj.contactInfo.firstName, supplier_obj.contactInfo.middleName)
-
     supplier = ZfcsContract2015Supplier(
         type = CntrSupplierType.LEFS,
         status = supplier_obj.status,
@@ -304,9 +301,6 @@ def get_legal_entity_fs(session, supplier_obj:corr_supplierLegalEntityForeignSta
         supplier.contact_phone = supplier_obj.placeOfStayInRF.contactPhone
 
     supplier.participant = participant
-
-    if supplier_obj.contactInfo:
-        supplier.contact = contact
 
     return supplier
 
@@ -411,7 +405,7 @@ def get_individual_culture_person_fs(session, supplier_obj:individualPersonForei
     contact = get_contact(session, supplier_obj.lastName, supplier_obj.firstName, supplier_obj.middleName)
 
     supplier = ZfcsContract2015Supplier(
-        type = CntrSupplierType.IPFS,
+        type = CntrSupplierType.IPFSC,
         personal_account = supplier_obj.personalAccount
     )
 
@@ -470,9 +464,10 @@ def get_not_published_on_eis(session, supplier_obj:bool):
     supplier.participant = get_participant(session, CntrParticipantKind.RF, NOT_PUBLISHED_VALUE, NOT_PUBLISHED_VALUE)
     return supplier
 
-def get_participant(session, kind:CntrParticipantKind, inn:str, kpp:str = None) -> CntrParticipantForeign:
+def get_participant(session:OrmSession, kind:CntrParticipantKind, inn:str, kpp:str = None) -> CntrParticipantForeign:
     # rf_plus_fs = with_polymorphic(CntrParticipant, CntrParticipantForeign)
-    participant = session.query(with_polymorphic(CntrParticipant, CntrParticipantForeign)).filter(CntrParticipant.inn == inn, CntrParticipant.kpp == kpp).one_or_none()
+    participant = session.query(with_polymorphic(CntrParticipant, CntrParticipantForeign)).\
+        filter(CntrParticipant.inn == inn, CntrParticipant.kpp == kpp).one_or_none()
     if participant is None:
         if kind == CntrParticipantKind.RF:
             participant = CntrParticipant(
@@ -487,6 +482,16 @@ def get_participant(session, kind:CntrParticipantKind, inn:str, kpp:str = None) 
         else:
             raise Error(f'Unknown participant kind ("{kind}")')
         # session.add(participant)
+    elif kind != participant.kind and kind == CntrParticipantKind.FS:
+        participant.kind = kind
+        session.flush([participant])
+        session.expire(participant)
+        del participant
+        participant = session.query(with_polymorphic(CntrParticipant, CntrParticipantForeign)).\
+            filter(CntrParticipant.inn == inn, CntrParticipant.kpp == kpp).\
+                one()
+    else:
+        pass
 
     return participant
 

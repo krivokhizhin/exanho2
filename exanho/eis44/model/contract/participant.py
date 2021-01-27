@@ -1,5 +1,6 @@
 import enum
 from sqlalchemy import BigInteger, Column, Date, Enum, ForeignKey, Index, String
+from sqlalchemy import event
 from sqlalchemy.orm import relationship
 
 from exanho.orm.domain import Base
@@ -55,3 +56,11 @@ class CntrParticipantForeign(CntrParticipant):
     __mapper_args__ = {
         'polymorphic_identity':CntrParticipantKind.FS
     }
+
+
+@event.listens_for(CntrParticipant.kind, 'set', raw=True)
+def receive_set(target, value, oldvalue, initiator):
+    "listen for the 'set' event"
+
+    if oldvalue == CntrParticipantKind.RF and value == CntrParticipantKind.FS:
+        target.session.connection().execute(CntrParticipantForeign.__table__.insert(), id=target.object.id)

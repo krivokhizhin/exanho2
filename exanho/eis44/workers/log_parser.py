@@ -36,7 +36,7 @@ def work(context:Context):
                 try:
                     addition_only = True if publish_dt < last_handled_publish_dt else False
                     context.log_parser.handle(session, source, doc_id, addition_only, *entity)
-                    context.log_parser.mark_as_handled(session, source, doc_id)
+                    context.log_parser.mark_as_handled(session, source, doc_id, *entity)
                     last_handled_publish_dt = max(last_handled_publish_dt, publish_dt)
                     session.commit()
                 except Exception as ex:

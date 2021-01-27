@@ -2,20 +2,15 @@ import datetime
 import decimal
 import logging
 
-from collections import namedtuple
 from sqlalchemy import func
 from sqlalchemy.orm.session import Session as OrmSession
 
 from exanho.core.common import Error
 
-from exanho.eis44.model import CntrParticipantKind, CntrParticipantForeign, ZfcsContract2015, ZfcsContractProcedure2015, ZfcsContractProcedureCancel2015
-
 from ..model.aggregate import EisTableName, EisContractLog, EisParticipantLog, AggContractState, AggContract
-from ..model.contract import ZfcsContract2015
+from ..model.contract import ZfcsContract2015, ZfcsContractProcedure2015, ZfcsContractProcedureCancel2015
 
 log = logging.getLogger(__name__)
-
-ContractRecord = namedtuple('ContractRecord', 'id reg_num publish_dt')
 
 def get_contract_state(current_stage:str) -> AggContractState:
     if current_stage.upper() == 'E':
@@ -28,19 +23,6 @@ def get_contract_state(current_stage:str) -> AggContractState:
         return AggContractState.CANCELED
 
     return AggContractState.UNKNOWN
-
-# def create_or_update_participant(session:OrmSession, unstable_supplier:EisParticipant):
-#     participant = session.query(EisParticipant).filter(EisParticipant.inn == unstable_supplier.inn, EisParticipant.kpp == unstable_supplier.kpp).one_or_none()
-    
-#     if participant is None:
-#         participant = unstable_supplier
-#     else:
-#         if unstable_supplier.name: participant.name = unstable_supplier.name
-#         if unstable_supplier.name_lat: participant.name_lat = unstable_supplier.name_lat
-#         if unstable_supplier.tax_payer_code: participant.tax_payer_code = unstable_supplier.tax_payer_code
-#         if unstable_supplier.country_full_name: participant.country_full_name = unstable_supplier.country_full_name
-
-#     return participant
 
 def fill_contract_by_zfcs_contract2015(session:OrmSession, cntr:AggContract, obj:ZfcsContract2015, addition_only:bool):
 
@@ -187,7 +169,7 @@ def handle(session:OrmSession, source:EisTableName, doc_id:int, addition_only:bo
     else:
         raise Error(f'not tested case ({source})')
 
-def mark_as_handled(session:OrmSession, source:EisTableName, doc_id:int):
+def mark_as_handled(session:OrmSession, source:EisTableName, doc_id:int, reg_num:str):
     cntr_log = session.query(EisContractLog).\
         filter(EisContractLog.source == source).filter(EisContractLog.doc_id == doc_id).\
             one()

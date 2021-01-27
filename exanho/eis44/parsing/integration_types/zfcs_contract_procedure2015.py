@@ -21,8 +21,7 @@ def parse(session, cntr_proc_obj:zfcs_contractProcedure2015Type, update=True, **
             modification_reason = cntr_proc_obj.modificationReason,
             current_stage = cntr_proc_obj.currentContractStage,
             okpd2okved2 = cntr_proc_obj.okpd2okved2,
-            scheme_version = cntr_proc_obj.schemeVersion,
-            content_id = content_id
+            scheme_version = cntr_proc_obj.schemeVersion
         )
         session.add(procedure)
     elif not update:
@@ -38,4 +37,5 @@ def parse(session, cntr_proc_obj:zfcs_contractProcedure2015Type, update=True, **
         procedure.current_stage = cntr_proc_obj.currentContractStage
         procedure.okpd2okved2 = cntr_proc_obj.okpd2okved2
         procedure.scheme_version = cntr_proc_obj.schemeVersion
-        procedure.content_id = content_id
+
+    procedure.content_id = content_id

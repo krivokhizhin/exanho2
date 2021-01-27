@@ -58,8 +58,7 @@ def parse(session, contract_obj:zfcs_contract2015Type, update=True, **kwargs):
             current_stage = contract_obj.currentContractStage,
             okpd2okved2 = contract_obj.okpd2okved2,
             is_invalid = contract_obj.isInvalid,
-            scheme_version = contract_obj.schemeVersion,
-            content_id = content_id
+            scheme_version = contract_obj.schemeVersion
         )
         session.add(contract)
     elif not update:
@@ -99,7 +98,8 @@ def parse(session, contract_obj:zfcs_contract2015Type, update=True, **kwargs):
         contract.okpd2okved2 = contract_obj.okpd2okved2
         contract.is_invalid = contract_obj.isInvalid
         contract.scheme_version = contract_obj.schemeVersion
-        contract.content_id = content_id
+
+    contract.content_id = content_id
 
     if contract_obj.priceInfo.rightToConcludeContractPriceInfo is None:
         contract.price = contract_obj.priceInfo.price

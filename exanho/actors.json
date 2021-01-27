@@ -90,7 +90,7 @@
                     "db_key": "eis44_test",
                     "sleep": 5.0,
                     "appsettings":{
-                        "log_placeholders": ["exanho.eis44.placeholders.zfcs_contract2015", "exanho.eis44.placeholders.zfcs_contract_procedure2015", "exanho.eis44.placeholders.zfcs_contract_procedure_cancel2015"]
+                        "log_placeholders": ["exanho.eis44.placeholders.zfcs_contract2015", "exanho.eis44.placeholders.zfcs_contract_cancel2015", "exanho.eis44.placeholders.zfcs_contract_procedure2015", "exanho.eis44.placeholders.zfcs_contract_procedure_cancel2015"]
                     }
                 }
             ]

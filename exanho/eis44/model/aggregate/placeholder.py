@@ -9,6 +9,7 @@ class EisTableName(enum.Enum):
     zfcs_contract2015 = 1
     zfcs_contract_procedure2015 = 2
     zfcs_contract_procedure_cancel2015 = 3
+    zfcs_contract_cancel2015 = 4
 
 class LogPlaceholder(Base):
     __tablename__ = 'log_placeholder'  

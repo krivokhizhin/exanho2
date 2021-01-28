@@ -10,6 +10,18 @@
                 ]
             }
         ],
+        "service_endpoints": [
+            {
+                "interface": "IEisParticipantService",
+                "host": "",
+                "port": 3120
+            },
+            {
+                "interface": "IEisContractService",
+                "host": "",
+                "port": 3121
+            }
+        ],
         "joinable_queues": [
             {
                 "name": "contract",
@@ -18,6 +30,31 @@
         ]
     },
     "exanho_actors": [
+        {
+            "name": "EisService",
+            "kind": "XmlRpcServer",
+            "daemon": true,
+            "services":[
+                {
+                    "handler_module": "exanho.eis44.services.eis_participant_service",
+                    "interface": "IEisParticipantService",
+                    "concurrency": {
+                        "degree": 2,
+                        "kind": "process"
+                    },
+                    "db_key": "eis44_test"
+                },
+                {
+                    "handler_module": "exanho.eis44.services.eis_contract_service",
+                    "interface": "IEisContractService",
+                    "concurrency": {
+                        "degree": 2,
+                        "kind": "process"
+                    },
+                    "db_key": "eis44_test"
+                }
+            ]            
+        },
         {
             "name": "ContractQHWorker",
             "kind": "QueueWorker",

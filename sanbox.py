@@ -1,4 +1,4 @@
-import exanho.sandbox.ds_test as mod
+import exanho.sandbox.orm as mod
 
 if __name__ == '__main__':
     mod.run()

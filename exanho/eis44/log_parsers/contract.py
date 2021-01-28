@@ -13,14 +13,15 @@ from ..model.contract import ZfcsContract2015, ZfcsContractCancel2015, ZfcsContr
 log = logging.getLogger(__name__)
 
 def get_contract_state(current_stage:str) -> AggContractState:
-    if current_stage.upper() == 'E':
-        return AggContractState.EXECUTION
-    if current_stage.upper() == 'EC':
-        return AggContractState.COMPLETED
-    if current_stage.upper() == 'ET':
-        return AggContractState.DISCONTINUED
-    if current_stage.upper() == 'IN':
-        return AggContractState.CANCELED
+    if current_stage:
+        if current_stage.upper() == 'E':
+            return AggContractState.EXECUTION
+        if current_stage.upper() == 'EC':
+            return AggContractState.COMPLETED
+        if current_stage.upper() == 'ET':
+            return AggContractState.DISCONTINUED
+        if current_stage.upper() == 'IN':
+            return AggContractState.CANCELED
 
     return AggContractState.UNKNOWN
 

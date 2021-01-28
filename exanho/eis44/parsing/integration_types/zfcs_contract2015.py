@@ -49,8 +49,8 @@ def parse(session, contract_obj:zfcs_contract2015Type, update=True, **kwargs):
             is_smpo_or_sono_engage = contract_obj.isSMPOrSONOEngage,
 
             quantity_stages = contract_obj.quantityContractStages,
-            execution_start_date = contract_obj.executionPeriod.startDate,
-            execution_end_date = contract_obj.executionPeriod.endDate,
+            execution_start_date = contract_obj.executionPeriod.startDate if contract_obj.executionPeriod else None,
+            execution_end_date = contract_obj.executionPeriod.endDate if contract_obj.executionPeriod else None,
 
             energy_service_info = contract_obj.energyServiceContractInfo,
             href = contract_obj.href,
@@ -88,8 +88,8 @@ def parse(session, contract_obj:zfcs_contract2015Type, update=True, **kwargs):
         contract.is_smpo_or_sono_engage = contract_obj.isSMPOrSONOEngage
 
         contract.quantity_stages = contract_obj.quantityContractStages
-        contract.execution_start_date = contract_obj.executionPeriod.startDate
-        contract.execution_end_date = contract_obj.executionPeriod.endDate
+        if contract_obj.executionPeriod: contract.execution_start_date = contract_obj.executionPeriod.startDate
+        if contract_obj.executionPeriod: contract.execution_end_date = contract_obj.executionPeriod.endDate
 
         contract.energy_service_info = contract_obj.energyServiceContractInfo
         contract.href = contract_obj.href
@@ -101,7 +101,7 @@ def parse(session, contract_obj:zfcs_contract2015Type, update=True, **kwargs):
 
     contract.content_id = content_id
 
-    if contract_obj.priceInfo.rightToConcludeContractPriceInfo is None:
+    if contract_obj.priceInfo and contract_obj.priceInfo.rightToConcludeContractPriceInfo is None:
         contract.price = contract_obj.priceInfo.price
         contract.price_type = contract_obj.priceInfo.priceType
         contract.price_formula = contract_obj.priceInfo.priceFormula

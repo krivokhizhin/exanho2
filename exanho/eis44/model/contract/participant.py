@@ -22,7 +22,7 @@ class CntrParticipant(Base):
     short_name = Column(String(2000))
     firm_name = Column(String(2000))
 
-    okpo = Column(String(10))
+    okpo = Column(String(20))
     inn = Column(String(12))
     kpp = Column(String(9))
     registration_date = Column(Date)

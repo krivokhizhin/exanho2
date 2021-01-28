@@ -106,9 +106,10 @@ def parse(session, contract_obj:zfcs_contract2015Type, update=True, **kwargs):
         contract.price_type = contract_obj.priceInfo.priceType
         contract.price_formula = contract_obj.priceInfo.priceFormula
         contract.price_formula_specified = contract_obj.priceInfo.maxPriceAndPriceFormulaSpecified
-        contract.currency_code = contract_obj.priceInfo.currency.code
-        contract.currency_rate = contract_obj.priceInfo.currencyRate.rate
-        contract.currency_raiting = contract_obj.priceInfo.currencyRate.raiting
+        if contract_obj.priceInfo.currency: contract.currency_code = contract_obj.priceInfo.currency.code
+        if contract_obj.priceInfo.currencyRate:
+            contract.currency_rate = contract_obj.priceInfo.currencyRate.rate
+            contract.currency_raiting = contract_obj.priceInfo.currencyRate.raiting
         contract.price_rur = contract_obj.priceInfo.priceRUR
         contract.price_vat = contract_obj.priceInfo.priceVAT
         contract.price_vat_rur = contract_obj.priceInfo.priceVATRUR

@@ -26,7 +26,7 @@ class ZfcsContract2015(Base):
     doc_code = Column(String(10))
     sign_date = Column(Date)
     reg_num = Column(String(19))
-    number = Column(String(50))
+    number = Column(String(100))
     subject = Column(String(2000))
 
     group_build_code = Column(String(5))
@@ -94,5 +94,5 @@ class ZfcsContract2015(Base):
     scheme_version = Column(String(20))
     content_id = Column(BigInteger)
 
-Index('idx_zfcs_contract2015_reg_num', ZfcsContract2015.reg_num, ZfcsContract2015.number, ZfcsContract2015.version_number,unique=True)
+Index('idx_zfcs_contract2015_reg_num', ZfcsContract2015.reg_num)
 Index('idx_zfcs_contract2015_doc_id', ZfcsContract2015.doc_id, ZfcsContract2015.external_id, unique=True)

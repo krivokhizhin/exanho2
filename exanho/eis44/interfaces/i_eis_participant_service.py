@@ -9,5 +9,5 @@ class IEisParticipantService(ABC):
         pass
     
     @abstractmethod
-    def get_contracts(self, inn:str, kpp:str=None, **kwargs) -> list:
+    def get_contracts(self, inn:str, kpp:str=None, state:str=None) -> list:
         pass

@@ -3,19 +3,19 @@ import time
 
 from sqlalchemy.orm.session import Session as OrmSession
 from sqlalchemy import func
-# from sqlalchemy.orm.exc import MultipleResultsFound
 
 from exanho.core.common import try_logged, Timer
 from exanho.core.actors import ServiceBase
 from exanho.orm.domain import Sessional
 
-from ..interfaces import IEisParticipantService, SummaryContracts, ContractShortInfo
+from ..interfaces import IEisParticipantService, SummaryContracts, ContractShortInfo, serialize
 from ..model import AggContractState, AggParticipant, AggContract, AggContractParticipant
 
 class EisParticipantService(IEisParticipantService, ServiceBase):
 
     logger = logging.getLogger(__name__)
     
+    @serialize
     @try_logged
     @Sessional
     def get_summary_contracts(self, inn:str, kpp:str=None) -> list:
@@ -40,16 +40,18 @@ class EisParticipantService(IEisParticipantService, ServiceBase):
 
         return summary_contracts
     
+    @serialize
     @try_logged
     @Sessional
-    def get_contracts(self, inn:str, kpp:str=None, **kwargs) -> list:
+    def get_contracts(self, inn:str, kpp:str=None, state:str=None) -> list:
         assert isinstance(inn, str)
         if kpp:
             assert isinstance(kpp, str)
 
-        state = kwargs.get('state', None)
-        if state and isinstance(state, str) and not str(state).startswith('_') and not str(state).endswith('_') and state in dir(AggContractState):
-            state = AggContractState[state]
+        if state:
+            assert isinstance(state, str)
+            if not str(state).startswith('_') and not str(state).endswith('_') and state in dir(AggContractState):
+                state = AggContractState[state]
 
         contracts = list()
 
@@ -57,9 +59,10 @@ class EisParticipantService(IEisParticipantService, ServiceBase):
         assert isinstance(session, OrmSession)
 
         contract_ids_stmt = session.query(AggContractParticipant.contract_id).\
-            join(AggParticipant).\
-                filter(AggParticipant.inn == inn, AggParticipant.kpp == kpp).\
-                    subquery()
+            join(AggParticipant).filter(AggParticipant.inn == inn)
+
+        if kpp:
+            contract_ids_stmt = contract_ids_stmt.filter(AggParticipant.kpp == kpp)
 
         contracts_stmt = session.query(AggContract.reg_num, AggContract.state.name, AggContract.price, AggContract.currency_code, AggContract.start_date, AggContract.href).\
             filter(AggContract.id.in_(contract_ids_stmt))

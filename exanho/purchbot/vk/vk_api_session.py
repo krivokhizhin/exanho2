@@ -13,13 +13,7 @@ class VkApiSession:
         self.v = v
         
     def groups_getLongPollServer(self, group_id:int) -> GetLongPollServerResponse:
-        dto = None
         url = '{}{}'.format(URL_VK_API, 'groups.getLongPollServer')
-        try:
-            resp_obj = self.driver.get_response(url, params={'group_id':group_id, 'v':self.v, 'access_token':self.access_token})
-            resp = VkResponse.create(resp_obj, GetLongPollServerResponse)
-            dto = resp.response
-        except:
-            raise
-
-        return dto
+        resp_obj = self.driver.get_response(url, params={'group_id':group_id, 'v':self.v, 'access_token':self.access_token})
+        resp = VkResponse.create(resp_obj, GetLongPollServerResponse)
+        return resp.response

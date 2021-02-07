@@ -75,7 +75,7 @@ def work(context:Context, event_obj:JSONObject):
                     random_id=0,
                     keyboard=ui_templates.get_element('main_menu'),
                     group_id=context.group_id,
-                    message='На данный момент сообщество находится в разработки и стадии наполнения контентом...'
+                    message='На данный момент раздел находится в разработке...'
                     )
 
                 if resp.error:

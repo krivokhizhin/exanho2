@@ -7,6 +7,7 @@ from exanho.purchbot.vk import VkApiSession, VkBotSession
 from exanho.purchbot.vk.drivers import BuildInDriver
 
 from exanho.core.manager_context import Context as ExanhoContext
+from exanho.purchbot.vk.dto import JSONObject
 from exanho.purchbot.vk.dto.groups import GetLongPollServerResponse
 from exanho.purchbot.vk.dto.bot.group_event import GroupEvent
 
@@ -70,7 +71,8 @@ def work(context:Context):
 
                 jq:JoinableQueue = queues_by_events.get(new_event.type_, None)
                 if jq:
-                    jq.put(new_event.object_)
+                    json_obj:JSONObject = new_event.object_
+                    jq.put(json_obj)
                     log.info(f'received "{new_event.type_}" event')
                 else:
                     log.warning(f'No consumer(queue) for {new_event.type_} event type')
@@ -92,5 +94,5 @@ def _get_bot_data(driver, access_token, group_id) -> GetLongPollServerResponse:
     vk_api_session = VkApiSession(driver, access_token)
     bot_data = vk_api_session.groups_getLongPollServer(group_id)
     if bot_data.error:
-        raise Error(f'VK getLongPollServer error: code={bot_data.error.error_code}, msg={bot_data.error.error_msg}')
+        raise Error(f'VK groups.getLongPollServer error: code={bot_data.error.error_code}, msg={bot_data.error.error_msg}')
     return bot_data

@@ -19,3 +19,4 @@ class Product(ExaObjectMixin, Base):
     desc = Column(String(2000))
 
     trades = relationship('Trade', back_populates='product')
+    tariff = relationship('Tariff', back_populates='product', uselist=False)

@@ -5,6 +5,7 @@ from sqlalchemy.orm import relationship
 
 from exanho.orm.domain import Base
 
+LEN_ANALITIC = 12
 class BalAccCode(enum.Enum):
     C901 = 901  # Общий счет
     C951 = 951  # Счет ВК
@@ -14,7 +15,6 @@ class BalAccCode(enum.Enum):
     C131 = 131  # Оплата за запросы
     C132 = 132  # Оплата за подписки
     C133 = 133  # Оплата за отчеты
-
 
 class AccAccount(Base):
     __tablename__ = 'acc_account'  
@@ -40,7 +40,7 @@ class AccAccount(Base):
         if self.analitic1 is None:
             assert self.analitic2 is None
 
-        analitic1 = '' if analitic1 is None else str(analitic1).rjust(12, '0')
-        analitic2 = '' if analitic2 is None else str(analitic2).rjust(12, '0')
+        analitic1 = '' if analitic1 is None else str(analitic1).rjust(LEN_ANALITIC, '0')
+        analitic2 = '' if analitic2 is None else str(analitic2).rjust(LEN_ANALITIC, '0')
 
         self.account = '{}{}{}'.format(balance_code.value, analitic1, analitic2)

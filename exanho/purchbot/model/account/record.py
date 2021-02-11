@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from sqlalchemy import BigInteger, Column, DateTime, ForeignKey, Numeric, String
 from sqlalchemy.orm import relationship
 
@@ -15,3 +17,8 @@ class AccRecord(Base):
 
     desc = Column(String(500))
     date = Column(DateTime)
+
+    def __init__(self, dt:int, cr:int, amount:Decimal) -> None:
+        self.dt = dt
+        self.cr = cr
+        self.amount = amount

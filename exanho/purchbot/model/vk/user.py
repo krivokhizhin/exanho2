@@ -10,5 +10,5 @@ class VkUser(ExaObjectMixin, Base):
 
     user_id = Column(BigInteger, nullable=False, unique=True, index=True)
 
-    client_id = Column(BigInteger, ForeignKey('client.id'))
+    client_id = Column(BigInteger, ForeignKey('client.id'), nullable=False)
     client = relationship('Client', back_populates='vk_users')

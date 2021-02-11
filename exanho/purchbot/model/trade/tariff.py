@@ -8,7 +8,7 @@ from exanho.orm.mixin import ExaObjectMixin
 class Tariff(ExaObjectMixin, Base):
 
     product_id = Column(BigInteger, ForeignKey('product.id'), nullable=False)
-    product = relationship('Product', back_populates='trades')
+    product = relationship('Product', back_populates='tariff')
 
     value = Column(Numeric(8,2), nullable=False)
 

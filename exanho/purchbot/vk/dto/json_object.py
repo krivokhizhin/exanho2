@@ -21,5 +21,5 @@ class JSONObject:
         return json.dumps(dic, indent=indent)
 
     @staticmethod
-    def loads(dto_str:str) -> dict:
+    def loads(dto_str:str):
         return json.loads(dto_str, object_hook=JSONObject)

@@ -56,13 +56,14 @@ def make_payment(session:OrmSession, dt:AccAccount, cr:AccAccount, amount:Decima
             raise Error(f'The account balance is less than the requested amount ({cr_remain.account.account}: {remain_amount} < {amount})')
 
         record = AccRecord(dt.id, cr.id, amount)
-        session.merge(record)
+        session.add(record)
+        session.flush([record])
 
         dt_remain.dt += amount
-        dt_remain.last_payment_id = record.id
+        dt_remain.updated_by = record.id
 
         cr_remain.cr += amount
-        cr_remain.last_payment_id = record.id
+        cr_remain.updated_by = record.id
        
         return record
 
@@ -85,4 +86,3 @@ def deposit_promo_funds(session:OrmSession, client:Client, amount:Decimal):
         dt_account = get_account(session, BalAccCode.C107, client.id, desc=f'Промо счет клиента id={client.id}')
         cr_account = get_account(session, BalAccCode.C907, desc='Промо счет оператора')
         record = make_payment(session, dt_account, cr_account, amount, True)
-        record.date = datetime.now()

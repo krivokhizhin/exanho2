@@ -11,8 +11,6 @@ class AccRemain(ExaObjectMixin, Base):
 
     dt = Column(Numeric(18,4), nullable=False)
     cr = Column(Numeric(18,4), nullable=False)
-    
-    last_payment_id = Column(BigInteger, ForeignKey('acc_record.id'))
 
     def __init__(self, account) -> None:
         self.account = account

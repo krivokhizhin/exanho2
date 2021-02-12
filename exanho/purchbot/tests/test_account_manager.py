@@ -128,7 +128,9 @@ class TestAccountManager(unittest.TestCase):
         self.assertEqual(actual_record1.amount, Decimal('100'))
 
         self.assertEqual(acc_mngr.get_remain_amount(self.session, dt_account1), Decimal('100'))
+        self.assertEqual(acc_mngr.get_remain(self.session, dt_account1).updated_by, actual_record1.id)
         self.assertEqual(acc_mngr.get_remain_amount(self.session, cr_account), Decimal('-100'))
+        self.assertEqual(acc_mngr.get_remain(self.session, cr_account).updated_by, actual_record1.id)
 
         actual_record2 = acc_mngr.make_payment(self.session, dt_account1, cr_account, Decimal('75'), True)
         self.assertEqual(actual_record2.dt, dt_account1.id)
@@ -136,7 +138,9 @@ class TestAccountManager(unittest.TestCase):
         self.assertEqual(actual_record2.amount, Decimal('75'))
 
         self.assertEqual(acc_mngr.get_remain_amount(self.session, dt_account1), Decimal('175'))
+        self.assertEqual(acc_mngr.get_remain(self.session, dt_account1).updated_by, actual_record2.id)
         self.assertEqual(acc_mngr.get_remain_amount(self.session, cr_account), Decimal('-175'))
+        self.assertEqual(acc_mngr.get_remain(self.session, cr_account).updated_by, actual_record2.id)
 
         dt_account2 = acc_mngr.get_account(self.session, BalAccCode.C107, 222222, 111111)
 
@@ -146,8 +150,11 @@ class TestAccountManager(unittest.TestCase):
         self.assertEqual(actual_record3.amount, Decimal('125'))
 
         self.assertEqual(acc_mngr.get_remain_amount(self.session, dt_account1), Decimal('175'))
+        self.assertEqual(acc_mngr.get_remain(self.session, dt_account1).updated_by, actual_record2.id)
         self.assertEqual(acc_mngr.get_remain_amount(self.session, dt_account2), Decimal('125'))
+        self.assertEqual(acc_mngr.get_remain(self.session, dt_account2).updated_by, actual_record3.id)
         self.assertEqual(acc_mngr.get_remain_amount(self.session, cr_account), Decimal('-300'))
+        self.assertEqual(acc_mngr.get_remain(self.session, cr_account).updated_by, actual_record3.id)
 
         dt_account3 = acc_mngr.get_account(self.session, BalAccCode.C107)
 
@@ -157,9 +164,13 @@ class TestAccountManager(unittest.TestCase):
         self.assertEqual(actual_record4.amount, Decimal('49.5'))
 
         self.assertEqual(acc_mngr.get_remain_amount(self.session, dt_account1), Decimal('175'))
+        self.assertEqual(acc_mngr.get_remain(self.session, dt_account1).updated_by, actual_record2.id)
         self.assertEqual(acc_mngr.get_remain_amount(self.session, dt_account2), Decimal('75.5'))
+        self.assertEqual(acc_mngr.get_remain(self.session, dt_account2).updated_by, actual_record4.id)
         self.assertEqual(acc_mngr.get_remain_amount(self.session, dt_account3), Decimal('49.5'))
+        self.assertEqual(acc_mngr.get_remain(self.session, dt_account3).updated_by, actual_record4.id)
         self.assertEqual(acc_mngr.get_remain_amount(self.session, cr_account), Decimal('-300'))
+        self.assertEqual(acc_mngr.get_remain(self.session, cr_account).updated_by, actual_record3.id)
 
         actual_record5 = acc_mngr.make_payment(self.session, cr_account, dt_account3, Decimal('49.5'))
         self.assertEqual(actual_record5.dt, cr_account.id)
@@ -167,6 +178,10 @@ class TestAccountManager(unittest.TestCase):
         self.assertEqual(actual_record5.amount, Decimal('49.5'))
 
         self.assertEqual(acc_mngr.get_remain_amount(self.session, dt_account1), Decimal('175'))
+        self.assertEqual(acc_mngr.get_remain(self.session, dt_account1).updated_by, actual_record2.id)
         self.assertEqual(acc_mngr.get_remain_amount(self.session, dt_account2), Decimal('75.5'))
+        self.assertEqual(acc_mngr.get_remain(self.session, dt_account2).updated_by, actual_record4.id)
         self.assertEqual(acc_mngr.get_remain_amount(self.session, dt_account3), Decimal('0'))
+        self.assertEqual(acc_mngr.get_remain(self.session, dt_account3).updated_by, actual_record5.id)
         self.assertEqual(acc_mngr.get_remain_amount(self.session, cr_account), Decimal('-250.5'))
+        self.assertEqual(acc_mngr.get_remain(self.session, cr_account).updated_by, actual_record5.id)

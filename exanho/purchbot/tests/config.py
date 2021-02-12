@@ -1,0 +1,1 @@
+db_url = 'postgresql+psycopg2://kks:Nata1311@localhost/purchbot_test'

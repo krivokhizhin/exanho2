@@ -5,10 +5,11 @@ from sqlalchemy.orm import relationship
 
 from exanho.orm.domain import Base
 
-LEN_ANALITIC = 12
+LEN_ANALITIC = 10
 class BalAccCode(enum.Enum):
-    C901 = 901  # Общий счет
-    C951 = 951  # Счет ВК
+    C901 = 901  # Общий счет оператора
+    C907 = 907  # Промо счет оператора
+    C951 = 951  # Счет оператора в ВК
     C101 = 101  # Свободный остаток
     C102 = 102  # Невыясненные поступления
     C107 = 107  # Промо-счет

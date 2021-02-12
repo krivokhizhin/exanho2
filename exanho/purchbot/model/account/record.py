@@ -4,11 +4,10 @@ from sqlalchemy import BigInteger, Column, DateTime, ForeignKey, Numeric, String
 from sqlalchemy.orm import relationship
 
 from exanho.orm.domain import Base
+from exanho.orm.mixin import ExaObjectMixin
 
-class AccRecord(Base):
-    __tablename__ = 'acc_record'  
-
-    id = Column(BigInteger, primary_key=True)
+class AccRecord(ExaObjectMixin, Base):
+    __tablename__ = 'acc_record'
 
     dt = Column(BigInteger, ForeignKey('acc_account.id'), nullable=False)
     cr = Column(BigInteger, ForeignKey('acc_account.id'), nullable=False)

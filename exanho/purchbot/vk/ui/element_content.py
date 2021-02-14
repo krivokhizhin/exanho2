@@ -50,21 +50,21 @@ class KeyboardContent(IContext):
 
 class ElementActionContent(IContext):
 
-    def __init__(self) -> None:
-        self.type_ = None
-        self.link = None
+    def __init__(self, **kwargs) -> None:
+        self.type_ = kwargs.get('type_', None)
+        self.link = kwargs.get('link', None)
 
 class TemplateElementContent(IContext):
 
-    def __init__(self) -> None:
-        self.title = None
-        self.description = None
-        self.photo_id = None
-        self.buttons = list()
-        self.action = None
+    def __init__(self, **kwargs) -> None:
+        self.title = kwargs.get('title', None)
+        self.description = kwargs.get('description', None)
+        self.photo_id = kwargs.get('photo_id', None)
+        self.buttons = kwargs.get('buttons', list())
+        self.action = kwargs.get('action', None)
 
 class TemplateContent(IContext):
 
-    def __init__(self) -> None:
-        self.type_ = None
-        self.elements = list()
+    def __init__(self, **kwargs) -> None:
+        self.type_ = kwargs.get('type_', None)
+        self.elements = kwargs.get('elements', list())

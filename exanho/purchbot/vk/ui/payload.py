@@ -11,6 +11,7 @@ class PayloadCommand(enum.Enum):
     get_balance = 6
     menu_section_my_subscriptions = 7
     menu_section_history = 8
+    request_product = 9
 
 class Payload:
 

@@ -1,24 +1,18 @@
 import logging
-from collections import namedtuple
 
-from exanho.orm.domain import Sessional
-from exanho.core.common import Error, Timer
-from exanho.core.manager_context import Context as ExanhoContext
+from exanho.core.common import Error
 
+from exanho.purchbot.vk.utils import VkApiContext
 from exanho.purchbot.vk import VkApiSession
 from exanho.purchbot.vk.drivers import BuildInDriver
 from exanho.purchbot.vk.dto import JSONObject
 
+from exanho.purchbot.vk.utils.message_manager import handle_message_event
+
 log = logging.getLogger(__name__)
 
-Context = namedtuple('Context', [
-    'access_token',
-    'group_id',
-    'vk_api_session'
-    ], defaults = [None])
-
-def initialize(appsettings, exanho_context:ExanhoContext):
-    context = Context(**appsettings)
+def initialize(appsettings, exanho_context):
+    context = VkApiContext(**appsettings)
     
     driver = BuildInDriver()
     vk_api_session = VkApiSession(driver, context.access_token)
@@ -28,7 +22,15 @@ def initialize(appsettings, exanho_context:ExanhoContext):
     log.info('Initialized')
     return context
 
-def work(context:Context, event_obj:JSONObject):
+def work(context:VkApiContext, event_obj:JSONObject):
+    try:
+        handle_message_event(context, event_obj)
+    except Error as er:
+        log.error(er.message)
+    except Exception as ex:
+        log.exception(event_obj.dumps(), ex)
+
+    return context
     log.debug(event_obj.dumps())
 
     user_id = None

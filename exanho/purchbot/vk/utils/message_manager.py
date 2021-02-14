@@ -1,3 +1,4 @@
+import logging
 from decimal import Decimal
 from sqlalchemy.orm.session import Session as OrmSession
 
@@ -13,7 +14,9 @@ from ..utils import ui_manager as ui_mngr
 
 from ...model import Client, VkUser
 
-def handle_message_new(context:VkApiContext, message_new:JSONObject):    
+log = logging.getLogger(__name__)
+
+def handle_message_new(context:VkApiContext, message_new:JSONObject):
 
     if hasattr(message_new, 'message'):
 
@@ -23,14 +26,11 @@ def handle_message_new(context:VkApiContext, message_new:JSONObject):
             ui_mngr.show_main_menu(context, client_context)
             return
 
-        payload = Payload()
-        payload.fill(message_new.message.payload)
-
         payload_obj = message_new.message.payload
         if isinstance(payload_obj, str):
             payload_obj = JSONObject.loads(payload_obj.replace('\\"', '"').replace('\"', '"'))
         
-        if hasattr(payload_obj, 'command'):
+        if not hasattr(payload_obj, 'command'):
             ui_mngr.show_main_menu(context, client_context)
             return
 
@@ -41,30 +41,56 @@ def handle_message_new(context:VkApiContext, message_new:JSONObject):
                 page = payload_obj.page if hasattr(payload_obj, 'page') else None
             )
 
-        match_payload()
+        match_payload(payload, client_context, context, message_new)
 
     else:
         raise Error('There is not "message" element in "message_new" event')
 
-def match_payload(payload:Payload, client_context:ClientContext, context:VkApiContext, message_new:JSONObject):
+def handle_message_event(context:VkApiContext, message_event:JSONObject):  
+
+    if hasattr(message_event, 'payload'):
+
+        client_context = get_client_context(message_event.user_id)
+
+        payload_obj = message_event.payload
+        if isinstance(payload_obj, str):
+            payload_obj = JSONObject.loads(payload_obj.replace('\\"', '"').replace('\"', '"'))
+        
+        if not hasattr(payload_obj, 'command'):
+            ui_mngr.show_main_menu(context, client_context)
+            return
+
+        payload = Payload()
+        payload.fill(
+                payload_obj.command,
+                context = payload_obj.context if hasattr(payload_obj, 'context') else None,
+                page = payload_obj.page if hasattr(payload_obj, 'page') else None
+            )
+
+        match_payload(payload, client_context, context, message_event)
+
+    else:
+        raise Error('There is not "payload" element in "message_event" event')
+
+def match_payload(payload:Payload, client_context:ClientContext, context:VkApiContext, event_obj:JSONObject):
     if payload is None or payload.command is None or payload.command == PayloadCommand.start or payload.command == PayloadCommand.empty:
         ui_mngr.show_main_menu(context, client_context)
         return
 
     if payload.command == PayloadCommand.get_balance:
-        pass
+        log.debug(f'VK user (id={client_context.vk_user_id}) pressed {PayloadCommand.get_balance.name.upper()}')
     elif payload.command == PayloadCommand.go_to_page:
-        pass
+        log.debug(f'VK user (id={client_context.vk_user_id}) pressed {PayloadCommand.go_to_page.name.upper()}')
     elif payload.command == PayloadCommand.menu_section_queries:
-        pass
+        ui_mngr.show_query_products(context, client_context, payload)
     elif payload.command == PayloadCommand.menu_section_subscriptions:
-        pass
+        ui_mngr.show_subscription_products(context, client_context, payload)
     elif payload.command == PayloadCommand.menu_section_reports:
-        pass
+        ui_mngr.show_report_products(context, client_context, payload)
     elif payload.command == PayloadCommand.menu_section_my_subscriptions:
-        pass
+        log.debug(f'VK user (id={client_context.vk_user_id}) pressed {PayloadCommand.menu_section_my_subscriptions.name.upper()}')
     elif payload.command == PayloadCommand.menu_section_history:
-        pass
+        log.debug(f'VK user (id={client_context.vk_user_id}) pressed {PayloadCommand.menu_section_history.name.upper()}')
     else:
         ui_mngr.show_main_menu(context, client_context)
 

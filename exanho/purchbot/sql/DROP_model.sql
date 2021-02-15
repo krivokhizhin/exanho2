@@ -1,3 +1,4 @@
+DROP TABLE vk_product_content CASCADE;
 DROP TABLE vk_user CASCADE;
 
 DROP TABLE subscription CASCADE;

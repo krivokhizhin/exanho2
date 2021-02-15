@@ -9,7 +9,7 @@ class ProductList:
             type_ = TemplateType.carousel
         )
 
-    def add_product(self, title:str, desc:str, label:str, payload:Payload):
+    def add_product(self, title:str, desc:str, btn_label:str, payload:Payload):
         self.content.elements.append(
             TemplateElementContent(
                 title = title,
@@ -18,7 +18,7 @@ class ProductList:
                     ButtonContent(
                         action = ButtonActionContent(
                             type_ = ButtonType.text,
-                            label = label,
+                            label = btn_label,
                             payload = payload
                         ),
                         color = ButtonColor.primary

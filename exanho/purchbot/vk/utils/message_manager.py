@@ -1,3 +1,4 @@
+from exanho.purchbot.model.common.product import ProductKind
 import logging
 from decimal import Decimal
 from sqlalchemy.orm.session import Session as OrmSession
@@ -64,7 +65,7 @@ def handle_message_event(context:VkApiContext, message_event:JSONObject):
         payload.fill(
                 payload_obj.command,
                 context = payload_obj.context if hasattr(payload_obj, 'context') else None,
-                page = payload_obj.page if hasattr(payload_obj, 'page') else None
+                page = int(payload_obj.page) if hasattr(payload_obj, 'page') else None
             )
 
         match_payload(payload, client_context, context, message_event)
@@ -82,11 +83,11 @@ def match_payload(payload:Payload, client_context:ClientContext, context:VkApiCo
     elif payload.command == PayloadCommand.go_to_page:
         log.debug(f'VK user (id={client_context.vk_user_id}) pressed {PayloadCommand.go_to_page.name.upper()}')
     elif payload.command == PayloadCommand.menu_section_queries:
-        ui_mngr.show_query_products(context, client_context, payload)
+        ui_mngr.show_products_by_kind(context, client_context, ProductKind.QUERY, payload)
     elif payload.command == PayloadCommand.menu_section_subscriptions:
-        ui_mngr.show_subscription_products(context, client_context, payload)
+        ui_mngr.show_products_by_kind(context, client_context, ProductKind.SUBSCRIPTION, payload)
     elif payload.command == PayloadCommand.menu_section_reports:
-        ui_mngr.show_report_products(context, client_context, payload)
+        ui_mngr.show_products_by_kind(context, client_context, ProductKind.REPORT, payload)
     elif payload.command == PayloadCommand.menu_section_my_subscriptions:
         log.debug(f'VK user (id={client_context.vk_user_id}) pressed {PayloadCommand.menu_section_my_subscriptions.name.upper()}')
     elif payload.command == PayloadCommand.menu_section_history:

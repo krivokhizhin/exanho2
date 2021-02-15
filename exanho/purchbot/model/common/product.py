@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import Column, Enum, String
+from sqlalchemy import BigInteger, Column, Enum, String
 from sqlalchemy.orm import relationship
 
 from exanho.orm.domain import Base
@@ -11,7 +11,10 @@ class ProductKind(enum.Enum):
     SUBSCRIPTION = 1
     REPORT = 2
 
-class Product(ExaObjectMixin, Base):
+class Product(Base):
+    __tablename__ = 'product'  
+
+    id = Column(BigInteger, primary_key=True)
 
     kind = Column(Enum(ProductKind), nullable=False)
     code = Column(String(30), nullable=False, unique=True, index=True)

@@ -18,7 +18,7 @@ class BalAccCode(enum.Enum):
     C133 = 133  # Оплата за отчеты
 
 class AccAccount(Base):
-    __tablename__ = 'acc_account'  
+    __tablename__ = 'acc_account'
 
     id = Column(BigInteger, primary_key=True)
 

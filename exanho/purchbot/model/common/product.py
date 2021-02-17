@@ -21,5 +21,7 @@ class Product(Base):
     name = Column(String(200), nullable=False)
     desc = Column(String(2000))
 
-    trades = relationship('Trade', back_populates='product')
+    add_infos = relationship('ProductAddInfo')
     tariff = relationship('Tariff', back_populates='product', uselist=False)
+    
+    trades = relationship('Trade', back_populates='product')

@@ -5,15 +5,17 @@ from exanho.purchbot.model import ProductKind, Product, Tariff, VkProductContent
 
 def run():
 
+    product_code = 'SUB_PAR'
+
     d = Domain('postgresql+psycopg2://kks:Nata1311@localhost/purchbot_test')
     with d.session_scope() as session:
         assert isinstance(session, OrmSession)
 
-        product = session.query(Product).filter(Product.code == 'SUB_PAR').one_or_none()
+        product = session.query(Product).filter(Product.code == product_code).one_or_none()
         if product is None:
             product = Product(
                 kind = ProductKind.SUBSCRIPTION,
-                code = 'SUB_PAR',
+                code = product_code,
                 name = 'События по участнику'
             )
             session.add(product)

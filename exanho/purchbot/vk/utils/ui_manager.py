@@ -1,19 +1,19 @@
 from collections import namedtuple
+from multiprocessing import JoinableQueue
 import logging
-
-from exanho.purchbot.model import ProductKind, Product, VkProductContent, Tariff
-from exanho.purchbot.vk.ui.elements.product_list import ProductList
-from exanho.purchbot.vk.ui.payload import Payload, PayloadCommand
-from exanho.purchbot.vk.ui.element_builder import UIElementBuilder
-from exanho.purchbot.vk.ui.elements.main_menu import MainMenu
-from exanho.core.common import Error
 
 from sqlalchemy.orm.session import Session as OrmSession
 from exanho.orm.domain import Sessional
 
+from ..dto import util as dto_util
+from ..dto.method_call import VkMethodCall
+from ..dto.messages import *
 from .vk_api_context import VkApiContext
 from .client_context import ClientContext
-from .. import VkApiSession
+
+from exanho.purchbot.model import ProductKind, Product, VkProductContent, Tariff
+from exanho.purchbot.vk.ui import PayloadCommand, Payload, ProductList, MainMenu, UIElementBuilder
+from exanho.core.common import Error
 
 log = logging.getLogger(__name__)
 
@@ -22,8 +22,6 @@ NUMBER_ELEMENTS_PER_PAGE = 10
 VkMenuPagination = namedtuple('VkMenuPagination', 'first prev page next last context')
 
 def show_main_menu(vk_context:VkApiContext, client_context:ClientContext, menu_message:str='Меню (см. клавиатуру под строкой ввода)', pagination:VkMenuPagination=None):    
-
-    vk_api_session:VkApiSession = vk_context.vk_api_session
 
     ui_menu = MainMenu()
     ui_menu.set_label_for_balance(client_context.free_balance, client_context.promo_balance)
@@ -62,16 +60,22 @@ def show_main_menu(vk_context:VkApiContext, client_context:ClientContext, menu_m
     builder = UIElementBuilder()
     builder.build_ui_element(ui_menu.content)
 
-    resp = vk_api_session.messages_send(
+    send_options = SendOptions(
         user_id=client_context.vk_user_id,
         random_id=0,
         keyboard=builder.form(),
         group_id=vk_context.group_id,
         message=menu_message
-        )
+    )
 
-    if resp.error:
-        raise Error(f'VK messages.send error: code={resp.error.error_code}, msg={resp.error.error_msg}')
+    call_queue:JoinableQueue = vk_context.call_queue
+    call_queue.put(
+        VkMethodCall(
+            'messages',
+            'send',
+            dto_util.form(send_options, SendOptions)
+        )
+    )
 
 def get_title_by_product_kind(product_kind:ProductKind) -> str:
     if product_kind == ProductKind.QUERY:
@@ -131,17 +135,22 @@ def show_products_by_kind(vk_context:VkApiContext, client_context:ClientContext,
     builder = UIElementBuilder()
     builder.build_ui_element(ui_product_list.content)
 
-    vk_api_session:VkApiSession = vk_context.vk_api_session
-    resp = vk_api_session.messages_send(
+    send_options = SendOptions(
         user_id=client_context.vk_user_id,
         random_id=0,
         template=builder.form(),
         group_id=vk_context.group_id,
         message=get_title_by_product_kind(product_kind)
-        )
+    )
 
-    if resp.error:
-        raise Error(f'VK messages.send error: code={resp.error.error_code}, msg={resp.error.error_msg}')
+    call_queue:JoinableQueue = vk_context.call_queue
+    call_queue.put(
+        VkMethodCall(
+            'messages',
+            'send',
+            dto_util.form(send_options, SendOptions)
+        )
+    )
 
     if pagination:
         show_main_menu(vk_context, client_context, menu_message='Для выбора нажмите соответствующую кнопку', pagination=pagination)

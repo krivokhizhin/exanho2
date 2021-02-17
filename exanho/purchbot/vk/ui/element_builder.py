@@ -1,8 +1,7 @@
 import json
 import enum
 
-from .element_content import IContext
-from .payload import Payload
+from . import IContext, Payload
 
 class UIElementBuilder:
 
@@ -16,7 +15,7 @@ class UIElementBuilder:
             if isinstance(value, Payload):
                 value = value.form()
                 
-            if value is None:
+            if not value and value != 0:
                 continue
 
             key = str(key).strip('_')
@@ -27,22 +26,7 @@ class UIElementBuilder:
             if isinstance(value, IContext):
                 dic[key] = self.inner_build_ui_element(value)
             elif isinstance(value, list):
-                dic.setdefault(key, list())
-                for item in value:
-                    if isinstance(item, IContext):
-                        dic[key].append(self.inner_build_ui_element(item))
-                    elif isinstance(value, list):
-                        inner_list = list()
-                        for inner_item in item:
-                            if isinstance(inner_item, IContext):
-                                inner_list.append(self.inner_build_ui_element(inner_item))
-                            elif isinstance(value, list):
-                                raise NotImplementedError()
-                            else:
-                                inner_list.append(inner_item)
-                        dic[key].append(inner_list)
-                    else:
-                        dic[key].append(item)
+                dic[key] = self.prepare_list_to_build(value)
             else:
                 dic[key] = value
         return dic
@@ -52,3 +36,17 @@ class UIElementBuilder:
 
     def form(self)-> str:
         return json.dumps(self.items)
+
+    def prepare_list_to_build(self, list_value:list) -> list:
+        result = list()
+
+        for item in list_value:
+            if item:
+                if isinstance(item, IContext):
+                    result.append(self.inner_build_ui_element(item))
+                elif isinstance(item, list):
+                    result.append(self.prepare_list_to_build(item))
+                else:
+                    result.append(item)
+
+        return result

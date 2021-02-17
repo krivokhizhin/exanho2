@@ -1,48 +1,35 @@
-import logging
-from collections import namedtuple
-from multiprocessing import JoinableQueue
 
-from exanho.core.common import Error
-from exanho.purchbot.vk import VkApiSession, VkBotSession
-from exanho.purchbot.vk.drivers import BuildInDriver
+import logging
 
 from exanho.core.manager_context import Context as ExanhoContext
-from exanho.purchbot.vk.dto import JSONObject
+
+from exanho.core.common import Error
+from exanho.purchbot.vk.drivers import BuildInDriver
 from exanho.purchbot.vk.dto.groups import GetLongPollServerResponse
-from exanho.purchbot.vk.dto.bot.group_event import GroupEvent
+from exanho.purchbot.vk.dto.bot import GroupEvent
+from exanho.purchbot.vk.utils import VkApiContext
+from exanho.purchbot.vk import VkApiSession, VkBotSession
+
+import exanho.purchbot.vk.utils.message_manager as msg_mngr
 
 log = logging.getLogger(__name__)
 
-Context = namedtuple('Context', [
-    'groups_events',
-    'queues_by_events',
-    'access_token',
-    'group_id',
-    'bot_session'
-    ], defaults=[None])
-
 def initialize(appsettings, exanho_context:ExanhoContext):
-    context = Context(**appsettings)
+    context = VkApiContext(**appsettings)
 
-    if len(context.groups_events) != len(context.queues_by_events):
-        raise RuntimeError(f'The number of "groups_events" and "queues_by_events" must match ({len(context.groups_events)}!={len(context.queues_by_events)})')
-   
-    queues_by_events = dict()
-    for group_event, queue_name in zip(context.groups_events, context.queues_by_events):
-        queues_by_events[group_event] = exanho_context.joinable_queues[queue_name]
+    call_queue = exanho_context.joinable_queues[context.call_queue]
 
     driver = BuildInDriver()
     bot_data = _get_bot_data(driver, context.access_token, context.group_id)
     bot_session = VkBotSession(driver, bot_data.server, bot_data.key, bot_data.ts)
 
-    context = context._replace(queues_by_events=queues_by_events, bot_session=bot_session)
+    context = context._replace(vk_session=bot_session, call_queue=call_queue)
     
     log.info(f'Initialized bot for {context.group_id} group')
     return context
 
-def work(context:Context):
-    bot_session:VkBotSession = context.bot_session
-    queues_by_events:dict = context.queues_by_events
+def work(context:VkApiContext):
+    bot_session:VkBotSession = context.vk_session
 
     try:
         events = bot_session.pool_events()
@@ -69,13 +56,13 @@ def work(context:Context):
                     log.warning(f'received "{new_event.type_}" event from group {new_event.group_id}, expected from group {context.group_id}')
                     continue
 
-                jq:JoinableQueue = queues_by_events.get(new_event.type_, None)
-                if jq:
-                    json_obj:JSONObject = new_event.object_
-                    jq.put(json_obj)
+                try:
+                    _handle_event(context, new_event)
                     log.info(f'received "{new_event.type_}" event')
-                else:
-                    log.warning(f'No consumer(queue) for {new_event.type_} event type')
+                except Error as er:
+                    log.error(er.message)
+                except Exception as ex:
+                    log.exception(new_event.object_.dumps(), ex)
 
             bot_session.ts = events.ts
 
@@ -86,7 +73,8 @@ def work(context:Context):
 
     return context 
 
-def finalize(context):
+def finalize(context:VkApiContext):
+    context.call_queue.put(None)
     log.info('Finalized')
 
 
@@ -96,3 +84,14 @@ def _get_bot_data(driver, access_token, group_id) -> GetLongPollServerResponse:
     if bot_data.error:
         raise Error(f'VK groups.getLongPollServer error: code={bot_data.error.error_code}, msg={bot_data.error.error_msg}')
     return bot_data
+
+def _handle_event(context:VkApiContext, new_event:GroupEvent):    
+
+    if new_event.type_ == 'message_new':
+        msg_mngr.handle_message_new(context, new_event.object_)
+    elif new_event.type_ == 'message_reply':
+        pass
+    elif new_event.type_ == 'message_event':
+        msg_mngr.handle_message_event(context, new_event.object_)
+    elif new_event.type_ == 'vkpay_transaction':
+        pass

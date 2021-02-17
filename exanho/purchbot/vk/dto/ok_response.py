@@ -1,5 +1,4 @@
-from .json_object import JSONObject
-from .method_response_base import MethodResponseBase
+from . import JSONObject, MethodResponseBase
 
 class OkResponse(MethodResponseBase):
 

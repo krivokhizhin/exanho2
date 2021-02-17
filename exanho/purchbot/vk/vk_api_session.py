@@ -1,9 +1,12 @@
 from .drivers import IVkDriver
-from .dto import VkResponse, OkResponse
+from .dto import JSONObject, VkResponse, OkResponse
+from .dto import util as dto_util
 from .dto.groups import GetLongPollServerResponse
+from .ui.element_builder import UIElementBuilder
+from .dto.messages import *
 
 URL_VK_API = 'https://api.vk.com/method/'
-API_VERSION = '5.126'
+API_VERSION = '5.130'
 
 class VkApiSession:
 
@@ -12,12 +15,29 @@ class VkApiSession:
         self.access_token = access_token
         self.v = v
 
-    def messages_send(self, **kwargs) -> OkResponse:
+    def obsolete_messages_send(self, **kwargs) -> OkResponse:
         assert isinstance(kwargs, dict)
 
         kwargs.update({'v':self.v, 'access_token':self.access_token})
         url = '{}{}'.format(URL_VK_API, 'messages.send')
         resp_obj = self.driver.get_response(url, params=kwargs)
+        resp:VkResponse = VkResponse.create(resp_obj, OkResponse)
+        return resp.response
+
+    def messages_send(self, content:str) -> OkResponse:
+        assert isinstance(content, str)
+
+        json_obj:JSONObject = dto_util.deform(content, JSONObject)
+        send_options = SendOptions()
+        send_options.fill(json_obj)
+
+        builder = UIElementBuilder()
+        builder.build_ui_element(send_options)
+        options_dict = builder.items
+
+        options_dict.update({'v':self.v, 'access_token':self.access_token})
+        url = '{}{}'.format(URL_VK_API, 'messages.send')
+        resp_obj = self.driver.get_response(url, params=options_dict)
         resp:VkResponse = VkResponse.create(resp_obj, OkResponse)
         return resp.response
         

@@ -1,4 +1,4 @@
-from exanho.purchbot.seed.products import rep_par_con as mod
+from exanho.sandbox import vk as mod
 
 if __name__ == '__main__':
     mod.run()

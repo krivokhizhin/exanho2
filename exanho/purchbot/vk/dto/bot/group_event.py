@@ -1,5 +1,4 @@
-from ..json_object import JSONObject
-from ..i_vk_dto import IVkDto
+from .. import IVkDto, JSONObject
 
 class GroupEvent(IVkDto):
 

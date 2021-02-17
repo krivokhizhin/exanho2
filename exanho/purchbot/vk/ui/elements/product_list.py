@@ -17,7 +17,7 @@ class ProductList:
                 buttons = [
                     ButtonContent(
                         action = ButtonActionContent(
-                            type_ = ButtonType.text,
+                            type_ = ButtonType.callback,
                             label = btn_label,
                             payload = payload
                         ),

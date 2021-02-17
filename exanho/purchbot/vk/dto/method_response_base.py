@@ -1,6 +1,4 @@
-from .json_object import JSONObject
-from .method_response_error import MethodResponseError
-from .i_method_response import IMethodResponse
+from . import JSONObject, IMethodResponse, MethodResponseError
 
 class MethodResponseBase(IMethodResponse):
 

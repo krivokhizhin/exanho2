@@ -1,6 +1,5 @@
-from ..json_object import JSONObject
-from ..method_response_base import MethodResponseBase
 from .group_event import GroupEvent
+from .. import JSONObject, MethodResponseBase
 
 class LongPollResponse(MethodResponseBase):
     

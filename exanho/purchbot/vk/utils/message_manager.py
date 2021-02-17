@@ -1,4 +1,3 @@
-from exanho.purchbot.model.common.product import ProductKind
 import logging
 from decimal import Decimal
 from sqlalchemy.orm.session import Session as OrmSession
@@ -9,11 +8,12 @@ from exanho.orm.domain import Sessional
 from .vk_api_context import VkApiContext
 from .client_context import ClientContext
 from ..dto import JSONObject
-from ..ui.payload import PayloadCommand, Payload
+from ..ui import PayloadCommand, Payload
+
 from ...utils import account_manager as acc_mngr
 from ..utils import ui_manager as ui_mngr
 
-from ...model import Client, VkUser
+from ...model import ProductKind, Client, VkUser
 
 log = logging.getLogger(__name__)
 

@@ -1,7 +1,6 @@
 from abc import abstractmethod
 
-from .i_vk_dto import IVkDto
-from .json_object import JSONObject
+from . import IVkDto, JSONObject
 
 class IMethodResponse(IVkDto):
     

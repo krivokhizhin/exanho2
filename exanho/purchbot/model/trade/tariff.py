@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Column, String, Numeric
+from sqlalchemy import BigInteger, Column, Index, String, Numeric
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
 
@@ -13,3 +13,5 @@ class Tariff(ExaObjectMixin, Base):
     value = Column(Numeric(8,2), nullable=False)
 
     desc = Column(String(2000))
+
+Index('idx_tariff_product', Tariff.product_id, unique=True)

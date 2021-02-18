@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 ClientContext = namedtuple('ClientContext', [
-    'client',
+    'client_id',
     'vk_user_id',
     'free_balance',
     'promo_balance',

@@ -1,5 +1,3 @@
-from exanho.purchbot.vk.dto.ok_response import OkResponse
-from exanho.purchbot.vk.dto.method_call import VkMethodCall
 import logging
 
 from multiprocessing import JoinableQueue
@@ -9,6 +7,8 @@ from exanho.core.common import Error
 from exanho.purchbot.vk.utils import VkApiContext
 from exanho.purchbot.vk import VkApiSession
 from exanho.purchbot.vk.drivers import BuildInDriver
+from exanho.purchbot.vk.dto import MethodResponseBase, VkMethodCall, IVkDto
+import exanho.purchbot.vk.dto.util as dto_mngr
 
 log = logging.getLogger(__name__)
 
@@ -70,8 +70,10 @@ def match_method_call(context:VkApiContext, method_call:VkMethodCall):
 
     if hasattr(vk_api_session, vk_api_method_name) and callable(getattr(vk_api_session, vk_api_method_name)):
         vk_api_method = getattr(vk_api_session, vk_api_method_name)
-        resp:OkResponse = vk_api_method(method_call.options)
+        resp:MethodResponseBase = vk_api_method(method_call.options)
         if resp.error:
             raise Error(f'VK api_method call failed with error: code={resp.error.error_code}, msg={resp.error.error_msg}')
+        else:
+            log.debug(dto_mngr.convert_obj_to_json_str(resp, IVkDto))
     else:
         log.warning(f'{method_call} | Not supported section and/or method')

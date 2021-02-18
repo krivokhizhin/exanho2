@@ -24,7 +24,7 @@ class VkApiSession:
         resp:VkResponse = VkResponse.create(resp_obj, OkResponse)
         return resp.response
 
-    def messages_send(self, content:str) -> OkResponse:
+    def messages_send(self, content:str) -> SendResponse:
         assert isinstance(content, str)
 
         json_obj:JSONObject = dto_util.deform(content, JSONObject)
@@ -38,7 +38,7 @@ class VkApiSession:
         options_dict.update({'v':self.v, 'access_token':self.access_token})
         url = '{}{}'.format(URL_VK_API, 'messages.send')
         resp_obj = self.driver.get_response(url, params=options_dict)
-        resp:VkResponse = VkResponse.create(resp_obj, OkResponse)
+        resp:VkResponse = VkResponse.create(resp_obj, SendResponse)
         return resp.response
         
     def groups_getLongPollServer(self, group_id:int) -> GetLongPollServerResponse:

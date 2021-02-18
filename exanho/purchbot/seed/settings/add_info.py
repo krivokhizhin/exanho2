@@ -22,4 +22,22 @@ def seed(session:OrmSession):
         )
         session.add(add_info2)
 
+    add_info1 = session.query(AddInfoSettings).filter(AddInfoSettings.code == AddInfoCode.PARTICIPANT).one_or_none()
+    if add_info1 is None:
+        add_info1 = AddInfoSettings(
+            code = AddInfoCode.NOTIFICATION,
+            name = 'Код закупки',
+            ui_prompt = 'Введите код закупки'
+        )
+        session.add(add_info1)
+
+    add_info1 = session.query(AddInfoSettings).filter(AddInfoSettings.code == AddInfoCode.PARTICIPANT).one_or_none()
+    if add_info1 is None:
+        add_info1 = AddInfoSettings(
+            code = AddInfoCode.CONTRACT,
+            name = 'Реестровый номер контракта',
+            ui_prompt = 'Введите реестровый номер контракта'
+        )
+        session.add(add_info1)
+
     session.flush()

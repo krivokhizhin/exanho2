@@ -13,7 +13,7 @@ from ..ui import PayloadCommand, Payload
 from ...utils import account_manager as acc_mngr
 from ..utils import ui_manager as ui_mngr
 
-from ...model import ProductKind, Client, VkUser
+from ...model import ProductKind, Product, Client, VkUser, Tariff, TradeStatus, Trade, ProductAddInfo, AddInfoCode, AddInfoSettings
 
 log = logging.getLogger(__name__)
 
@@ -24,6 +24,9 @@ def handle_message_new(context:VkApiContext, message_new:JSONObject):
         client_context = get_client_context(message_new.message.from_id)
 
         if not hasattr(message_new.message, 'payload'):
+            
+            #TODO: history analisys, extract context
+
             ui_mngr.show_main_menu(context, client_context)
             return
 
@@ -82,6 +85,10 @@ def match_payload(payload:Payload, client_context:ClientContext, context:VkApiCo
         log.debug(f'VK user (id={client_context.vk_user_id}) pressed {PayloadCommand.get_balance.name.upper()}')
     elif payload.command == PayloadCommand.go_to_page:
         log.debug(f'VK user (id={client_context.vk_user_id}) pressed {PayloadCommand.go_to_page.name.upper()}')
+    elif payload.command == PayloadCommand.request_product:
+        request_product(context, client_context, payload)
+    elif payload.command == PayloadCommand.detailing_product:
+        log.debug(f'VK user (id={client_context.vk_user_id}) pressed {PayloadCommand.detailing_product.name.upper()}')
     elif payload.command == PayloadCommand.menu_section_queries:
         ui_mngr.show_products_by_kind(context, client_context, ProductKind.QUERY, payload)
     elif payload.command == PayloadCommand.menu_section_subscriptions:
@@ -113,7 +120,7 @@ def get_client_context(user_id:int) -> ClientContext:
         free_balance = acc_mngr.get_free_balance(session, vk_user.client)
         promo_balance = acc_mngr.get_promo_balance(session, vk_user.client)
 
-        return ClientContext(client=vk_user.client, vk_user_id=user_id, free_balance=free_balance, promo_balance=promo_balance)        
+        return ClientContext(client_id=vk_user.client.id, vk_user_id=user_id, free_balance=free_balance, promo_balance=promo_balance)        
 
 def promo(session:OrmSession, client:Client):
     PROMO_AMOUNT = Decimal('999.00')
@@ -123,3 +130,59 @@ def promo(session:OrmSession, client:Client):
         return
 
     acc_mngr.deposit_promo_funds(session, client, PROMO_AMOUNT)
+
+def request_product(vk_context:VkApiContext, client_context:ClientContext, payload:Payload):
+    if payload.command != PayloadCommand.request_product:
+        return
+
+    product_code:str = payload.context
+    trade_id = None
+    add_info_code = None
+
+    with Sessional.domain.session_scope() as session:
+        assert isinstance(session, OrmSession)
+
+        product = session.query(Product).filter(Product.code == product_code).one_or_none()
+        if product is None:
+            return
+
+        amount = session.query(Tariff.value).filter(Tariff.product == product).scalar()
+
+        trade = session.query(Trade).filter(Trade.product_id == product.id, Trade.status.in_([TradeStatus.NEW, TradeStatus.FILLING])).\
+            filter(Trade.client_id == client_context.client_id).first()
+        if trade:
+            trade.amount = amount
+        else:
+            trade = Trade(
+                status = TradeStatus.NEW,
+                client_id = client_context.client_id,
+                product_id = product.id,
+                amount = amount,
+                paid = False
+            )
+            session.add(trade)
+            session.flush()
+
+        trade_id = trade.id
+
+        parameters = dict([
+            _ for _ in session.query(ProductAddInfo.par_number, AddInfoSettings.code).\
+                join(AddInfoSettings, ProductAddInfo.add_info_id == AddInfoSettings.id).filter(ProductAddInfo.product_id == product.id)
+        ])
+
+        if trade.parameter1 is None and 1 in parameters:
+            add_info_code = parameters[1]
+        elif trade.parameter2 is None and 2 in parameters:
+            add_info_code = parameters[2]
+        elif trade.parameter3 is None and 3 in parameters:
+            add_info_code = parameters[3]
+        else:
+            add_info_code = None
+
+        if add_info_code is None:
+            trade.status = TradeStatus.FILLING
+
+    if add_info_code:
+        ui_mngr.show_detailing_product(vk_context, client_context, trade_id, add_info_code)
+    else:
+        ui_mngr.show_confirmation_product(vk_context, client_context, trade_id)

@@ -11,7 +11,7 @@ from ..dto.messages import *
 from .vk_api_context import VkApiContext
 from .client_context import ClientContext
 
-from exanho.purchbot.model import ProductKind, Product, VkProductContent, Tariff
+from exanho.purchbot.model import ProductKind, Product, VkProductContent, Tariff, AddInfoCode, AddInfoSettings
 from exanho.purchbot.vk.ui import PayloadCommand, Payload, ProductList, MainMenu, UIElementBuilder
 from exanho.core.common import Error
 
@@ -128,7 +128,7 @@ def show_products_by_kind(vk_context:VkApiContext, client_context:ClientContext,
             product_number += 1
             product_name = '{}. {} ({:.0f}р)'.format(((page-1)*NUMBER_ELEMENTS_PER_PAGE)+product_number, name, tariff)
 
-            payload = Payload(command = command, context=code)
+            payload = Payload(command = PayloadCommand.request_product, context=code)
             ui_product_list.add_product(product_name, desc, btn_label, payload)
 
 
@@ -154,3 +154,39 @@ def show_products_by_kind(vk_context:VkApiContext, client_context:ClientContext,
 
     if pagination:
         show_main_menu(vk_context, client_context, menu_message='Для выбора нажмите соответствующую кнопку', pagination=pagination)
+
+def show_detailing_product(vk_context:VkApiContext, client_context:ClientContext, trade_id:int, add_info_code:AddInfoCode):
+
+    message = 'Уточнение'
+
+    ui_menu = MainMenu()
+    ui_menu.set_label_for_balance(client_context.free_balance, client_context.promo_balance)
+    builder = UIElementBuilder()
+    builder.build_ui_element(ui_menu.content)
+
+    with Sessional.domain.session_scope() as session:
+        assert isinstance(session, OrmSession)
+        message = session.query(AddInfoSettings.ui_prompt).filter(AddInfoSettings.code == add_info_code).scalar()
+
+    payload = Payload(command = PayloadCommand.detailing_product, context=trade_id, page=add_info_code.value)
+
+    send_options = SendOptions(
+        user_id=client_context.vk_user_id,
+        random_id=0,
+        keyboard=builder.form(),
+        group_id=vk_context.group_id,
+        message=message,
+        payload=payload.form()
+    )
+
+    call_queue:JoinableQueue = vk_context.call_queue
+    call_queue.put(
+        VkMethodCall(
+            'messages',
+            'send',
+            dto_util.form(send_options, SendOptions)
+        )
+    )
+
+def show_confirmation_product(vk_context:VkApiContext, client_context:ClientContext, trade_id:int):
+    pass

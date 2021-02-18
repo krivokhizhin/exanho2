@@ -1,16 +1,17 @@
-
 import logging
 
 from exanho.core.manager_context import Context as ExanhoContext
 
 from exanho.core.common import Error
 from exanho.purchbot.vk.drivers import BuildInDriver
+from exanho.purchbot.vk.dto import JSONObject
 from exanho.purchbot.vk.dto.groups import GetLongPollServerResponse
 from exanho.purchbot.vk.dto.bot import GroupEvent
 from exanho.purchbot.vk.utils import VkApiContext
 from exanho.purchbot.vk import VkApiSession, VkBotSession
 
 import exanho.purchbot.vk.utils.message_manager as msg_mngr
+import exanho.purchbot.vk.dto.util as dto_mngr
 
 log = logging.getLogger(__name__)
 
@@ -22,6 +23,7 @@ def initialize(appsettings, exanho_context:ExanhoContext):
     driver = BuildInDriver()
     bot_data = _get_bot_data(driver, context.access_token, context.group_id)
     bot_session = VkBotSession(driver, bot_data.server, bot_data.key, bot_data.ts)
+    log.debug(dto_mngr.convert_obj_to_json_str(bot_data, JSONObject))
 
     context = context._replace(vk_session=bot_session, call_queue=call_queue)
     
@@ -33,6 +35,7 @@ def work(context:VkApiContext):
 
     try:
         events = bot_session.pool_events()
+        log.debug(f'events.ts: {events.ts}')
 
         if events.failed:
             if events.failed == 1:
@@ -59,10 +62,14 @@ def work(context:VkApiContext):
                 try:
                     _handle_event(context, new_event)
                     log.info(f'received "{new_event.type_}" event')
+                    if new_event.type_ != 'message_reply':
+                        log.debug(dto_mngr.convert_obj_to_json_str(new_event.object_, JSONObject))
                 except Error as er:
                     log.error(er.message)
+                except TypeError:
+                    log.warning(new_event.object_.__dict__)
                 except Exception as ex:
-                    log.exception(new_event.object_.dumps(), ex)
+                    log.exception(dto_mngr.convert_obj_to_json_str(new_event.object_, JSONObject), ex)
 
             bot_session.ts = events.ts
 

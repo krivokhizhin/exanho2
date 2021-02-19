@@ -155,7 +155,7 @@ def show_products_by_kind(vk_context:VkApiContext, client_context:ClientContext,
     if pagination:
         show_main_menu(vk_context, client_context, menu_message='Для выбора нажмите соответствующую кнопку', pagination=pagination)
 
-def show_detailing_product(vk_context:VkApiContext, client_context:ClientContext, trade_id:int, add_info_code:AddInfoCode):
+def show_detailing_trade(vk_context:VkApiContext, client_context:ClientContext, trade_id:int, add_info_code:AddInfoCode):
 
     message = 'Уточнение'
 

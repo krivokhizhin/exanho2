@@ -183,6 +183,6 @@ def request_product(vk_context:VkApiContext, client_context:ClientContext, paylo
             trade.status = TradeStatus.FILLING
 
     if add_info_code:
-        ui_mngr.show_detailing_product(vk_context, client_context, trade_id, add_info_code)
+        ui_mngr.show_detailing_trade(vk_context, client_context, trade_id, add_info_code)
     else:
         ui_mngr.show_confirmation_product(vk_context, client_context, trade_id)

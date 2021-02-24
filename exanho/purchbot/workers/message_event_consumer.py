@@ -2,7 +2,7 @@ import logging
 
 from exanho.core.common import Error
 
-from exanho.purchbot.vk.utils import VkApiContext
+from exanho.purchbot.vk.utils import VkBotContext
 from exanho.purchbot.vk import VkApiSession
 from exanho.purchbot.vk.drivers import BuildInDriver
 from exanho.purchbot.vk.dto import JSONObject
@@ -12,7 +12,7 @@ from exanho.purchbot.vk.utils.message_manager import handle_message_event
 log = logging.getLogger(__name__)
 
 def initialize(appsettings, exanho_context):
-    context = VkApiContext(**appsettings)
+    context = VkBotContext(**appsettings)
     
     driver = BuildInDriver()
     vk_api_session = VkApiSession(driver, context.access_token)
@@ -22,7 +22,7 @@ def initialize(appsettings, exanho_context):
     log.info('Initialized')
     return context
 
-def work(context:VkApiContext, event_obj:JSONObject):
+def work(context:VkBotContext, event_obj:JSONObject):
     try:
         handle_message_event(context, event_obj)
     except Error as er:

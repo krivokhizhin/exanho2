@@ -17,4 +17,3 @@ class AddInfoSettings(Base):
 
     code = Column(Enum(AddInfoCode), nullable=False, unique=True)
     name = Column(String(200), nullable=False)
-    ui_prompt = Column(String(200), nullable=False)

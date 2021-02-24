@@ -1,6 +1,7 @@
-DROP TABLE vk_product_content CASCADE;
+DROP TABLE vk_dialog_content CASCADE;
 DROP TABLE vk_user CASCADE;
 
+DROP TABLE last_trade_detailing CASCADE;
 DROP TABLE subscription CASCADE;
 DROP TABLE trade CASCADE;
 DROP TABLE tariff CASCADE;

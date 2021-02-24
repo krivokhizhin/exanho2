@@ -1,4 +1,5 @@
 import logging
+from xmlrpc.client import ServerProxy
 
 from exanho.core.manager_context import Context as ExanhoContext
 
@@ -7,7 +8,7 @@ from exanho.purchbot.vk.drivers import BuildInDriver
 from exanho.purchbot.vk.dto import JSONObject
 from exanho.purchbot.vk.dto.groups import GetLongPollServerResponse
 from exanho.purchbot.vk.dto.bot import GroupEvent
-from exanho.purchbot.vk.utils import VkApiContext
+from exanho.purchbot.vk.utils import VkBotContext
 from exanho.purchbot.vk import VkApiSession, VkBotSession
 
 import exanho.purchbot.vk.utils.message_manager as msg_mngr
@@ -16,7 +17,7 @@ import exanho.purchbot.vk.dto.util as dto_mngr
 log = logging.getLogger(__name__)
 
 def initialize(appsettings, exanho_context:ExanhoContext):
-    context = VkApiContext(**appsettings)
+    context = VkBotContext(**appsettings)
 
     call_queue = exanho_context.joinable_queues[context.call_queue]
 
@@ -25,12 +26,16 @@ def initialize(appsettings, exanho_context:ExanhoContext):
     bot_session = VkBotSession(driver, bot_data.server, bot_data.key, bot_data.ts)
     log.debug(dto_mngr.convert_obj_to_json_str(bot_data, JSONObject))
 
-    context = context._replace(vk_session=bot_session, call_queue=call_queue)
+    host, port = exanho_context.get_service_endpoint(context.participant_service)
+    part_uri = f'http://{host}:{port}/RPC2'
+    participant_service = ServerProxy(part_uri, allow_none=True, use_builtin_types=True)
+
+    context = context._replace(vk_session=bot_session, call_queue=call_queue, participant_service=participant_service)
     
     log.info(f'Initialized bot for {context.group_id} group')
     return context
 
-def work(context:VkApiContext):
+def work(context:VkBotContext):
     bot_session:VkBotSession = context.vk_session
 
     try:
@@ -80,7 +85,7 @@ def work(context:VkApiContext):
 
     return context 
 
-def finalize(context:VkApiContext):
+def finalize(context:VkBotContext):
     context.call_queue.put(None)
     log.info('Finalized')
 
@@ -92,12 +97,12 @@ def _get_bot_data(driver, access_token, group_id) -> GetLongPollServerResponse:
         raise Error(f'VK groups.getLongPollServer error: code={bot_data.error.error_code}, msg={bot_data.error.error_msg}')
     return bot_data
 
-def _handle_event(context:VkApiContext, new_event:GroupEvent):    
+def _handle_event(context:VkBotContext, new_event:GroupEvent):    
 
     if new_event.type_ == 'message_new':
         msg_mngr.handle_message_new(context, new_event.object_)
     elif new_event.type_ == 'message_reply':
-        pass
+        msg_mngr.handle_message_reply(context, new_event.object_)
     elif new_event.type_ == 'message_event':
         msg_mngr.handle_message_event(context, new_event.object_)
     elif new_event.type_ == 'vkpay_transaction':

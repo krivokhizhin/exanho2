@@ -3,6 +3,8 @@ import logging
 
 from . import Timer
 
+from exanho.core.common import Error
+
 
 def try_logged(func):
     log = logging.getLogger(func.__module__)
@@ -17,7 +19,7 @@ def try_logged(func):
             log.info(f'{func.__name__}(), OK: {timer}')
         except Exception as ex:
             log.exception(ex)
-            result = ex.args
+            result = Error(func.__name__, ex, ex.args)
         finally:
             timer.reset()
         return result

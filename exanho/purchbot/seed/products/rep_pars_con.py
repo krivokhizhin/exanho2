@@ -1,6 +1,6 @@
 from sqlalchemy.orm.session import Session as OrmSession
 
-from exanho.purchbot.model import ProductKind, Product, Tariff, VkProductContent
+from exanho.purchbot.model import ProductKind, Product, Tariff
 
 def seed(session:OrmSession):
 
@@ -21,14 +21,5 @@ def seed(session:OrmSession):
         tariff = Tariff(value = 390)
         tariff.product = product
         session.add(tariff)
-
-    vk_content = session.query(VkProductContent).filter(VkProductContent.product_id == product.id).one_or_none()
-    if vk_content is None:
-        vk_content = VkProductContent(
-            product_id = product.id,
-            list_desc='+ учет незавершенных контрактов',
-            list_button='Получить'
-        )
-        session.add(vk_content)
 
     session.flush()

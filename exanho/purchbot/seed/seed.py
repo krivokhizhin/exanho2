@@ -8,6 +8,7 @@ from .products import sub_par
 from .products import rep_par_act
 from .products import rep_par_his
 from .products import rep_pars_con
+from .vk import content as vk_content
 
 def run():
 
@@ -22,3 +23,5 @@ def run():
         rep_par_act.seed(session)
         rep_par_his.seed(session)
         rep_pars_con.seed(session)
+
+        vk_content.seed(session)

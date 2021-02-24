@@ -24,6 +24,6 @@ class VkBotSession:
         
     def pool_events(self) -> LongPollResponse:
         url = URL_VK_BOT.format(server=self.server, key=self.key, ts=self.ts, wait=self.wait)
-        resp_obj = self.driver.get_response(url)
+        resp_obj = self.driver.get(url)
         resp = VkResponse.create(resp_obj, LongPollResponse)
         return resp.response

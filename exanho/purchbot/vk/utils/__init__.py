@@ -1,2 +1,2 @@
-from .vk_api_context import VkApiContext
+from .vk_bot_context import VkBotContext
 from .client_context import ClientContext

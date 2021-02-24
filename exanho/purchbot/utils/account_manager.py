@@ -1,6 +1,4 @@
 from decimal import Decimal
-from datetime import datetime
-from exanho.purchbot.model.common.client import Client
 
 from exanho.core.common import Error
 from exanho.purchbot.model.account.account import BalAccCode
@@ -70,19 +68,19 @@ def make_payment(session:OrmSession, dt:AccAccount, cr:AccAccount, amount:Decima
 
 # ************ free balance ******************************
 
-def get_free_balance(session:OrmSession, client:Client) -> Decimal:
-    account = get_account(session, BalAccCode.C101, client.id, desc=f'Свободный остаток клиента id={client.id}')
+def get_free_balance(session:OrmSession, client_id:int) -> Decimal:
+    account = get_account(session, BalAccCode.C101, client_id, desc=f'Свободный остаток клиента id={client_id}')
     return get_remain_amount(session, account)
 
 
 # ************ promo **************************************
 
-def get_promo_balance(session:OrmSession, client:Client) -> Decimal:
-    account = get_account(session, BalAccCode.C107, client.id, desc=f'Промо счет клиента id={client.id}')
+def get_promo_balance(session:OrmSession, client_id:int) -> Decimal:
+    account = get_account(session, BalAccCode.C107, client_id, desc=f'Промо счет клиента id={client_id}')
     return get_remain_amount(session, account)
 
-def deposit_promo_funds(session:OrmSession, client:Client, amount:Decimal):
+def deposit_promo_funds(session:OrmSession, client_id:int, amount:Decimal):
     if amount > 0:
-        dt_account = get_account(session, BalAccCode.C107, client.id, desc=f'Промо счет клиента id={client.id}')
+        dt_account = get_account(session, BalAccCode.C107, client_id, desc=f'Промо счет клиента id={client_id}')
         cr_account = get_account(session, BalAccCode.C907, desc='Промо счет оператора')
         record = make_payment(session, dt_account, cr_account, amount, True)

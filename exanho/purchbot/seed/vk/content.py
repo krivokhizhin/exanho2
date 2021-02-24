@@ -1,42 +1,40 @@
-# from sqlalchemy.orm.session import Session as OrmSession
-# from exanho.orm.domain import Domain
+from sqlalchemy.orm.session import Session as OrmSession
 
-# from exanho.purchbot.model import VkContent
+from exanho.purchbot.model import VkDialogContent, AddInfoCode
 
-# def run():
+def _seed_content(session:OrmSession, group:str, topic:str, content:str):
 
-#     d = Domain('postgresql+psycopg2://kks:Nata1311@localhost/purchbot_test')
-#     with d.session_scope() as session:
-#         assert isinstance(session, OrmSession)
+    vk_content = session.query(VkDialogContent).filter(VkDialogContent.topic == topic, VkDialogContent.group == group).one_or_none()
+    if vk_content is None:
+        vk_content = VkDialogContent(
+            topic = topic,
+            group = group,
+            content = content
+        )
+        session.add(vk_content)
 
-#         vk_content1 = session.query(VkContent).filter(VkContent.key == 'query_product_list_message').one_or_none()
-#         if vk_content1 is None:
-#             vk_content1 = VkContent(
-#                 key = 'query_product_list_message',
-#                 value = 'Запросы:'
-#             )
-#             session.add(vk_content1)
+def seed(session:OrmSession):
 
-#         vk_content2 = session.query(VkContent).filter(VkContent.key == 'sub_product_list_message').one_or_none()
-#         if vk_content2 is None:
-#             vk_content2 = VkContent(
-#                 key = 'sub_product_list_message',
-#                 value = 'Подписки:'
-#             )
-#             session.add(vk_content2)
+    _seed_content(session, 'QUE_PAR_ACT', 'list_desc', 'Потребуется указать ИНН и КПП (при наличии) участника')
+    _seed_content(session, 'QUE_PAR_ACT', 'list_button', 'Запросить')
 
-#         vk_content3 = session.query(VkContent).filter(VkContent.key == 'report_product_list_message').one_or_none()
-#         if vk_content3 is None:
-#             vk_content3 = VkContent(
-#                 key = 'report_product_list_message',
-#                 value = 'Отчеты:'
-#             )
-#             session.add(vk_content3)
+    _seed_content(session, 'QUE_PAR_HIS', 'list_desc', 'Потребуется указать ИНН и КПП (при наличии) участника')
+    _seed_content(session, 'QUE_PAR_HIS', 'list_button', 'Запросить')
 
-#         vk_content4 = session.query(VkContent).filter(VkContent.key == 'query_product_list_message').one_or_none()
-#         if vk_content4 is None:
-#             vk_content4 = VkContent(
-#                 key = 'query_product_list_hint',
-#                 value = 'Для выбора нажмите соответствующую кнопку'
-#             )
-#             session.add(vk_content4)
+    _seed_content(session, 'REP_PAR_ACT', 'list_desc', 'Потребуется указать ИНН и КПП (при наличии) участника')
+    _seed_content(session, 'REP_PAR_ACT', 'list_button', 'Получить')
+
+    _seed_content(session, 'REP_PAR_HIS', 'list_desc', 'Потребуется указать ИНН и КПП (при наличии) участника')
+    _seed_content(session, 'REP_PAR_HIS', 'list_button', 'Получить')
+
+    _seed_content(session, 'REP_PARS_CON', 'list_desc', '+ учет незавершенных контрактов')
+    _seed_content(session, 'REP_PARS_CON', 'list_button', 'Получить')
+
+    _seed_content(session, 'SUB_PAR', 'list_desc', 'Потребуется указать ИНН и КПП (при наличии) участника')
+    _seed_content(session, 'SUB_PAR', 'list_button', 'Подписаться')
+
+
+    _seed_content(session, AddInfoCode.__name__, AddInfoCode.PARTICIPANT.name, 'Введите через пробел ИНН и КПП (при наличии) участника')
+    _seed_content(session, AddInfoCode.__name__, AddInfoCode.CUSTOMER.name, 'Введите через пробел ИНН и КПП заказчика')
+    _seed_content(session, AddInfoCode.__name__, AddInfoCode.NOTIFICATION.name, 'Введите код закупки')
+    _seed_content(session, AddInfoCode.__name__, AddInfoCode.CONTRACT.name, 'Введите реестровый номер контракта')

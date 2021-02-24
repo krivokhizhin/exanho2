@@ -8,8 +8,7 @@ def seed(session:OrmSession):
     if add_info1 is None:
         add_info1 = AddInfoSettings(
             code = AddInfoCode.PARTICIPANT,
-            name = 'ID участника закупок',
-            ui_prompt = 'Введите через пробел ИНН и КПП (при наличии) участника'
+            name = 'ID участника закупок'
         )
         session.add(add_info1)
 
@@ -17,8 +16,7 @@ def seed(session:OrmSession):
     if add_info2 is None:
         add_info2 = AddInfoSettings(
             code = AddInfoCode.CUSTOMER,
-            name = 'ID заказчика закупок',
-            ui_prompt = 'Введите через пробел ИНН и КПП заказчика'
+            name = 'ID заказчика закупок'
         )
         session.add(add_info2)
 
@@ -26,8 +24,7 @@ def seed(session:OrmSession):
     if add_info1 is None:
         add_info1 = AddInfoSettings(
             code = AddInfoCode.NOTIFICATION,
-            name = 'Код закупки',
-            ui_prompt = 'Введите код закупки'
+            name = 'Код закупки'
         )
         session.add(add_info1)
 
@@ -35,8 +32,7 @@ def seed(session:OrmSession):
     if add_info1 is None:
         add_info1 = AddInfoSettings(
             code = AddInfoCode.CONTRACT,
-            name = 'Реестровый номер контракта',
-            ui_prompt = 'Введите реестровый номер контракта'
+            name = 'Реестровый номер контракта'
         )
         session.add(add_info1)
 

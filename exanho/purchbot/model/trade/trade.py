@@ -18,11 +18,11 @@ class Trade(ExaObjectMixin, Base):
 
     status = Column(Enum(TradeStatus), nullable=False)
 
-    product_id = Column(BigInteger, ForeignKey('product.id'), nullable=False)
-    product = relationship('Product', back_populates='trades')
-
     client_id = Column(BigInteger, ForeignKey('client.id'), nullable=False)
     client = relationship('Client', back_populates='trades')
+
+    product_id = Column(BigInteger, ForeignKey('product.id'), nullable=False)
+    product = relationship('Product', back_populates='trades')
 
     amount = Column(Numeric(8,2), nullable=False)
 
@@ -32,4 +32,4 @@ class Trade(ExaObjectMixin, Base):
     parameter2 = Column(String(100))
     parameter3 = Column(String(100))
 
-Index('idx_product_status', Trade.product_id, Trade.status)
+Index('idx_trade_product_status', Trade.client_id, Trade.product_id, Trade.status)

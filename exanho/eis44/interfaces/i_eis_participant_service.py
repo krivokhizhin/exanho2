@@ -1,11 +1,15 @@
 from abc import ABC, abstractmethod
 
-from . import SummaryContracts
+from . import ParticipantInfo
 
 class IEisParticipantService(ABC):
     
     @abstractmethod
-    def get_participants(self, inn:str, kpp:str=None) -> list:
+    def get_participant(self, id:int) -> ParticipantInfo:
+        pass
+    
+    @abstractmethod
+    def get_participant_list(self, inn:str, kpp:str, page:int, size:int):
         pass
     
     @abstractmethod

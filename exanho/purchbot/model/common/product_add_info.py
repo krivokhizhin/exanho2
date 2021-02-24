@@ -8,8 +8,7 @@ class ProductAddInfo(Base):
     __tablename__ = 'product_add_info'
 
     product_id = Column(BigInteger, ForeignKey('product.id'), primary_key=True)
-    add_info_id = Column(BigInteger, ForeignKey('add_info_settings.id'), primary_key=True)
+    par_number = Column(Integer, primary_key=True)
 
-    par_number = Column(Integer, nullable=False)
-
+    add_info_id = Column(BigInteger, ForeignKey('add_info_settings.id'), nullable=False)
     add_info = relationship('AddInfoSettings')

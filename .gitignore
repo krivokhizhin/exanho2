@@ -110,3 +110,7 @@ vscode/
 # VSCodeCounter VS Code extension
 .VSCodeCounter
 VSCodeCounter/
+
+# ExAnHo settings
+actors.json
+actors*.json

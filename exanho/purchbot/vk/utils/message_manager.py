@@ -129,7 +129,7 @@ def match_payload(session:OrmSession, payload:Payload, client_context:ClientCont
     elif payload.command == PayloadCommand.go_to_page:
         go_to(session, payload, client_context, context, event_obj)
     elif payload.command == PayloadCommand.request_product:
-        request_product(session, context, client_context, payload.product)
+        request_product(session, context, client_context, payload)
     elif payload.command == PayloadCommand.detailing_trade:
         detailing_trade(session, context, client_context, payload, event_obj)
     elif payload.command == PayloadCommand.selection_add_info:
@@ -202,7 +202,8 @@ def go_to(session:OrmSession, payload:Payload, client_context:ClientContext, con
 
     match_payload(session, payload, client_context, context, event_obj)
 
-def request_product(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, product_code:str):
+def request_product(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload):
+    product_code:str = payload.product
     trade_id = None
     par_number = None
 
@@ -241,6 +242,7 @@ def request_product(session:OrmSession, vk_context:VkBotContext, client_context:
     else:
         par_number = None
 
+    ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Принято')
     if par_number:
         ui_mngr.show_detailing_trade_message(session, vk_context, client_context, trade_id, par_number)
     else:

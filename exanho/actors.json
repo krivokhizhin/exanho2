@@ -8,6 +8,13 @@
                     "exanho.ftp_loading.model.__init__",
                     "exanho.eis44.model.__init__"
                 ]
+            },
+            {
+                "name": "purchbot_test",
+                "url": "postgresql+psycopg2://kks:Nata1311@localhost/purchbot_test",
+                "models": [
+                    "exanho.purchbot.model.__init__"
+                ]
             }
         ],
         "service_endpoints": [
@@ -24,7 +31,7 @@
         ],
         "joinable_queues": [
             {
-                "name": "contract",
+                "name": "vk_method_calls",
                 "maxsize": 200
             }
         ]
@@ -56,108 +63,37 @@
             ]            
         },
         {
-            "name": "ContractQHWorker",
-            "kind": "QueueWorker",
+            "name": "VkApiCalls",
+            "kind": "SleepWorker",
             "daemon": true,
             "workers": [
                 {
-                    "module": "exanho.eis44.workers.ds_consumer",
-                    "db_key": "eis44_test",
-                    "queue_name": "contract",
+                    "module": "exanho.purchbot.workers.vk_api_calls",
+                    "sleep": 1.0,
                     "appsettings":{
-                        "parse_module": "exanho.eis44.ds.contracts.fcsExport",
-                        "error_attempts": 2,
-                        "update": true
+                        "access_token": "ece8ae0bd980d4ced850b3be6ad8002792e1bfd614d725232ad3f7d6a6bae91188a50d993813be3d84f71",
+                        "group_id": 202308925,
+                        "call_queue": "vk_method_calls",
+                        "max_calls": 20,
+                        "timeout": 1
                     }
                 }
             ]
         },
         {
-            "name": "RunFtpTaskWorker",
+            "name": "VkBotsLongPoll",
             "kind": "SleepWorker",
             "daemon": true,
             "workers": [
                 {
-                    "module": "exanho.ftp_loading.workers.task_run",
-                    "db_key": "eis44_test",
-                    "sleep": 5.0,
+                    "module": "exanho.purchbot.workers.bots_long_poll",
+                    "db_key": "purchbot_test",
+                    "sleep": 1.0,
                     "appsettings":{
-                        "ftp_host": "ftp.zakupki.gov.ru",
-                        "ftp_port": 21,
-                        "ftp_user": "free",
-                        "ftp_password": "free"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "LoadFtpFileWorker",
-            "kind": "SleepWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.ftp_loading.workers.file_load",
-                    "db_key": "eis44_test",
-                    "sleep": 5.0,
-                    "appsettings":{
-                        "ftp_host": "ftp.zakupki.gov.ru",
-                        "ftp_port": 21,
-                        "ftp_user": "free",
-                        "ftp_password": "free",
-                        "parse_queues":["contract"],
-                        "queue_by_filter":[1],
-                        "parse_filters":[
-                            "contract_"
-                        ],
-                        "max_mem_level": 0.8,
-                        "with_swap": false,
-                        "max_pool_workers": 1,
-                        "block_timeout": 60
-                    }
-                }
-            ]
-        },
-        {
-            "name": "ContractLogPlaceholder",
-            "kind": "SleepWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.eis44.workers.placeholder",
-                    "db_key": "eis44_test",
-                    "sleep": 5.0,
-                    "appsettings":{
-                        "log_placeholders": ["exanho.eis44.placeholders.zfcs_contract2015", "exanho.eis44.placeholders.zfcs_contract_cancel2015", "exanho.eis44.placeholders.zfcs_contract_procedure2015", "exanho.eis44.placeholders.zfcs_contract_procedure_cancel2015"]
-                    }
-                }
-            ]
-        },
-        {
-            "name": "ParticipantLogParser",
-            "kind": "SleepWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.eis44.workers.log_parser",
-                    "db_key": "eis44_test",
-                    "sleep": 5.0,
-                    "appsettings":{
-                        "log_parser": "exanho.eis44.log_parsers.participant"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "ContractLogParser",
-            "kind": "SleepWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.eis44.workers.log_parser",
-                    "db_key": "eis44_test",
-                    "sleep": 5.0,
-                    "appsettings":{
-                        "log_parser": "exanho.eis44.log_parsers.contract"
+                        "access_token": "843e477baaa13e3022776a9a5cd7544cfeeda9f3262a5516decbf681f896f008cc9c502eebcd37ca79417",
+                        "group_id": 202308925,
+                        "call_queue": "vk_method_calls",
+                        "participant_service": "IEisParticipantService"
                     }
                 }
             ]

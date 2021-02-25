@@ -2,28 +2,64 @@
     "exanho_context":{
         "db_connectings":[
             {
-                "name": "eis44_test",
-                "url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44_test",
+                "name": "purchbot_test",
+                "url": "postgresql+psycopg2://kks:Nata1311@localhost/purchbot_test",
                 "models": [
-                    "exanho.eis44.model.__init__",
                     "exanho.purchbot.model.__init__"
                 ]
+            }
+        ],
+        "service_endpoints": [
+            {
+                "interface": "IEisParticipantService",
+                "host": "",
+                "port": 3120
+            },
+            {
+                "interface": "IEisContractService",
+                "host": "",
+                "port": 3121
+            }
+        ],
+        "joinable_queues": [
+            {
+                "name": "vk_method_calls",
+                "maxsize": 200
             }
         ]
     },
     "exanho_actors": [
         {
-            "name": "ContractPlaceholder",
+            "name": "VkApiCalls",
             "kind": "SleepWorker",
             "daemon": true,
             "workers": [
                 {
-                    "module": "exanho.purchbot.workers.placeholder",
-                    "db_key": "eis44_test",
-                    "sleep": 5.0,
+                    "module": "exanho.purchbot.workers.vk_api_calls",
+                    "sleep": 1.0,
                     "appsettings":{
-                        "placeholder_module": "exanho.purchbot.placeholders.contract",
-                        "source_db_key": "eis44_test"
+                        "access_token": "ece8ae0bd980d4ced850b3be6ad8002792e1bfd614d725232ad3f7d6a6bae91188a50d993813be3d84f71",
+                        "group_id": 202308925,
+                        "call_queue": "vk_method_calls",
+                        "max_calls": 20
+                    }
+                }
+            ]
+        },
+        {
+            "name": "VkBotsLongPoll",
+            "kind": "SleepWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.purchbot.workers.bots_long_poll",
+                    "db_key": "purchbot_test",
+                    "sleep": 1.0,
+                    "appsettings":{
+                        "access_token": "843e477baaa13e3022776a9a5cd7544cfeeda9f3262a5516decbf681f896f008cc9c502eebcd37ca79417",
+                        "group_id": 202308925,
+                        "call_queue": "vk_method_calls",
+                        "participant_service": "IEisParticipantService"
                     }
                 }
             ]

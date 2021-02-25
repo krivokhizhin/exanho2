@@ -10,8 +10,8 @@ from .client_context import ClientContext
 from ..dto import util, JSONObject
 from ..ui import PayloadCommand, Payload
 
+from ...utils import accounts as acc_util
 from ...utils import account_manager as acc_mngr
-from ...utils import get_account
 from ...utils import eis_service
 from ..utils import ui_manager as ui_mngr
 
@@ -165,8 +165,8 @@ def get_client_context(session:OrmSession, user_id:int) -> ClientContext:
 
         promo(session, client.id)
 
-    free_balance = acc_mngr.get_free_balance(session, vk_user.client.id)
-    promo_balance = acc_mngr.get_promo_balance(session, vk_user.client.id)
+    free_balance = acc_mngr.free_balance_by_client(session, vk_user.client.id)
+    promo_balance = acc_mngr.promo_balance_by_client(session, vk_user.client.id)
 
     payload = None
     last_trade_detail = session.query(LastTradeDetailing).filter(LastTradeDetailing.client_id == vk_user.client.id).\
@@ -184,7 +184,7 @@ def get_client_context(session:OrmSession, user_id:int) -> ClientContext:
 
 def promo(session:OrmSession, client_id:int):
     PROMO_AMOUNT = Decimal('999.00')
-    promo_remain = acc_mngr.get_promo_balance(session, client_id)
+    promo_remain = acc_mngr.promo_balance_by_client(session, client_id)
 
     if promo_remain > 0:
         return
@@ -327,33 +327,33 @@ def confirm_trade(session:OrmSession, vk_context:VkBotContext, client_context:Cl
     if trade is None:
         return
 
-    promo_balance = acc_mngr.get_promo_balance(session, client_context.client_id)
-    free_balance = acc_mngr.get_free_balance(session, client_context.client_id)
+    promo_balance = acc_mngr.promo_balance_by_client(session, client_context.client_id)
+    free_balance = acc_mngr.free_balance_by_client(session, client_context.client_id)
     if promo_balance >= trade.amount:
-        acc_mngr.make_payment(
+        acc_util.make_payment(
             session,
-            get_account.for_client_promo_payment(session, client_context.client_id, trade_id),
-            get_account.promo_by_client(session, client_context.client_id),
+            acc_mngr.client_promo_payment_acc(session, client_context.client_id, trade_id),
+            acc_mngr.promo_by_client_acc(session, client_context.client_id),
             trade.amount
         )
     elif promo_balance > 0 and free_balance >= trade.amount - promo_balance:
-        acc_mngr.make_payment(
+        acc_util.make_payment(
             session,
-            get_account.for_client_promo_payment(session, client_context.client_id, trade_id),
-            get_account.promo_by_client(session, client_context.client_id),
+            acc_mngr.client_promo_payment_acc(session, client_context.client_id, trade_id),
+            acc_mngr.promo_by_client_acc(session, client_context.client_id),
             promo_balance
         )
-        acc_mngr.make_payment(
+        acc_util.make_payment(
             session,
-            get_account.for_client_payment(session, client_context.client_id, trade_id),
-            get_account.free_balance_by_client(session, client_context.client_id),
+            acc_mngr.client_payment_acc(session, client_context.client_id, trade_id),
+            acc_mngr.free_balance_by_client_acc(session, client_context.client_id),
             trade.amount - promo_balance
         )
     elif free_balance >= trade.amount:
-        acc_mngr.make_payment(
+        acc_util.make_payment(
             session,
-            get_account.for_client_payment(session, client_context.client_id, trade_id),
-            get_account.free_balance_by_client(session, client_context.client_id),
+            acc_mngr.client_payment_acc(session, client_context.client_id, trade_id),
+            acc_mngr.free_balance_by_client_acc(session, client_context.client_id),
             trade.amount
         )
     else:
@@ -421,6 +421,8 @@ def edit_trade(session:OrmSession, vk_context:VkBotContext, client_context:Clien
     if trade is None:
         return
 
+    #TODO: check trade status
+
     trade.status = TradeStatus.NEW
     trade.parameter1 = None
     trade.parameter2 = None
@@ -437,6 +439,8 @@ def cancel_trade(session:OrmSession, vk_context:VkBotContext, client_context:Cli
     if trade is None:
         return
 
+    #TODO: check trade status
+
     trade.status = TradeStatus.REJECTED
 
     ui_mngr.show_main_menu(session, vk_context, client_context, f'Заказ №{trade_id} отменен')
@@ -448,36 +452,36 @@ def trade_execute(session:OrmSession, vk_context:VkBotContext, client_context:Cl
     if trade is None:
         return
 
-    promo_pay_acc = get_account.for_client_promo_payment(session, client_context.client_id, trade_id)
-    promo_pay_acc_amount = acc_mngr.get_remain_amount(session, promo_pay_acc)
+    promo_pay_acc = acc_mngr.client_promo_payment_acc(session, client_context.client_id, trade_id)
+    promo_pay_acc_amount = acc_util.get_remain_amount(session, promo_pay_acc)
 
-    pay_acc = get_account.for_client_payment(session, client_context.client_id, trade_id)
-    pay_acc_amount = acc_mngr.get_remain_amount(session, pay_acc)
+    pay_acc = acc_mngr.client_payment_acc(session, client_context.client_id, trade_id)
+    pay_acc_amount = acc_util.get_remain_amount(session, pay_acc)
 
     if promo_pay_acc_amount >= trade.amount:
-        acc_mngr.make_payment(
+        acc_util.make_payment(
             session,
-            get_account.product_promo_revenue(session, trade_id),
+            acc_mngr.product_promo_revenue_acc(session, trade_id),
             promo_pay_acc,
             trade.amount
         )
     elif promo_pay_acc_amount > 0 and pay_acc_amount >= trade.amount - promo_pay_acc_amount:
-        acc_mngr.make_payment(
+        acc_util.make_payment(
             session,
-            get_account.product_promo_revenue(session, trade_id),
+            acc_mngr.product_promo_revenue_acc(session, trade_id),
             promo_pay_acc,
             promo_pay_acc_amount
         )
-        acc_mngr.make_payment(
+        acc_util.make_payment(
             session,
-            get_account.product_revenue(session, trade_id),
+            acc_mngr.product_revenue_acc(session, trade_id),
             pay_acc,
             trade.amount - promo_pay_acc_amount
         )
     elif pay_acc_amount >= trade.amount:
-        acc_mngr.make_payment(
+        acc_util.make_payment(
             session,
-            get_account.product_revenue(session, trade_id),
+            acc_mngr.product_revenue_acc(session, trade_id),
             pay_acc,
             trade.amount
         )
@@ -486,8 +490,8 @@ def trade_execute(session:OrmSession, vk_context:VkBotContext, client_context:Cl
 
     trade.status = TradeStatus.COMPLETED
 
-    free_balance = acc_mngr.get_free_balance(session, client_context.client_id)
-    promo_balance = acc_mngr.get_promo_balance(session, client_context.client_id)
+    free_balance = acc_mngr.free_balance_by_client(session, client_context.client_id)
+    promo_balance = acc_mngr.promo_balance_by_client(session, client_context.client_id)
 
     client_context = client_context._replace(free_balance=free_balance, promo_balance=promo_balance)
 

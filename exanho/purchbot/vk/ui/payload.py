@@ -31,6 +31,7 @@ class Payload:
         self.par_value = kwargs.get('par_value', None)
         self.content = kwargs.get('content', None)
         self.go_to = kwargs.get('go_to', None)
+        self.event = kwargs.get('event', None)
 
     def form(self) -> str:
         dic = dict([(key, value if not isinstance(value, PayloadCommand) else value.name) for key, value in self.__dict__.items() if value])        
@@ -54,6 +55,7 @@ class Payload:
         self.par_value = kwargs.get('par_value', None)
         self.content = kwargs.get('content', None)
         self.go_to = kwargs.get('go_to', None)
+        self.event = kwargs.get('event', None)
 
     def __str__(self) -> str:
         return 'Payload: {}'.format(', '.join([f'{key}={value}' for key, value in self.__dict__.items()]))

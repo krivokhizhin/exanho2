@@ -24,6 +24,11 @@ class ElementActionType(enum.Enum):
     open_link = 1
     open_photo = 2
 
+class SnackbarType(enum.Enum):
+    show_snackbar = 1
+    open_link = 2
+    open_app = 3
+
 class ButtonActionContent(IContext):
 
     def __init__(self, **kwargs) -> None:
@@ -68,3 +73,13 @@ class TemplateContent(IContext):
     def __init__(self, **kwargs) -> None:
         self.type_ = kwargs.get('type_', None)
         self.elements = kwargs.get('elements', list())
+
+class SnackbarContent(IContext):
+
+    def __init__(self, **kwargs) -> None:
+        self.type_ = kwargs.get('type_', None)
+        self.text = kwargs.get('text', None)
+        self.link = kwargs.get('link', None)
+        self.app_id = kwargs.get('app_id', None)
+        self.owner_id = kwargs.get('owner_id', None)
+        self.hash = kwargs.get('hash', None)

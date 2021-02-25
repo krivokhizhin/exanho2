@@ -81,7 +81,8 @@ def handle_message_event(session:OrmSession, context:VkBotContext, message_event
                 add_info = payload_obj.add_info if hasattr(payload_obj, 'add_info') else None,
                 par_number = int(payload_obj.par_number) if hasattr(payload_obj, 'par_number') else None,
                 par_value = payload_obj.par_value if hasattr(payload_obj, 'par_value') else None,
-                go_to = payload_obj.go_to if hasattr(payload_obj, 'go_to') else None
+                go_to = payload_obj.go_to if hasattr(payload_obj, 'go_to') else None,
+                event = message_event.event_id if hasattr(message_event, 'event_id') else None
             )
 
         match_payload(session, payload, client_context, context, message_event)
@@ -111,7 +112,8 @@ def handle_message_reply(session:OrmSession, context:VkBotContext, message_reply
                 add_info = payload_obj.add_info if hasattr(payload_obj, 'add_info') else None,
                 par_number = int(payload_obj.par_number) if hasattr(payload_obj, 'par_number') else None,
                 par_value = payload_obj.par_value if hasattr(payload_obj, 'par_value') else None,
-                go_to = payload_obj.go_to if hasattr(payload_obj, 'go_to') else None
+                go_to = payload_obj.go_to if hasattr(payload_obj, 'go_to') else None,
+                event = payload_obj.event if hasattr(payload_obj, 'event') else None
             )
 
         match_payload(session, payload, client_context, context, message_reply)
@@ -138,7 +140,7 @@ def match_payload(session:OrmSession, payload:Payload, client_context:ClientCont
     elif payload.command == PayloadCommand.cancel_trade:
         cancel_trade(session, context, client_context, payload)
     elif payload.command == PayloadCommand.trade_executed:
-        trade_execute(session, context, client_context, payload)
+        trade_executed(session, context, client_context, payload)
     elif payload.command == PayloadCommand.menu_section_queries:
         ui_mngr.show_products_by_kind(session, context, client_context, ProductKind.QUERY, payload)
     elif payload.command == PayloadCommand.menu_section_subscriptions:
@@ -238,12 +240,10 @@ def request_product(session:OrmSession, vk_context:VkBotContext, client_context:
     else:
         par_number = None
 
-    if par_number is None:
-        trade.status = TradeStatus.FILLING
-
     if par_number:
         ui_mngr.show_detailing_trade_message(session, vk_context, client_context, trade_id, par_number)
     else:
+        trade.status = TradeStatus.FILLING
         ui_mngr.show_confirmation_trade(session, vk_context, client_context, trade_id)
 
 def detailing_trade(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, event_obj:JSONObject):
@@ -312,12 +312,10 @@ def selection_add_info(session:OrmSession, vk_context:VkBotContext, client_conte
     else:
         par_number = None
 
-    if par_number is None:
-        trade.status = TradeStatus.FILLING
-
     if par_number:
         ui_mngr.show_detailing_trade_message(session, vk_context, client_context, trade_id, par_number)
     else:
+        trade.status = TradeStatus.FILLING
         ui_mngr.show_confirmation_trade(session, vk_context, client_context, trade_id)
 
 def confirm_trade(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload):
@@ -327,41 +325,56 @@ def confirm_trade(session:OrmSession, vk_context:VkBotContext, client_context:Cl
     if trade is None:
         return
 
-    promo_balance = acc_mngr.promo_balance_by_client(session, client_context.client_id)
-    free_balance = acc_mngr.free_balance_by_client(session, client_context.client_id)
-    if promo_balance >= trade.amount:
-        acc_util.make_payment(
-            session,
-            acc_mngr.client_promo_payment_acc(session, client_context.client_id, trade_id),
-            acc_mngr.promo_by_client_acc(session, client_context.client_id),
-            trade.amount
-        )
-    elif promo_balance > 0 and free_balance >= trade.amount - promo_balance:
-        acc_util.make_payment(
-            session,
-            acc_mngr.client_promo_payment_acc(session, client_context.client_id, trade_id),
-            acc_mngr.promo_by_client_acc(session, client_context.client_id),
-            promo_balance
-        )
-        acc_util.make_payment(
-            session,
-            acc_mngr.client_payment_acc(session, client_context.client_id, trade_id),
-            acc_mngr.free_balance_by_client_acc(session, client_context.client_id),
-            trade.amount - promo_balance
-        )
-    elif free_balance >= trade.amount:
-        acc_util.make_payment(
-            session,
-            acc_mngr.client_payment_acc(session, client_context.client_id, trade_id),
-            acc_mngr.free_balance_by_client_acc(session, client_context.client_id),
-            trade.amount
-        )
-    else:
-        ui_mngr.show_main_menu(session, vk_context, client_context, 'Недостаточно средств! Пополните, пожалуйста, баланс.')
-        return
+    if trade.status != TradeStatus.FILLING:
+        return ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Подтверждение невозможно. Отредактируйте заказ или оформите услугу заново.')
 
-    trade.paid = True
+    last_trade_detail = session.query(LastTradeDetailing).filter(LastTradeDetailing.client_id == client_context.client_id).\
+        filter(LastTradeDetailing.handled == False).one_or_none()
+    if last_trade_detail:
+        last_trade_detail.handled = True
+
+    if not trade.paid and trade.amount > 0:
+        promo_balance = acc_mngr.promo_balance_by_client(session, client_context.client_id)
+        free_balance = acc_mngr.free_balance_by_client(session, client_context.client_id)
+        if promo_balance >= trade.amount:
+            acc_util.make_payment(
+                session,
+                acc_mngr.client_promo_payment_acc(session, client_context.client_id, trade_id),
+                acc_mngr.promo_by_client_acc(session, client_context.client_id),
+                trade.amount
+            )
+        elif promo_balance > 0 and free_balance >= trade.amount - promo_balance:
+            acc_util.make_payment(
+                session,
+                acc_mngr.client_promo_payment_acc(session, client_context.client_id, trade_id),
+                acc_mngr.promo_by_client_acc(session, client_context.client_id),
+                promo_balance
+            )
+            acc_util.make_payment(
+                session,
+                acc_mngr.client_payment_acc(session, client_context.client_id, trade_id),
+                acc_mngr.free_balance_by_client_acc(session, client_context.client_id),
+                trade.amount - promo_balance
+            )
+        elif free_balance >= trade.amount:
+            acc_util.make_payment(
+                session,
+                acc_mngr.client_payment_acc(session, client_context.client_id, trade_id),
+                acc_mngr.free_balance_by_client_acc(session, client_context.client_id),
+                trade.amount
+            )
+        else:
+            ui_mngr.show_main_menu(session, vk_context, client_context, 'Недостаточно средств! Пополните, пожалуйста, баланс.')
+            return
+        
+        trade.paid = True        
+
     trade.status = TradeStatus.CONFIRMED
+
+    free_balance = acc_mngr.free_balance_by_client(session, client_context.client_id)
+    promo_balance = acc_mngr.promo_balance_by_client(session, client_context.client_id)
+
+    client_context = client_context._replace(free_balance=free_balance, promo_balance=promo_balance)
 
     execute_trade(session, vk_context, client_context, payload, trade_id)
     trade.status = TradeStatus.DURING
@@ -409,7 +422,8 @@ def execute_trade(session:OrmSession, vk_context:VkBotContext, client_context:Cl
 
     exec_payload = Payload(
         command = PayloadCommand.trade_executed,
-        trade = trade_id
+        trade = trade_id,
+        event = payload.event
     )
     ui_method(session, vk_context, client_context, exec_payload, result)
 
@@ -421,7 +435,8 @@ def edit_trade(session:OrmSession, vk_context:VkBotContext, client_context:Clien
     if trade is None:
         return
 
-    #TODO: check trade status
+    if trade.status in (TradeStatus.DURING, TradeStatus.COMPLETED):
+        return ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Редактирование невозможно. Услуга оказана ранее.')
 
     trade.status = TradeStatus.NEW
     trade.parameter1 = None
@@ -439,60 +454,60 @@ def cancel_trade(session:OrmSession, vk_context:VkBotContext, client_context:Cli
     if trade is None:
         return
 
-    #TODO: check trade status
+    if trade.status in (TradeStatus.DURING, TradeStatus.COMPLETED):
+        return ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Отмена невозможна. Услуга оказана ранее.')
 
     trade.status = TradeStatus.REJECTED
 
-    ui_mngr.show_main_menu(session, vk_context, client_context, f'Заказ №{trade_id} отменен')
+    ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, f'Заказ №{trade_id} отменен')
 
-def trade_execute(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload):
+def trade_executed(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload):
     trade_id:int = payload.trade
 
     trade = session.query(Trade).get(trade_id)
-    if trade is None:
+    if trade is None or trade.status != TradeStatus.DURING:
         return
 
-    promo_pay_acc = acc_mngr.client_promo_payment_acc(session, client_context.client_id, trade_id)
-    promo_pay_acc_amount = acc_util.get_remain_amount(session, promo_pay_acc)
+    if trade.paid:
+        promo_pay_acc = acc_mngr.client_promo_payment_acc(session, client_context.client_id, trade_id)
+        promo_pay_acc_amount = acc_util.get_remain_amount(session, promo_pay_acc)
 
-    pay_acc = acc_mngr.client_payment_acc(session, client_context.client_id, trade_id)
-    pay_acc_amount = acc_util.get_remain_amount(session, pay_acc)
+        pay_acc = acc_mngr.client_payment_acc(session, client_context.client_id, trade_id)
+        pay_acc_amount = acc_util.get_remain_amount(session, pay_acc)
 
-    if promo_pay_acc_amount >= trade.amount:
-        acc_util.make_payment(
-            session,
-            acc_mngr.product_promo_revenue_acc(session, trade_id),
-            promo_pay_acc,
-            trade.amount
-        )
-    elif promo_pay_acc_amount > 0 and pay_acc_amount >= trade.amount - promo_pay_acc_amount:
-        acc_util.make_payment(
-            session,
-            acc_mngr.product_promo_revenue_acc(session, trade_id),
-            promo_pay_acc,
-            promo_pay_acc_amount
-        )
-        acc_util.make_payment(
-            session,
-            acc_mngr.product_revenue_acc(session, trade_id),
-            pay_acc,
-            trade.amount - promo_pay_acc_amount
-        )
-    elif pay_acc_amount >= trade.amount:
-        acc_util.make_payment(
-            session,
-            acc_mngr.product_revenue_acc(session, trade_id),
-            pay_acc,
-            trade.amount
-        )
-    else:
-        return
+        if promo_pay_acc_amount >= trade.amount:
+            acc_util.make_payment(
+                session,
+                acc_mngr.product_promo_revenue_acc(session, trade_id),
+                promo_pay_acc,
+                trade.amount
+            )
+        elif promo_pay_acc_amount > 0 and pay_acc_amount >= trade.amount - promo_pay_acc_amount:
+            acc_util.make_payment(
+                session,
+                acc_mngr.product_promo_revenue_acc(session, trade_id),
+                promo_pay_acc,
+                promo_pay_acc_amount
+            )
+            acc_util.make_payment(
+                session,
+                acc_mngr.product_revenue_acc(session, trade_id),
+                pay_acc,
+                trade.amount - promo_pay_acc_amount
+            )
+        elif pay_acc_amount >= trade.amount:
+            acc_util.make_payment(
+                session,
+                acc_mngr.product_revenue_acc(session, trade_id),
+                pay_acc,
+                trade.amount
+            )
+        else:
+            return
 
     trade.status = TradeStatus.COMPLETED
 
-    free_balance = acc_mngr.free_balance_by_client(session, client_context.client_id)
-    promo_balance = acc_mngr.promo_balance_by_client(session, client_context.client_id)
-
-    client_context = client_context._replace(free_balance=free_balance, promo_balance=promo_balance)
-
-    ui_mngr.show_main_menu(session, vk_context, client_context, 'Благодарим Вас за использование нашего сервиса!')
+    if payload.event:
+        ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Благодарим Вас за использование нашего сервиса!')
+    
+    ui_mngr.show_main_menu(session, vk_context, client_context)

@@ -2,6 +2,14 @@
     "exanho_context":{
         "db_connectings":[
             {
+                "name": "eis44_test",
+                "url": "postgresql+psycopg2://kks:Nata1311@localhost/eis44_test",
+                "models": [
+                    "exanho.ftp_loading.model.__init__",
+                    "exanho.eis44.model.__init__"
+                ]
+            },
+            {
                 "name": "purchbot_test",
                 "url": "postgresql+psycopg2://kks:Nata1311@localhost/purchbot_test",
                 "models": [
@@ -30,6 +38,31 @@
     },
     "exanho_actors": [
         {
+            "name": "EisService",
+            "kind": "XmlRpcServer",
+            "daemon": true,
+            "services":[
+                {
+                    "handler_module": "exanho.eis44.services.eis_participant_service",
+                    "interface": "IEisParticipantService",
+                    "concurrency": {
+                        "degree": 2,
+                        "kind": "process"
+                    },
+                    "db_key": "eis44_test"
+                },
+                {
+                    "handler_module": "exanho.eis44.services.eis_contract_service",
+                    "interface": "IEisContractService",
+                    "concurrency": {
+                        "degree": 2,
+                        "kind": "process"
+                    },
+                    "db_key": "eis44_test"
+                }
+            ]            
+        },
+        {
             "name": "VkApiCalls",
             "kind": "SleepWorker",
             "daemon": true,
@@ -41,7 +74,8 @@
                         "access_token": "ece8ae0bd980d4ced850b3be6ad8002792e1bfd614d725232ad3f7d6a6bae91188a50d993813be3d84f71",
                         "group_id": 202308925,
                         "call_queue": "vk_method_calls",
-                        "max_calls": 20
+                        "max_calls": 20,
+                        "timeout": 1
                     }
                 }
             ]

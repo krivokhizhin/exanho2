@@ -50,7 +50,8 @@ def handle_message_new(session:OrmSession, context:VkBotContext, message_new:JSO
                 add_info = payload_obj.add_info if hasattr(payload_obj, 'add_info') else None,
                 par_number = int(payload_obj.par_number) if hasattr(payload_obj, 'par_number') else None,
                 par_value = payload_obj.par_value if hasattr(payload_obj, 'par_value') else None,
-                go_to = payload_obj.go_to if hasattr(payload_obj, 'go_to') else None
+                go_to = payload_obj.go_to if hasattr(payload_obj, 'go_to') else None,
+                event = str(payload_obj.event) if hasattr(payload_obj, 'event') else None
             )
 
         match_payload(session, payload, client_context, context, message_new)
@@ -82,7 +83,7 @@ def handle_message_event(session:OrmSession, context:VkBotContext, message_event
                 par_number = int(payload_obj.par_number) if hasattr(payload_obj, 'par_number') else None,
                 par_value = payload_obj.par_value if hasattr(payload_obj, 'par_value') else None,
                 go_to = payload_obj.go_to if hasattr(payload_obj, 'go_to') else None,
-                event = message_event.event_id if hasattr(message_event, 'event_id') else None
+                event = str(message_event.event_id) if hasattr(message_event, 'event_id') else None
             )
 
         match_payload(session, payload, client_context, context, message_event)
@@ -113,7 +114,7 @@ def handle_message_reply(session:OrmSession, context:VkBotContext, message_reply
                 par_number = int(payload_obj.par_number) if hasattr(payload_obj, 'par_number') else None,
                 par_value = payload_obj.par_value if hasattr(payload_obj, 'par_value') else None,
                 go_to = payload_obj.go_to if hasattr(payload_obj, 'go_to') else None,
-                event = payload_obj.event if hasattr(payload_obj, 'event') else None
+                event = str(payload_obj.event) if hasattr(payload_obj, 'event') else None
             )
 
         match_payload(session, payload, client_context, context, message_reply)
@@ -261,10 +262,11 @@ def detailing_trade(session:OrmSession, vk_context:VkBotContext, client_context:
 
     if payload.add_info == AddInfoCode.PARTICIPANT.value:
         inn, kpp = extract_inn_kpp_from_text(text)
-        if inn is None:
-            return
-        payload.par_value = '{} {}'.format(inn, kpp) if kpp else inn
-        ui_mngr.detailing_trade_by_participant(session, vk_context, client_context, payload, inn, kpp)
+        if inn:            
+            payload.par_value = '{} {}'.format(inn, kpp) if kpp else inn
+            ui_mngr.detailing_trade_by_participant(session, vk_context, client_context, payload, inn, kpp)
+        else:
+            ui_mngr.show_main_menu(session, vk_context, client_context, 'В сообщении как минимум должны быть указаны 10 или 12 цифр подряд (формат ИНН)')
     elif payload.add_info == AddInfoCode.CUSTOMER.value:
         pass
     elif payload.add_info == AddInfoCode.NOTIFICATION.value:
@@ -327,6 +329,8 @@ def confirm_trade(session:OrmSession, vk_context:VkBotContext, client_context:Cl
 
     if trade.status != TradeStatus.FILLING:
         return ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Подтверждение невозможно. Отредактируйте заказ или оформите услугу заново.')
+
+    ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Принято')
 
     last_trade_detail = session.query(LastTradeDetailing).filter(LastTradeDetailing.client_id == client_context.client_id).\
         filter(LastTradeDetailing.handled == False).one_or_none()
@@ -445,6 +449,7 @@ def edit_trade(session:OrmSession, vk_context:VkBotContext, client_context:Clien
 
     product_code = trade.product.code
 
+    ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, f'Заказ №{trade_id} доступен для редактирования.')
     request_product(session, vk_context, client_context, product_code)
 
 def cancel_trade(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload):
@@ -456,6 +461,11 @@ def cancel_trade(session:OrmSession, vk_context:VkBotContext, client_context:Cli
 
     if trade.status in (TradeStatus.DURING, TradeStatus.COMPLETED):
         return ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Отмена невозможна. Услуга оказана ранее.')
+
+    last_trade_detail = session.query(LastTradeDetailing).filter(LastTradeDetailing.client_id == client_context.client_id).\
+        filter(LastTradeDetailing.handled == False).one_or_none()
+    if last_trade_detail:
+        last_trade_detail.handled = True
 
     trade.status = TradeStatus.REJECTED
 

@@ -101,28 +101,29 @@ def show_main_menu(session:OrmSession, vk_context:VkBotContext, client_context:C
     )
 
 def show_snackbar_notice(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, event_id:str, text:str='OK'):
+    if event_id:
 
-    ui_snackbar = SnackbarNotice()
-    ui_snackbar.set_text(text)
+        ui_snackbar = SnackbarNotice()
+        ui_snackbar.set_text(text)
 
-    builder = UIElementBuilder()
-    builder.build_ui_element(ui_snackbar.content)
+        builder = UIElementBuilder()
+        builder.build_ui_element(ui_snackbar.content)
 
-    send_options = SendMessageEventAnswerOptions(
-        event_id = event_id,
-        user_id=client_context.vk_user_id,
-        peer_id=client_context.vk_user_id,
-        event_data=builder.form()
-    )
-
-    call_queue:JoinableQueue = vk_context.call_queue
-    call_queue.put(
-        VkMethodCall(
-            'messages',
-            'sendMessageEventAnswer',
-            dto_util.form(send_options, SendMessageEventAnswerOptions)
+        send_options = SendMessageEventAnswerOptions(
+            event_id = event_id,
+            user_id=client_context.vk_user_id,
+            peer_id=client_context.vk_user_id,
+            event_data=builder.form()
         )
-    )
+
+        call_queue:JoinableQueue = vk_context.call_queue
+        call_queue.put(
+            VkMethodCall(
+                'messages',
+                'sendMessageEventAnswer',
+                dto_util.form(send_options, SendMessageEventAnswerOptions)
+            )
+        )
 
 def get_title_by_product_kind(product_kind:ProductKind) -> str:
     if product_kind == ProductKind.QUERY:
@@ -176,7 +177,7 @@ def show_products_by_kind(session:OrmSession, vk_context:VkBotContext, client_co
         random_id=0,
         template=builder.form(),
         group_id=vk_context.group_id,
-        message=get_title_by_product_kind(product_kind)
+        message='Для выбора нажмите соответствующую кнопку' #get_title_by_product_kind(product_kind)
     )
 
     call_queue:JoinableQueue = vk_context.call_queue
@@ -188,7 +189,7 @@ def show_products_by_kind(session:OrmSession, vk_context:VkBotContext, client_co
         )
     )
 
-    show_main_menu(session, vk_context, client_context, menu_message='Для выбора нажмите соответствующую кнопку', pagination=pagination)
+    show_main_menu(session, vk_context, client_context, menu_message='?', pagination=pagination)
 
 def show_detailing_trade_message(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, trade_id:int, par_number:int):
 

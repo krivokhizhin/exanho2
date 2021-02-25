@@ -54,7 +54,7 @@ class MainMenu:
                 [
                     ButtonContent(
                         action = ButtonActionContent(
-                            type_ = ButtonType.callback,
+                            type_ = ButtonType.text,
                             label = 'Запросы',
                             payload = Payload(command = PayloadCommand.menu_section_queries).form()
                         ),
@@ -62,7 +62,7 @@ class MainMenu:
                     ),
                     ButtonContent(
                         action = ButtonActionContent(
-                            type_ = ButtonType.callback,
+                            type_ = ButtonType.text,
                             label = 'Подписки',
                             payload = Payload(command = PayloadCommand.menu_section_subscriptions).form()
                         ),
@@ -70,7 +70,7 @@ class MainMenu:
                     ),
                     ButtonContent(
                         action = ButtonActionContent(
-                            type_ = ButtonType.callback,
+                            type_ = ButtonType.text,
                             label = 'Отчеты',
                             payload = Payload(command = PayloadCommand.menu_section_reports).form()
                         ),

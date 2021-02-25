@@ -2,6 +2,7 @@ import logging
 
 from collections import namedtuple
 from multiprocessing import JoinableQueue
+from queue import Empty
 
 from exanho.core.common import Error
 
@@ -17,8 +18,9 @@ VkApiContext = namedtuple('VkApiContext', [
     'group_id',
     'call_queue',
     'max_calls',
+    'timeout',
     'vk_session'
-    ], defaults = [None])
+    ], defaults = [20, 1, None])
 
 def initialize(appsettings, exanho_context):
     context = VkApiContext(**appsettings)
@@ -46,7 +48,10 @@ def work(context:VkApiContext):
 
     while call_counter < context.max_calls:
         if method_call is None:
-            method_call = call_queue.get()
+            try:
+                method_call = call_queue.get(block=True, timeout=context.timeout)
+            except Empty:
+                return context
             if method_call is None:
                 return context
 
@@ -64,7 +69,7 @@ def work(context:VkApiContext):
         method_call = None
 
     if context.max_calls <= call_counter:
-        log.warning(f'Calls per minute limit has been reached: {call_counter}')
+        log.warning(f'Calls per second limit has been reached: {call_counter}')
 
     return context 
 

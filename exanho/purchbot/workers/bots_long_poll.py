@@ -1,9 +1,11 @@
 import logging
 from xmlrpc.client import ServerProxy
+from sqlalchemy.orm.session import Session as OrmSession
 
 from exanho.core.manager_context import Context as ExanhoContext
 
 from exanho.core.common import Error
+from exanho.orm.domain import Sessional
 from exanho.purchbot.vk.drivers import BuildInDriver
 from exanho.purchbot.vk.dto import JSONObject
 from exanho.purchbot.vk.dto.groups import GetLongPollServerResponse
@@ -57,26 +59,31 @@ def work(context:VkBotContext):
                 bot_session.ts = bot_data.ts
             else:
                 raise Error(f'unknown failed value: {events.failed}')
-        else:            
-            for new_event in events.updates:
-                assert isinstance(new_event, GroupEvent)
-                if new_event.group_id != context.group_id:
-                    log.warning(f'received "{new_event.type_}" event from group {new_event.group_id}, expected from group {context.group_id}')
-                    continue
+        else:
 
-                try:
-                    _handle_event(context, new_event)
-                    log.info(f'received "{new_event.type_}" event')
-                    if new_event.type_ != 'message_reply':
-                        log.debug(dto_mngr.convert_obj_to_json_str(new_event.object_, JSONObject))
-                except Error as er:
-                    log.error(er.message)
-                except TypeError:
-                    log.warning(new_event.object_.__dict__)
-                except Exception as ex:
-                    log.exception(dto_mngr.convert_obj_to_json_str(new_event.object_, JSONObject), ex)
+            with Sessional.domain.session_scope() as session:
+                assert isinstance(session, OrmSession)
 
-            bot_session.ts = events.ts
+                for new_event in events.updates:
+                    assert isinstance(new_event, GroupEvent)
+                    if new_event.group_id != context.group_id:
+                        log.warning(f'received "{new_event.type_}" event from group {new_event.group_id}, expected from group {context.group_id}')
+                        continue
+
+                    try:
+                        with session.begin_nested():
+                            _handle_event(session, context, new_event)
+                        log.info(f'received "{new_event.type_}" event')
+                        if new_event.type_ != 'message_reply':
+                            log.debug(dto_mngr.convert_obj_to_json_str(new_event.object_, JSONObject))
+                    except Error as er:
+                        log.error(er.message)
+                    except TypeError:
+                        log.warning(new_event.object_.__dict__)
+                    except Exception as ex:
+                        log.exception(dto_mngr.convert_obj_to_json_str(new_event.object_, JSONObject), ex)
+
+                bot_session.ts = events.ts
 
     except Error as er:
         log.error(er.message)
@@ -97,13 +104,13 @@ def _get_bot_data(driver, access_token, group_id) -> GetLongPollServerResponse:
         raise Error(f'VK groups.getLongPollServer error: code={bot_data.error.error_code}, msg={bot_data.error.error_msg}')
     return bot_data
 
-def _handle_event(context:VkBotContext, new_event:GroupEvent):    
+def _handle_event(session:OrmSession, context:VkBotContext, new_event:GroupEvent):    
 
     if new_event.type_ == 'message_new':
-        msg_mngr.handle_message_new(context, new_event.object_)
+        msg_mngr.handle_message_new(session, context, new_event.object_)
     elif new_event.type_ == 'message_reply':
-        msg_mngr.handle_message_reply(context, new_event.object_)
+        msg_mngr.handle_message_reply(session, context, new_event.object_)
     elif new_event.type_ == 'message_event':
-        msg_mngr.handle_message_event(context, new_event.object_)
+        msg_mngr.handle_message_event(session, context, new_event.object_)
     elif new_event.type_ == 'vkpay_transaction':
         pass

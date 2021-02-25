@@ -1,11 +1,8 @@
-from exanho.purchbot.model.common import add_info
-import pickle
 from collections import namedtuple
 from multiprocessing import JoinableQueue
 import logging
 
 from sqlalchemy.orm.session import Session as OrmSession
-from exanho.orm.domain import Sessional
 
 from exanho.eis44.interfaces import ParticipantInfo, SummaryContractsByStateInfo
 
@@ -26,7 +23,7 @@ NUMBER_ELEMENTS_PER_PAGE = 10
 
 VkMenuPagination = namedtuple('VkMenuPagination', 'first prev page next last payload')
 
-def show_main_menu(vk_context:VkBotContext, client_context:ClientContext, menu_message:str='Меню (см. клавиатуру под строкой ввода)', pagination:VkMenuPagination=None):    
+def show_main_menu(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, menu_message:str='Меню (см. клавиатуру под строкой ввода)', pagination:VkMenuPagination=None):    
 
     ui_menu = MainMenu()
     ui_menu.set_label_for_balance(client_context.free_balance, client_context.promo_balance)
@@ -112,52 +109,39 @@ def get_title_by_product_kind(product_kind:ProductKind) -> str:
         return 'Отчеты:'
     raise Error(f'Unknown product kind: {product_kind}')
 
-def get_command_by_product_kind(product_kind:ProductKind) -> PayloadCommand:
-    if product_kind == ProductKind.QUERY:
-        return PayloadCommand.menu_section_queries
-    if product_kind == ProductKind.SUBSCRIPTION:
-        return PayloadCommand.menu_section_subscriptions
-    if product_kind == ProductKind.REPORT:
-        return PayloadCommand.menu_section_reports
-    raise Error(f'Unknown product kind: {product_kind}')
-
-def show_products_by_kind(vk_context:VkBotContext, client_context:ClientContext, product_kind:ProductKind, payload:Payload):
+def show_products_by_kind(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, product_kind:ProductKind, payload:Payload):
     page:int = payload.page if payload.page else 1
 
     ui_product_list = ProductList()
     pagination = None
 
-    with Sessional.domain.session_scope() as session:
-        assert isinstance(session, OrmSession)
+    product_count = session.query(Product).filter(Product.kind == product_kind).count()
 
-        command = get_command_by_product_kind(product_kind)
-        product_count = session.query(Product).filter(Product.kind == product_kind).count()
+    if product_count > NUMBER_ELEMENTS_PER_PAGE:
+        last = product_count // NUMBER_ELEMENTS_PER_PAGE if product_count % NUMBER_ELEMENTS_PER_PAGE == 0 else (product_count // NUMBER_ELEMENTS_PER_PAGE) + 1
+        pagination = VkMenuPagination(
+            first=1,
+            prev=page-1 if page>1 else 1,
+            page=page,
+            next=page+1 if page<last else last,
+            last=last,
+            payload=payload
+        )
 
-        if True:#product_count > NUMBER_ELEMENTS_PER_PAGE:
-            last = product_count // NUMBER_ELEMENTS_PER_PAGE if product_count % NUMBER_ELEMENTS_PER_PAGE == 0 else (product_count // NUMBER_ELEMENTS_PER_PAGE) + 1
-            pagination = VkMenuPagination(
-                first=1,
-                prev=page-1 if page>1 else 1,
-                page=page,
-                next=page+1 if page<last else last,
-                last=last,
-                payload=payload
-            )
+    product_number = 0
+    for name, code, tariff in session.query(Product.name, Product.code, Tariff.value).\
+        join(Tariff).\
+            filter(Product.kind == product_kind).\
+                order_by(Product.id).limit(NUMBER_ELEMENTS_PER_PAGE).offset((page-1)*NUMBER_ELEMENTS_PER_PAGE):
 
-        product_number = 0
-        for name, code, tariff in session.query(Product.name, Product.code, Tariff.value).\
-            join(Tariff).\
-                filter(Product.kind == product_kind).\
-                    order_by(Product.id).limit(NUMBER_ELEMENTS_PER_PAGE).offset((page-1)*NUMBER_ELEMENTS_PER_PAGE):
+        list_desc = session.query(VkDialogContent.content).filter(VkDialogContent.group == code, VkDialogContent.topic == 'list_desc').scalar()
+        btn_label = session.query(VkDialogContent.content).filter(VkDialogContent.group == code, VkDialogContent.topic == 'list_button').scalar()
 
-            list_desc = session.query(VkDialogContent.content).filter(VkDialogContent.group == code, VkDialogContent.topic == 'list_desc').scalar()
-            btn_label = session.query(VkDialogContent.content).filter(VkDialogContent.group == code, VkDialogContent.topic == 'list_button').scalar()
+        product_number += 1
+        product_name = '{}. {} ({:.0f}р)'.format(((page-1)*NUMBER_ELEMENTS_PER_PAGE)+product_number, name, tariff)
 
-            product_number += 1
-            product_name = '{}. {} ({:.0f}р)'.format(((page-1)*NUMBER_ELEMENTS_PER_PAGE)+product_number, name, tariff)
-
-            payload = Payload(command = PayloadCommand.request_product, product=code)
-            ui_product_list.add_product(product_name, list_desc, btn_label, payload)
+        pr_payload = Payload(command = PayloadCommand.request_product, product=code)
+        ui_product_list.add_product(product_name, list_desc, btn_label, pr_payload)
 
 
     builder = UIElementBuilder()
@@ -181,9 +165,9 @@ def show_products_by_kind(vk_context:VkBotContext, client_context:ClientContext,
     )
 
     if pagination:
-        show_main_menu(vk_context, client_context, menu_message='Для выбора нажмите соответствующую кнопку', pagination=pagination)
+        show_main_menu(session, vk_context, client_context, menu_message='Для выбора нажмите соответствующую кнопку', pagination=pagination)
 
-def show_detailing_trade_message(vk_context:VkBotContext, client_context:ClientContext, trade_id:int, par_number:int):
+def show_detailing_trade_message(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, trade_id:int, par_number:int):
 
     message = 'Уточнение'
 
@@ -192,31 +176,29 @@ def show_detailing_trade_message(vk_context:VkBotContext, client_context:ClientC
     # builder = UIElementBuilder()
     # builder.build_ui_element(ui_menu.content)
 
-    with Sessional.domain.session_scope() as session:
-        assert isinstance(session, OrmSession)
-        product_id = session.query(Trade).get(trade_id).product_id
-        add_info_id = session.query(ProductAddInfo).get((product_id, par_number)).add_info_id
-        add_info_code:AddInfoCode = session.query(AddInfoSettings).get(add_info_id).code
-        message = session.query(VkDialogContent.content).filter(VkDialogContent.group == AddInfoCode.__name__, VkDialogContent.topic == add_info_code.name).scalar()
+    product_id = session.query(Trade).get(trade_id).product_id
+    add_info_id = session.query(ProductAddInfo).get((product_id, par_number)).add_info_id
+    add_info_code:AddInfoCode = session.query(AddInfoSettings).get(add_info_id).code
+    message = session.query(VkDialogContent.content).filter(VkDialogContent.group == AddInfoCode.__name__, VkDialogContent.topic == add_info_code.name).scalar()
 
-        last_trade_detail = session.query(LastTradeDetailing).\
-            filter(LastTradeDetailing.client_id == client_context.client_id).\
-                one_or_none()
+    last_trade_detail = session.query(LastTradeDetailing).\
+        filter(LastTradeDetailing.client_id == client_context.client_id).\
+            one_or_none()
 
-        if last_trade_detail is None:
-            last_trade_detail = LastTradeDetailing(
-                client_id = client_context.client_id,
-                trade_id = trade_id,
-                par_number = par_number,
-                add_info = add_info_code,
-                handled = False
-            )
-            session.add(last_trade_detail)
-        else:
-            last_trade_detail.trade_id = trade_id
-            last_trade_detail.par_number = par_number
-            last_trade_detail.add_info = add_info_code
-            last_trade_detail.handled = False
+    if last_trade_detail is None:
+        last_trade_detail = LastTradeDetailing(
+            client_id = client_context.client_id,
+            trade_id = trade_id,
+            par_number = par_number,
+            add_info = add_info_code,
+            handled = False
+        )
+        session.add(last_trade_detail)
+    else:
+        last_trade_detail.trade_id = trade_id
+        last_trade_detail.par_number = par_number
+        last_trade_detail.add_info = add_info_code
+        last_trade_detail.handled = False
         
 
     # payload = Payload(command = PayloadCommand.detailing_product, context=trade_id, page=add_info_code.value)
@@ -239,7 +221,7 @@ def show_detailing_trade_message(vk_context:VkBotContext, client_context:ClientC
         )
     )
 
-def detailing_trade_by_participant(vk_context:VkBotContext, client_context:ClientContext, payload:Payload, inn:str, kpp:str):
+def detailing_trade_by_participant(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, inn:str, kpp:str):
     page:int = payload.page if payload.page else 1
     
     result = None
@@ -249,11 +231,11 @@ def detailing_trade_by_participant(vk_context:VkBotContext, client_context:Clien
             raise result
     except Error as er:
         log.error(f'participant_service: "{er.message}" method call error')
-        show_main_menu(vk_context, client_context, 'Удаленный сервер не ответил, попробуйте позже. Приносим свои извинения (:')
+        show_main_menu(session, vk_context, client_context, 'Удаленный сервер не ответил, попробуйте позже. Приносим свои извинения (:')
         return
     except Exception as ex:
         log.exception(f'participant_service: "get_participant_list" method call error', ex.args)
-        show_main_menu(vk_context, client_context, 'Удаленный сервер не ответил, попробуйте позже. Приносим свои извинения (:')
+        show_main_menu(session, vk_context, client_context, 'Удаленный сервер не ответил, попробуйте позже. Приносим свои извинения (:')
         return
 
     participants, participant_count = result
@@ -261,7 +243,7 @@ def detailing_trade_by_participant(vk_context:VkBotContext, client_context:Clien
     ui_participant_list = ParticipantList()
     pagination = None
 
-    if True:#product_count > NUMBER_ELEMENTS_PER_PAGE:
+    if participant_count > NUMBER_ELEMENTS_PER_PAGE:
         last = participant_count // NUMBER_ELEMENTS_PER_PAGE if participant_count % NUMBER_ELEMENTS_PER_PAGE == 0 else (participant_count // NUMBER_ELEMENTS_PER_PAGE) + 1
         pagination = VkMenuPagination(
             first=1,
@@ -314,10 +296,10 @@ def detailing_trade_by_participant(vk_context:VkBotContext, client_context:Clien
     )
 
     if pagination:
-        show_main_menu(vk_context, client_context, menu_message='Для выбора нажмите соответствующую кнопку', pagination=pagination)
+        show_main_menu(session, vk_context, client_context, menu_message='Для выбора нажмите соответствующую кнопку', pagination=pagination)
 
-def show_confirmation_trade(vk_context:VkBotContext, client_context:ClientContext, trade_id:int):
-    message = get_message_for_confirm(vk_context, client_context, trade_id)
+def show_confirmation_trade(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, trade_id:int):
+    message = get_message_for_confirm(session, vk_context, client_context, trade_id)
 
     ui_confirm_trade = ConfirmTrade()
     ui_confirm_trade.set_trade(trade_id)
@@ -342,29 +324,26 @@ def show_confirmation_trade(vk_context:VkBotContext, client_context:ClientContex
         )
     )
 
-def get_message_for_confirm(vk_context:VkBotContext, client_context:ClientContext, trade_id:int) -> str:
+def get_message_for_confirm(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, trade_id:int) -> str:
     message = 'Подтвердите заказ:'
     
-    with Sessional.domain.session_scope() as session:
-        assert isinstance(session, OrmSession)
-        
-        trade = session.query(Trade).get(trade_id)
-        product = session.query(Product).get(trade.product_id)
-        act:str = session.query(VkDialogContent.content).filter(VkDialogContent.group == product.code, VkDialogContent.topic == 'list_button').scalar()
-        if product.kind == ProductKind.REPORT:
-            message += f'\n{act.lower()} отчет "{product.name}"'
-        else:
-            message += f'\n{act.lower()} "{product.name}"'
+    trade = session.query(Trade).get(trade_id)
+    product = session.query(Product).get(trade.product_id)
+    act:str = session.query(VkDialogContent.content).filter(VkDialogContent.group == product.code, VkDialogContent.topic == 'list_button').scalar()
+    if product.kind == ProductKind.REPORT:
+        message += f'\n{act.lower()} отчет "{product.name}"'
+    else:
+        message += f'\n{act.lower()} "{product.name}"'
 
-        if product.code in ('QUE_PAR_ACT', 'QUE_PAR_HIS', 'REP_PAR_ACT', 'REP_PAR_HIS', 'SUB_PAR'):
-            message += get_participant_info_for_confirm(vk_context, client_context, int(trade.parameter1))
-        elif product.code == 'REP_PARS_CON':
-            pass
-        else:
-            pass
+    if product.code in ('QUE_PAR_ACT', 'QUE_PAR_HIS', 'REP_PAR_ACT', 'REP_PAR_HIS', 'SUB_PAR'):
+        message += get_participant_info_for_confirm(vk_context, client_context, int(trade.parameter1))
+    elif product.code == 'REP_PARS_CON':
+        pass
+    else:
+        pass
 
-        tariff = session.query(Tariff.value).filter(Tariff.product_id == trade.product_id).scalar()
-        message += f'\nБудет списано {tariff:.0f}р'
+    tariff = session.query(Tariff.value).filter(Tariff.product_id == trade.product_id).scalar()
+    message += f'\nБудет списано {tariff:.0f}р'
 
     return message
 
@@ -390,7 +369,7 @@ def get_participant_info_for_confirm(vk_context:VkBotContext, client_context:Cli
     else:
         return f'\n{participant.name}\nИНН: {participant.inn}'
 
-def show_que_par_act_result(vk_context:VkBotContext, client_context:ClientContext, payload:Payload, result:list):
+def show_que_par_act_result(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, result:list):
     answer = 'Статус Кол-во Сумма'
 
     for summary_by_state in result:

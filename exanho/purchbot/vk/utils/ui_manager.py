@@ -4,7 +4,7 @@ import logging
 
 from sqlalchemy.orm.session import Session as OrmSession
 
-from exanho.eis44.interfaces import ParticipantInfo, SummaryContractsByStateInfo
+from exanho.eis44.interfaces import ParticipantInfo, ParticipantCurrentActivityInfo
 
 from ..dto import util as dto_util
 from ..dto.method_call import VkMethodCall
@@ -393,13 +393,19 @@ def get_participant_info_for_confirm(vk_context:VkBotContext, client_context:Cli
     else:
         return f'\n{participant.name}\nИНН: {participant.inn}'
 
-def show_que_par_act_result(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, result:list):
-    answer = 'Статус Кол-во Сумма'
-
-    for summary_by_state in result:
-        assert isinstance(summary_by_state, SummaryContractsByStateInfo)
-
-        answer += f'\n{summary_by_state.state} {summary_by_state.count} {summary_by_state.sum} {summary_by_state.currency}'
+def show_que_par_act_result(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, result:ParticipantCurrentActivityInfo):
+    answer = 'В данный момент участник:\n'
+    if result.cntr_count > 0:
+        answer += 'исполняет контракты:\n{} штук, на сумму {} руб.'.format(result.cntr_count, result.cntr_rur_sum)
+        if result.cntr_currencies:
+            for currency, cur_count, cur_sum in zip(result.cntr_currencies, result.cntr_cur_count, result.cntr_cur_sum):
+                answer += ', {} {} ({} шт)'.format(currency, cur_count, cur_sum)
+        if result.cntr_right_to_conclude_count > 0:
+            answer += ', в т.ч. {} шт. с правом на заключение'.format(result.cntr_right_to_conclude_count)
+        if result.cntr_first_start_date:
+            answer += ', с {} по {} (план)'.format(result.cntr_first_start_date, result.cntr_last_end_date) if result.cntr_last_end_date else '\nс {}'.format(result.cntr_first_start_date)
+    else:
+        answer += 'никакие контракты не исполняет'
     
     send_options = SendOptions(
         user_id=client_context.vk_user_id,

@@ -7,3 +7,14 @@ ContractInfo = namedtuple('ContractInfo', 'reg_num state publish_dt subject pric
 ContractShortInfo = namedtuple('ContractShortInfo', 'reg_num state price currency start_date href')
 SummaryContracts = namedtuple('SummaryContracts', 'state count sum currency first_start_date last_end_date')
 
+ParticipantCurrentActivityInfo = namedtuple('ParticipantCurrentActivityInfo',[
+    'participant_id',
+    'cntr_count',
+    'cntr_rur_sum',
+    'cntr_currencies',
+    'cntr_cur_count',
+    'cntr_cur_sum',
+    'cntr_right_to_conclude_count',
+    'cntr_first_start_date',
+    'cntr_last_end_date'
+])

@@ -1,6 +1,6 @@
 from xmlrpc.client import ServerProxy
 
-from exanho.eis44.interfaces import ParticipantInfo, deserialize  
+from exanho.eis44.interfaces import ParticipantInfo, ParticipantCurrentActivityInfo, deserialize  
 
 @deserialize
 def get_participant(eis_service:ServerProxy, participant_id:int) -> ParticipantInfo:
@@ -21,6 +21,6 @@ def get_participant_list(eis_service:ServerProxy, inn:str, kpp:str, page:int, si
     return eis_service.get_participant_list(inn, kpp, page, size)    
 
 @deserialize
-def get_current_participant_activity(eis_service:ServerProxy, participant_id:int) -> list:
+def get_current_participant_activity(eis_service:ServerProxy, participant_id:int) -> ParticipantCurrentActivityInfo:
     assert isinstance(participant_id, int)
     return eis_service.get_current_activity(participant_id)

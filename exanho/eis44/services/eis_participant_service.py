@@ -1,3 +1,4 @@
+from exanho.eis44.model.aggregate import participant
 import logging
 import time
 
@@ -8,7 +9,7 @@ from exanho.core.common import try_logged, Timer
 from exanho.core.actors import ServiceBase
 from exanho.orm.domain import Sessional
 
-from ..interfaces import IEisParticipantService, ParticipantInfo, SummaryContractsByStateInfo, serialize
+from ..interfaces import IEisParticipantService, ParticipantInfo, SummaryContractsByStateInfo, ParticipantCurrentActivityInfo, serialize
 from ..model import AggContractState, AggParticipant, AggContract, AggContractParticipant
 
 class EisParticipantService(IEisParticipantService, ServiceBase):
@@ -67,10 +68,8 @@ class EisParticipantService(IEisParticipantService, ServiceBase):
     @serialize
     @try_logged
     @Sessional
-    def get_current_activity(self, id: int) -> list:
+    def get_current_activity(self, id: int) -> ParticipantCurrentActivityInfo:
         assert isinstance(id, int)
-
-        exec_contracts = list()
 
         session = Sessional.domain.Session
         assert isinstance(session, OrmSession)
@@ -79,13 +78,53 @@ class EisParticipantService(IEisParticipantService, ServiceBase):
             filter(AggContractParticipant.participant_id == id).\
                 subquery()
 
-        for exec_contr in session.query(AggContract.state, func.count(AggContract.id), func.sum(AggContract.price), AggContract.currency_code, func.min(AggContract.start_date), func.max(AggContract.end_date)).\
-            filter(AggContract.id.in_(contract_ids_stmt)).filter(AggContract.state == AggContractState.EXECUTION).\
-                group_by(AggContract.state, AggContract.currency_code).\
-                    order_by(AggContract.state, AggContract.currency_code):
-            exec_contracts.append(SummaryContractsByStateInfo._make((id, *exec_contr)))
+        cntr_count = 0
+        cntr_rur_sum = 0
+        cntr_currencies = list()
+        cntr_cur_count = list()
+        cntr_cur_sum = list()
+        cntr_first_start_date = None
+        cntr_last_end_date = None
 
-        return exec_contracts
+        for exec_contr in session.query(func.count(AggContract.id), func.sum(AggContract.price), AggContract.currency_code, func.min(AggContract.start_date), func.max(AggContract.end_date)).\
+            filter(AggContract.id.in_(contract_ids_stmt)).filter(AggContract.state == AggContractState.EXECUTION).\
+                group_by(AggContract.currency_code):
+            
+            cntr_count_by_currency, cntr_sum, cntr_currency, cntr_first, cntr_last = exec_contr
+            if cntr_currency == 'RUB':
+                cntr_count += cntr_count_by_currency
+                cntr_rur_sum += cntr_sum
+                cntr_first_start_date = cntr_first if cntr_first_start_date is None else min(cntr_first_start_date, cntr_first)
+                cntr_last_end_date = cntr_last if cntr_last_end_date is None else max(cntr_last_end_date, cntr_last)
+            elif cntr_currency is None or cntr_currency == '':
+                cntr_count += cntr_count_by_currency
+                cntr_first_start_date = cntr_first if cntr_first_start_date is None else min(cntr_first_start_date, cntr_first)
+                cntr_last_end_date = cntr_last if cntr_last_end_date is None else max(cntr_last_end_date, cntr_last)
+            else:
+                cntr_count += cntr_count_by_currency
+                cntr_currencies.append(cntr_currency)
+                cntr_cur_count.append(cntr_count)
+                cntr_cur_sum.append(cntr_sum)
+                cntr_first_start_date = cntr_first if cntr_first_start_date is None else min(cntr_first_start_date, cntr_first)
+                cntr_last_end_date = cntr_last if cntr_last_end_date is None else max(cntr_last_end_date, cntr_last)
+
+        cntr_right_to_conclude_count = session.query(func.count(AggContract.id)).\
+            filter(AggContract.id.in_(contract_ids_stmt)).filter(AggContract.state == AggContractState.EXECUTION).\
+                filter(AggContract.right_to_conclude == True).scalar()
+        
+        exec_activities = ParticipantCurrentActivityInfo(
+            participant_id=id,
+            cntr_count=cntr_count,
+            cntr_rur_sum=cntr_rur_sum,
+            cntr_currencies=cntr_currencies,
+            cntr_cur_count=cntr_cur_count,
+            cntr_cur_sum=cntr_cur_sum,
+            cntr_right_to_conclude_count=cntr_right_to_conclude_count,
+            cntr_first_start_date=cntr_first_start_date,
+            cntr_last_end_date=cntr_last_end_date
+        )
+
+        return exec_activities
 
     @serialize
     @try_logged

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from . import ParticipantInfo
+from . import ParticipantInfo, ParticipantCurrentActivityInfo
 
 class IEisParticipantService(ABC):
     
@@ -13,7 +13,7 @@ class IEisParticipantService(ABC):
         pass
     
     @abstractmethod
-    def get_current_activity(self, id:int) -> list:
+    def get_current_activity(self, id:int) -> ParticipantCurrentActivityInfo:
         pass
     
     @abstractmethod

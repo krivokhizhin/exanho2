@@ -1,4 +1,4 @@
-from exanho.sandbox import vk_api as mod
+from exanho.sandbox import vk as mod
 
 if __name__ == '__main__':
     mod.run()

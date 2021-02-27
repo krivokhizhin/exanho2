@@ -264,6 +264,25 @@ def detailing_trade_by_participant(session:OrmSession, vk_context:VkBotContext, 
 
     participants, participant_count = result
 
+    if participant_count == 0:
+
+        send_options = SendOptions(
+            user_id=client_context.vk_user_id,
+            random_id=0,
+            group_id=vk_context.group_id,
+            message='По Вашим критериям участник не найден. Проверьте корректность введенных данных.'
+        )
+
+        call_queue:JoinableQueue = vk_context.call_queue
+        call_queue.put(
+            VkMethodCall(
+                'messages',
+                'send',
+                dto_util.form(send_options, SendOptions)
+            )
+        )
+        return
+
     ui_participant_list = ParticipantList()
     pagination = None
 

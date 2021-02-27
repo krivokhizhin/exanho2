@@ -2,7 +2,7 @@ from exanho.purchbot.vk.utils.message_manager import extract_inn_kpp_from_text
 
 def run():
     print('{}: {}'.format('1234567890 987654321', extract_inn_kpp_from_text('1234567890 987654321')))
-    print('{}: {}'.format('123456789012', extract_inn_kpp_from_text('123456789012')))
+    print('{}: {}'.format('151303803109', extract_inn_kpp_from_text('151303803109')))
     print('{}: {}'.format('987654321', extract_inn_kpp_from_text('987654321')))
     print('{}: {}'.format('INN1234567890 KPP987654321', extract_inn_kpp_from_text('INN1234567890 KPP987654321')))
     print('{}: {}'.format('INN1234567890KPP987654321', extract_inn_kpp_from_text('INN1234567890KPP987654321')))

@@ -99,7 +99,7 @@ def finalize(context:VkBotContext):
 
 def _get_bot_data(driver, access_token, group_id) -> GetLongPollServerResponse:
     vk_api_session = VkApiSession(driver, access_token)
-    _, bot_data = vk_api_session.groups_getLongPollServer(group_id)
+    bot_data = vk_api_session.groups_getLongPollServer(group_id)
     if bot_data.error:
         raise Error(f'VK groups.getLongPollServer error: code={bot_data.error.error_code}, msg={bot_data.error.error_msg}')
     return bot_data

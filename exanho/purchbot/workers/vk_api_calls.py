@@ -1,4 +1,5 @@
 import logging
+import time
 
 from collections import namedtuple
 from multiprocessing import JoinableQueue
@@ -39,6 +40,7 @@ def initialize(appsettings, exanho_context):
     return context
 
 def work(context:VkApiContext):
+    vk_api_session:VkApiSession = context.vk_session
     call_queue:JoinableQueue = context.call_queue
     call_counter = 0
 
@@ -55,9 +57,18 @@ def work(context:VkApiContext):
             if method_call is None:
                 return context
 
+            assert isinstance(method_call, VkMethodCall)
+
         try:
-            weight = match_method_call(context, method_call)
+            weight = vk_api_session.method_weight(method_call.form_vk_api_method_name())
             call_counter += weight
+            if call_counter > context.max_calls:
+                log.warning(f'Calls were forced to pause ({call_counter+weight} > {context.max_calls})')
+                time.sleep(context.timeout)
+                call_counter = weight
+
+            match_method_call(context, method_call)
+
         except Error as er:
             log.error(method_call)
             log.error(er.message)
@@ -68,7 +79,7 @@ def work(context:VkApiContext):
         call_queue.task_done()
         method_call = None
 
-    if context.max_calls <= call_counter:
+    if call_counter == context.max_calls:
         log.warning(f'Calls per second limit has been reached: {call_counter}')
 
     return context 
@@ -83,12 +94,10 @@ def match_method_call(context:VkApiContext, method_call:VkMethodCall):
 
     if hasattr(vk_api_session, vk_api_method_name) and callable(getattr(vk_api_session, vk_api_method_name)):
         vk_api_method = getattr(vk_api_session, vk_api_method_name)
-        weight, resp = vk_api_method(method_call.options)
+        resp = vk_api_method(method_call.options)
         if resp.error:
             raise Error(f'VK api_method call failed with error: code={resp.error.error_code}, msg={resp.error.error_msg}')
         else:
             log.debug(dto_mngr.convert_obj_to_json_str(resp, IVkDto))
     else:
         log.warning(f'{method_call} | Not supported section and/or method')
-
-    return weight

@@ -7,6 +7,7 @@ from .dto.messages import *
 
 URL_VK_API = 'https://api.vk.com/method/'
 API_VERSION = '5.130'
+DEFAULT_METHOD_WEIGHT = 1
 
 class VkApiSession:
 
@@ -14,6 +15,15 @@ class VkApiSession:
         self.driver = driver
         self.access_token = access_token
         self.v = v
+        self.method_weights = {}
+
+    def method_weight(self, method_name:str) -> int:
+        assert isinstance(method_name, str)
+
+        if method_name in self.method_weights:
+            return self.method_weights(method_name)
+        else:
+            return DEFAULT_METHOD_WEIGHT
 
     def messages_send(self, content:str) -> SendResponse:
         assert isinstance(content, str)
@@ -30,7 +40,7 @@ class VkApiSession:
         url = '{}{}'.format(URL_VK_API, 'messages.send')
         resp_obj = self.driver.post(url, params=options_dict)
         resp:VkResponse = VkResponse.create(resp_obj, SendResponse)
-        return 1, resp.response
+        return resp.response
 
     def messages_sendMessageEventAnswer(self, content:str) -> SendResponse:
         assert isinstance(content, str)
@@ -47,10 +57,10 @@ class VkApiSession:
         url = '{}{}'.format(URL_VK_API, 'messages.sendMessageEventAnswer')
         resp_obj = self.driver.post(url, params=options_dict)
         resp:VkResponse = VkResponse.create(resp_obj, SendResponse)
-        return 1, resp.response
+        return resp.response
         
     def groups_getLongPollServer(self, group_id:int) -> GetLongPollServerResponse:
         url = '{}{}'.format(URL_VK_API, 'groups.getLongPollServer')
         resp_obj = self.driver.get(url, params={'group_id':group_id, 'v':self.v, 'access_token':self.access_token})
         resp:VkResponse = VkResponse.create(resp_obj, GetLongPollServerResponse)
-        return 1, resp.response
+        return resp.response

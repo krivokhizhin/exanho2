@@ -279,7 +279,7 @@ def detailing_trade(session:OrmSession, vk_context:VkBotContext, client_context:
         return
 
 def extract_inn_kpp_from_text(text:str):
-    pattern = r'(?P<inn>\d{10}|\d{12})(?:\D+(?P<kpp>\d{9}))?'
+    pattern = r'(?P<inn>\d{12}|\d{10})(?:\D+(?P<kpp>\d{9}))?'
     match = re.search(pattern, text)
 
     if match:

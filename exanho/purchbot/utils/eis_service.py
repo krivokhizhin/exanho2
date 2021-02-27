@@ -23,4 +23,9 @@ def get_participant_list(eis_service:ServerProxy, inn:str, kpp:str, page:int, si
 @deserialize
 def get_current_participant_activity(eis_service:ServerProxy, participant_id:int) -> ParticipantCurrentActivityInfo:
     assert isinstance(participant_id, int)
-    return eis_service.get_current_activity(participant_id)
+    return eis_service.get_current_activity(participant_id)   
+
+@deserialize
+def get_current_participant_activity_report(eis_service:ServerProxy, participant_id:int) -> list:
+    assert isinstance(participant_id, int)
+    return eis_service.get_current_activity_report(participant_id)

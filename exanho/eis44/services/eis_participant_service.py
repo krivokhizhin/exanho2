@@ -9,7 +9,7 @@ from exanho.core.common import try_logged, Timer
 from exanho.core.actors import ServiceBase
 from exanho.orm.domain import Sessional
 
-from ..interfaces import IEisParticipantService, ParticipantInfo, SummaryContractsByStateInfo, ParticipantCurrentActivityInfo, serialize
+from ..interfaces import IEisParticipantService, ParticipantInfo, SummaryContractsByStateInfo, ParticipantCurrentActivityInfo, ContractInfo, serialize
 from ..model import AggContractState, AggParticipant, AggContract, AggContractParticipant
 
 class EisParticipantService(IEisParticipantService, ServiceBase):
@@ -125,6 +125,43 @@ class EisParticipantService(IEisParticipantService, ServiceBase):
         )
 
         return exec_activities
+
+    @serialize
+    @try_logged
+    @Sessional
+    def get_current_activity_report(self, id: int) -> list:
+        assert isinstance(id, int)
+
+        session = Sessional.domain.Session
+        assert isinstance(session, OrmSession)
+          
+        contract_ids_stmt = session.query(AggContractParticipant.contract_id).\
+            filter(AggContractParticipant.participant_id == id).\
+                subquery()
+
+        result = list()
+
+        for exec_contr in session.query(AggContract).\
+            filter(AggContract.id.in_(contract_ids_stmt)).filter(AggContract.state == AggContractState.EXECUTION).\
+                order_by(AggContract.publish_dt):
+            
+            result.append(
+                ContractInfo(
+                    reg_num=exec_contr.reg_num,
+                    state=AggContractState.EXECUTION,
+                    publish_dt=exec_contr.publish_dt,
+                    subject=exec_contr.subject,
+                    price=exec_contr.price,
+                    currency_code=exec_contr.currency_code,
+                    right_to_conclude=exec_contr.right_to_conclude,
+                    start_date=exec_contr.start_date,
+                    end_date=exec_contr.end_date,
+                    supplier_number=exec_contr.supplier_number,
+                    href=exec_contr.href
+                )
+            )
+
+        return result
 
     @serialize
     @try_logged

@@ -17,5 +17,9 @@ class IEisParticipantService(ABC):
         pass
     
     @abstractmethod
+    def get_current_activity_report(self, id:int) -> list:
+        pass
+    
+    @abstractmethod
     def get_experience(self, id:int) -> list:
         pass

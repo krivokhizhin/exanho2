@@ -4,7 +4,7 @@ import logging
 
 from sqlalchemy.orm.session import Session as OrmSession
 
-from exanho.eis44.interfaces import ParticipantInfo, ParticipantCurrentActivityInfo
+from exanho.eis44.interfaces import ParticipantInfo, ParticipantCurrentActivityInfo, ContractInfo
 
 from ..dto import util as dto_util
 from ..dto.method_call import VkMethodCall
@@ -406,6 +406,32 @@ def show_que_par_act_result(session:OrmSession, vk_context:VkBotContext, client_
             answer += ', с {} по {} (план)'.format(result.cntr_first_start_date, result.cntr_last_end_date) if result.cntr_last_end_date else '\nс {}'.format(result.cntr_first_start_date)
     else:
         answer += 'никакие контракты не исполняет'
+    
+    send_options = SendOptions(
+        user_id=client_context.vk_user_id,
+        random_id=0,
+        group_id=vk_context.group_id,
+        message=answer,
+        payload = payload.form()
+    )
+
+    call_queue:JoinableQueue = vk_context.call_queue
+    call_queue.put(
+        VkMethodCall(
+            'messages',
+            'send',
+            dto_util.form(send_options, SendOptions)
+        )
+    )
+
+def show_rep_par_act_result(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, result:list):
+    answer = 'В данный момент участник:'
+    if result:
+        for exec_cntr in result:
+            assert isinstance(exec_cntr, ContractInfo)
+            answer += '\n{} {} {}'.format(exec_cntr.reg_num, exec_cntr.price, exec_cntr.href)
+    else:
+        answer += '\nникакие контракты не исполняет'
     
     send_options = SendOptions(
         user_id=client_context.vk_user_id,

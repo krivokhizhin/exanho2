@@ -7,7 +7,7 @@ from queue import Empty
 from exanho.core.common import Error
 
 from exanho.purchbot.vk import VkApiSession
-from exanho.purchbot.vk.drivers import BuildInDriver
+from exanho.purchbot.vk.drivers import RequestsDriver
 from exanho.purchbot.vk.dto import MethodResponseBase, VkMethodCall, IVkDto
 import exanho.purchbot.vk.dto.util as dto_mngr
 
@@ -27,7 +27,7 @@ def initialize(appsettings, exanho_context):
 
     call_queue = exanho_context.joinable_queues[context.call_queue]
     
-    driver = BuildInDriver()
+    driver = RequestsDriver()
     vk_api_session = VkApiSession(driver, context.access_token)
 
     if not isinstance(context.max_calls, int):

@@ -6,7 +6,7 @@ from exanho.core.manager_context import Context as ExanhoContext
 
 from exanho.core.common import Error
 from exanho.orm.domain import Sessional
-from exanho.purchbot.vk.drivers import BuildInDriver
+from exanho.purchbot.vk.drivers import RequestsDriver
 from exanho.purchbot.vk.dto import JSONObject
 from exanho.purchbot.vk.dto.groups import GetLongPollServerResponse
 from exanho.purchbot.vk.dto.bot import GroupEvent
@@ -23,7 +23,7 @@ def initialize(appsettings, exanho_context:ExanhoContext):
 
     call_queue = exanho_context.joinable_queues[context.call_queue]
 
-    driver = BuildInDriver()
+    driver = RequestsDriver()
     bot_data = _get_bot_data(driver, context.access_token, context.group_id)
     bot_session = VkBotSession(driver, bot_data.server, bot_data.key, bot_data.ts)
     log.debug(dto_mngr.convert_obj_to_json_str(bot_data, JSONObject))

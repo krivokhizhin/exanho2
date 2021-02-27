@@ -9,3 +9,7 @@ class IVkDriver(ABC):
     @abstractmethod
     def post(self, *args, **kwargs):
         pass
+    
+    @abstractmethod
+    def upload_file(self, *args, **kwargs):
+        pass

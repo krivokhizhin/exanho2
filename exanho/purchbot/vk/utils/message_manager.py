@@ -253,8 +253,8 @@ def detailing_trade(session:OrmSession, vk_context:VkBotContext, client_context:
     text = None
     if hasattr(event_obj, 'message') and hasattr(event_obj.message, 'text'):
         text = event_obj.message.text
-    if payload.par_value:
-        text = payload.par_value
+    if payload.content:
+        text = payload.content
 
     if text is None:
         return
@@ -265,7 +265,7 @@ def detailing_trade(session:OrmSession, vk_context:VkBotContext, client_context:
     if payload.add_info == AddInfoCode.PARTICIPANT.value:
         inn, kpp = extract_inn_kpp_from_text(text)
         if inn:            
-            payload.par_value = '{} {}'.format(inn, kpp) if kpp else inn
+            payload.content = '{} {}'.format(inn, kpp) if kpp else inn
             ui_mngr.detailing_trade_by_participant(session, vk_context, client_context, payload, inn, kpp)
         else:
             ui_mngr.show_main_menu(session, vk_context, client_context, 'В сообщении как минимум должны быть указаны 10 или 12 цифр подряд (формат ИНН)')
@@ -295,6 +295,22 @@ def selection_add_info(session:OrmSession, vk_context:VkBotContext, client_conte
     trade = session.query(Trade).get(trade_id)
     if trade is None:
         return
+
+    if trade.status not in (TradeStatus.NEW, TradeStatus.FILLING):
+        clone_trade = Trade(
+            status = TradeStatus.NEW,
+            client_id = trade.client_id,
+            product_id = trade.product_id,
+            amount = session.query(Tariff.value).filter(Tariff.product_id == trade.product_id).scalar(),
+            paid = False,
+            parameter1 = trade.parameter1,
+            parameter2 = trade.parameter2,
+            parameter3 = trade.parameter3
+        )
+        session.add(clone_trade)
+        session.flush()
+        trade_id = clone_trade.id
+        trade = clone_trade
 
     if par_number == 1:
         trade.parameter1 = str(par_value)
@@ -407,7 +423,10 @@ def execute_trade(session:OrmSession, vk_context:VkBotContext, client_context:Cl
             pass
 
         if product_code == 'REP_PAR_ACT':
-            pass
+            result = eis_service.get_current_participant_activity_report(vk_context.participant_service, int(trade.parameter1))
+            if isinstance(result, Error):
+                raise result
+            ui_method = ui_mngr.show_rep_par_act_result
 
         if product_code == 'REP_PAR_HIS':
             pass

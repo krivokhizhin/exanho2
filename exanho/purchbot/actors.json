@@ -71,7 +71,7 @@
                     "module": "exanho.purchbot.workers.vk_api_calls",
                     "sleep": 1.0,
                     "appsettings":{
-                        "access_token": "ece8ae0bd980d4ced850b3be6ad8002792e1bfd614d725232ad3f7d6a6bae91188a50d993813be3d84f71",
+                        "access_token": "79f8b669b1d60157a7295fab4d9fa6942d93bdef8edd0e6bb124d351ad738c8fa7e28cf2adb0d3599135d",
                         "group_id": 202308925,
                         "call_queue": "vk_method_calls",
                         "max_calls": 20,
@@ -90,7 +90,7 @@
                     "db_key": "purchbot_test",
                     "sleep": 1.0,
                     "appsettings":{
-                        "access_token": "843e477baaa13e3022776a9a5cd7544cfeeda9f3262a5516decbf681f896f008cc9c502eebcd37ca79417",
+                        "access_token": "63aaede189a068baff2e8cb3a0b6700a7243de160c616c0e38908a71cb95db7c9d0cdd33f7959bd8a1183",
                         "group_id": 202308925,
                         "call_queue": "vk_method_calls",
                         "participant_service": "IEisParticipantService"

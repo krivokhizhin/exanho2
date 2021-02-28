@@ -26,7 +26,7 @@ def prepare_dict_to_dict(dict_obj:dict, *obj_types) -> dict:
             elif isinstance(value, dict):
                 result[key] = prepare_dict_to_dict(value, *obj_types)
             elif isinstance(value, list):
-                result[key] = prepare_list_to_dict(value)
+                result[key] = prepare_list_to_dict(value, *obj_types)
             else:
                 result[key] = value
 

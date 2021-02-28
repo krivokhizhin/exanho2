@@ -1,6 +1,8 @@
-from collections import namedtuple
-from multiprocessing import JoinableQueue
+import csv
+import io
 import logging
+from collections import namedtuple
+from multiprocessing import JoinableQueue, shared_memory
 
 from sqlalchemy.orm.session import Session as OrmSession
 
@@ -9,6 +11,7 @@ from exanho.eis44.interfaces import ParticipantInfo, ParticipantCurrentActivityI
 from ..dto import util as dto_util
 from ..dto.method_call import VkMethodCall
 from ..dto.messages import *
+from ..dto.attachments import *
 from ...utils import eis_service
 from .vk_bot_context import VkBotContext
 from .client_context import ClientContext
@@ -444,27 +447,59 @@ def show_que_par_act_result(session:OrmSession, vk_context:VkBotContext, client_
     )
 
 def show_rep_par_act_result(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, result:list):
-    answer = 'В данный момент участник:'
-    if result:
+    trade_id:int = payload.trade
+    shm_name = None
+    shm_size = None
+    filename = f'rep_par_act_{trade_id}.csv'
+
+    with io.StringIO() as buffer:
+        fieldnames = ['N', 'reg_num', 'state', 'publish_dt', 'subject', 'price', 'currency_code', 'right_to_conclude', 'start_date', 'end_date', 'supplier_number', 'href']
+        writer = csv.DictWriter(buffer, fieldnames=fieldnames,  dialect=csv.excel)
+        writer.writeheader()
+
+        sort_number = 0
+
         for exec_cntr in result:
             assert isinstance(exec_cntr, ContractInfo)
-            answer += '\n{} {} {}'.format(exec_cntr.reg_num, exec_cntr.price, exec_cntr.href)
-    else:
-        answer += '\nникакие контракты не исполняет'
+            sort_number += 1
+            writer.writerow({
+                'N': sort_number,
+                'reg_num': f'\'{exec_cntr.reg_num}',
+                'state': exec_cntr.state,
+                'publish_dt': exec_cntr.publish_dt,
+                'subject': exec_cntr.subject,
+                'price': exec_cntr.price,
+                'currency_code': exec_cntr.currency_code,
+                'right_to_conclude': exec_cntr.right_to_conclude,
+                'start_date': exec_cntr.start_date,
+                'end_date': exec_cntr.end_date,
+                'supplier_number': exec_cntr.supplier_number,
+                'href': exec_cntr.href
+            })
+
+        content = buffer.getvalue().encode(encoding='utf-8')
+        shm_size = len(content)
+
+        shm_a = shared_memory.SharedMemory(create=True, size=shm_size)
+        shm_name = shm_a.name
+        shm_a.buf[:shm_size] = content
+        shm_a.close()
     
-    send_options = SendOptions(
-        user_id=client_context.vk_user_id,
-        random_id=0,
-        group_id=vk_context.group_id,
-        message=answer,
-        payload = payload.form()
+    send_options = SendAttachmentsOptions(
+        shm_name = shm_name,
+        shm_size = shm_size,
+        filename = filename,
+        peer_id = client_context.vk_user_id,
+        type = 'doc',
+        group_id = vk_context.group_id,
+        random_id = 0
     )
 
     call_queue:JoinableQueue = vk_context.call_queue
     call_queue.put(
         VkMethodCall(
-            'messages',
+            'attachment',
             'send',
-            dto_util.form(send_options, SendOptions)
+            dto_util.form(send_options, SendAttachmentsOptions)
         )
     )

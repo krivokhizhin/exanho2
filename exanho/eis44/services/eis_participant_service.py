@@ -148,7 +148,7 @@ class EisParticipantService(IEisParticipantService, ServiceBase):
             result.append(
                 ContractInfo(
                     reg_num=exec_contr.reg_num,
-                    state=AggContractState.EXECUTION,
+                    state=AggContractState.EXECUTION.name,
                     publish_dt=exec_contr.publish_dt,
                     subject=exec_contr.subject,
                     price=exec_contr.price,

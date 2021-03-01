@@ -10,6 +10,7 @@ class SendAttachmentsOptions(IVkDto):
         self.type = kwargs.get('type', None)
         self.group_id = kwargs.get('group_id', None)
         self.random_id = kwargs.get('random_id', None)
+        self.payload = kwargs.get('payload', None)
 
     def fill(self, json_obj: JSONObject):
         self.__dict__.update(json_obj.__dict__)

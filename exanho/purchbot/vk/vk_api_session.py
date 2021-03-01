@@ -1,3 +1,4 @@
+from exanho.purchbot.vk.ui import payload
 import logging
 import io
 from multiprocessing import shared_memory
@@ -25,7 +26,9 @@ class VkApiSession:
         self.driver = driver
         self.access_token = access_token
         self.v = v
-        self.method_weights = {'attachment_send': 3}
+        self.method_weights = {
+            'attachment_send': 3
+        }
 
     def method_weight(self, method_name:str) -> int:
         assert isinstance(method_name, str)
@@ -184,5 +187,6 @@ class VkApiSession:
                 user_id=send_options.peer_id,
                 attachment=attachment,
                 group_id=send_options.group_id,
-                random_id=send_options.random_id
+                random_id=send_options.random_id,
+                payload=send_options.payload
             )

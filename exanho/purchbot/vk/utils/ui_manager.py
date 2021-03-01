@@ -492,7 +492,8 @@ def show_rep_par_act_result(session:OrmSession, vk_context:VkBotContext, client_
         peer_id = client_context.vk_user_id,
         type = 'doc',
         group_id = vk_context.group_id,
-        random_id = 0
+        random_id = 0,
+        payload = payload.form()
     )
 
     call_queue:JoinableQueue = vk_context.call_queue
@@ -590,7 +591,8 @@ def show_rep_par_his_result(session:OrmSession, vk_context:VkBotContext, client_
         peer_id = client_context.vk_user_id,
         type = 'doc',
         group_id = vk_context.group_id,
-        random_id = 0
+        random_id = 0,
+        payload = payload.form()
     )
 
     call_queue:JoinableQueue = vk_context.call_queue

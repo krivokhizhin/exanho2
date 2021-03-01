@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from . import ParticipantInfo, ParticipantCurrentActivityInfo
+from . import ParticipantInfo, ParticipantCurrentActivityInfo, ParticipantExperienceInfo
 
 class IEisParticipantService(ABC):
     
@@ -21,5 +21,9 @@ class IEisParticipantService(ABC):
         pass
     
     @abstractmethod
-    def get_experience(self, id:int) -> list:
+    def get_experience(self, id:int) -> ParticipantExperienceInfo:
+        pass
+    
+    @abstractmethod
+    def get_experience_report(self, id:int) -> list:
         pass

@@ -6,7 +6,7 @@ from multiprocessing import JoinableQueue, shared_memory
 
 from sqlalchemy.orm.session import Session as OrmSession
 
-from exanho.eis44.interfaces import ParticipantInfo, ParticipantCurrentActivityInfo, ContractInfo
+from exanho.eis44.interfaces import ParticipantInfo, ParticipantCurrentActivityInfo, ParticipantExperienceInfo, ContractInfo
 
 from ..dto import util as dto_util
 from ..dto.method_call import VkMethodCall
@@ -418,7 +418,7 @@ def get_participant_info_for_confirm(vk_context:VkBotContext, client_context:Cli
 def show_que_par_act_result(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, result:ParticipantCurrentActivityInfo):
     answer = 'В данный момент участник:\n'
     if result.cntr_count > 0:
-        answer += 'исполняет контракты:\n{} штук, на сумму {} руб.'.format(result.cntr_count, result.cntr_rur_sum)
+        answer += '- исполняет контракты:\n{} шт., на сумму {} руб.'.format(result.cntr_count, result.cntr_rur_sum)
         if result.cntr_currencies:
             for currency, cur_count, cur_sum in zip(result.cntr_currencies, result.cntr_cur_count, result.cntr_cur_sum):
                 answer += ', {} {} ({} шт)'.format(currency, cur_count, cur_sum)
@@ -427,7 +427,7 @@ def show_que_par_act_result(session:OrmSession, vk_context:VkBotContext, client_
         if result.cntr_first_start_date:
             answer += ', с {} по {} (план)'.format(result.cntr_first_start_date, result.cntr_last_end_date) if result.cntr_last_end_date else '\nс {}'.format(result.cntr_first_start_date)
     else:
-        answer += 'никакие контракты не исполняет'
+        answer += '- никакие контракты не исполняет'
     
     send_options = SendOptions(
         user_id=client_context.vk_user_id,
@@ -451,6 +451,104 @@ def show_rep_par_act_result(session:OrmSession, vk_context:VkBotContext, client_
     shm_name = None
     shm_size = None
     filename = f'rep_par_act_{trade_id}.csv'
+
+    with io.StringIO() as buffer:
+        fieldnames = ['N', 'reg_num', 'state', 'publish_dt', 'subject', 'price', 'currency_code', 'right_to_conclude', 'start_date', 'end_date', 'supplier_number', 'href']
+        writer = csv.DictWriter(buffer, fieldnames=fieldnames,  dialect=csv.excel)
+        writer.writeheader()
+
+        sort_number = 0
+
+        for exec_cntr in result:
+            assert isinstance(exec_cntr, ContractInfo)
+            sort_number += 1
+            writer.writerow({
+                'N': sort_number,
+                'reg_num': f'\'{exec_cntr.reg_num}',
+                'state': exec_cntr.state,
+                'publish_dt': exec_cntr.publish_dt,
+                'subject': exec_cntr.subject,
+                'price': exec_cntr.price,
+                'currency_code': exec_cntr.currency_code,
+                'right_to_conclude': exec_cntr.right_to_conclude,
+                'start_date': exec_cntr.start_date,
+                'end_date': exec_cntr.end_date,
+                'supplier_number': exec_cntr.supplier_number,
+                'href': exec_cntr.href
+            })
+
+        content = buffer.getvalue().encode(encoding='utf-8')
+        shm_size = len(content)
+
+        shm_a = shared_memory.SharedMemory(create=True, size=shm_size)
+        shm_name = shm_a.name
+        shm_a.buf[:shm_size] = content
+        shm_a.close()
+    
+    send_options = SendAttachmentsOptions(
+        shm_name = shm_name,
+        shm_size = shm_size,
+        filename = filename,
+        peer_id = client_context.vk_user_id,
+        type = 'doc',
+        group_id = vk_context.group_id,
+        random_id = 0
+    )
+
+    call_queue:JoinableQueue = vk_context.call_queue
+    call_queue.put(
+        VkMethodCall(
+            'attachment',
+            'send',
+            dto_util.form(send_options, SendAttachmentsOptions)
+        )
+    )
+
+def show_que_par_his_result(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, result:ParticipantExperienceInfo):
+    answer = 'Опыт участника:\n'
+    answer += '- КОНТРАКТЫ, исполнение'
+    if result.cntr_ec_count > 0 or result.cntr_et_count > 0 or result.cntr_in_count > 0:
+        if result.cntr_first_start_date:
+            answer += ' (с {} по {}):'.format(result.cntr_first_start_date, result.cntr_last_end_date) if result.cntr_last_end_date else '\nс {}'.format(result.cntr_first_start_date)
+        else:
+            answer += ':'
+        if result.cntr_ec_count > 0:
+            answer += '\nзавершено: {} шт, на сумму {} руб.'.format(result.cntr_ec_count, result.cntr_ec_rur_sum)
+            if result.cntr_ec_cur_count > 0:
+                answer += ', в т.ч. в валюте {} шт.'.format(result.cntr_ec_cur_count)
+        if result.cntr_et_count > 0:
+            answer += '\nпрекращено: {} шт, на сумму {} руб.'.format(result.cntr_et_count, result.cntr_et_rur_sum)
+            if result.cntr_ec_cur_count > 0:
+                answer += ', в т.ч. в валюте {} шт.'.format(result.cntr_et_cur_count)
+        if result.cntr_in_count > 0:
+            answer += '\nаннулировано: {} шт, на сумму {} руб.'.format(result.cntr_in_count, result.cntr_in_rur_sum)
+            if result.cntr_ec_cur_count > 0:
+                answer += ', в т.ч. в валюте {} шт.'.format(result.cntr_in_cur_count)
+    else:
+        answer += 'отсутствует'
+    
+    send_options = SendOptions(
+        user_id=client_context.vk_user_id,
+        random_id=0,
+        group_id=vk_context.group_id,
+        message=answer,
+        payload = payload.form()
+    )
+
+    call_queue:JoinableQueue = vk_context.call_queue
+    call_queue.put(
+        VkMethodCall(
+            'messages',
+            'send',
+            dto_util.form(send_options, SendOptions)
+        )
+    )
+
+def show_rep_par_his_result(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, result:list):
+    trade_id:int = payload.trade
+    shm_name = None
+    shm_size = None
+    filename = f'rep_par_his_{trade_id}.csv'
 
     with io.StringIO() as buffer:
         fieldnames = ['N', 'reg_num', 'state', 'publish_dt', 'subject', 'price', 'currency_code', 'right_to_conclude', 'start_date', 'end_date', 'supplier_number', 'href']

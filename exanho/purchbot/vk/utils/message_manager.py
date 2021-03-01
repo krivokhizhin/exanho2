@@ -417,7 +417,10 @@ def execute_trade(session:OrmSession, vk_context:VkBotContext, client_context:Cl
             ui_method = ui_mngr.show_que_par_act_result
 
         if product_code == 'QUE_PAR_HIS':
-            pass
+            result = eis_service.get_participant_experience(vk_context.participant_service, int(trade.parameter1))
+            if isinstance(result, Error):
+                raise result
+            ui_method = ui_mngr.show_que_par_his_result
 
         if product_code == 'SUB_PAR':
             pass
@@ -429,7 +432,10 @@ def execute_trade(session:OrmSession, vk_context:VkBotContext, client_context:Cl
             ui_method = ui_mngr.show_rep_par_act_result
 
         if product_code == 'REP_PAR_HIS':
-            pass
+            result = eis_service.get_participant_experience_report(vk_context.participant_service, int(trade.parameter1))
+            if isinstance(result, Error):
+                raise result
+            ui_method = ui_mngr.show_rep_par_his_result
 
         if product_code == 'REP_PARS_CON':
             pass

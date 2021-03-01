@@ -9,7 +9,7 @@ from exanho.core.common import try_logged, Timer
 from exanho.core.actors import ServiceBase
 from exanho.orm.domain import Sessional
 
-from ..interfaces import IEisParticipantService, ParticipantInfo, SummaryContractsByStateInfo, ParticipantCurrentActivityInfo, ContractInfo, serialize
+from ..interfaces import IEisParticipantService, ParticipantInfo, ParticipantCurrentActivityInfo, ContractInfo, ParticipantExperienceInfo, serialize
 from ..model import AggContractState, AggParticipant, AggContract, AggContractParticipant
 
 class EisParticipantService(IEisParticipantService, ServiceBase):
@@ -166,13 +166,23 @@ class EisParticipantService(IEisParticipantService, ServiceBase):
     @serialize
     @try_logged
     @Sessional
-    def get_experience(self, id: int) ->list:
+    def get_experience(self, id: int) -> ParticipantExperienceInfo:
         assert isinstance(id, int)
-
-        done_contracts = list()
 
         session = Sessional.domain.Session
         assert isinstance(session, OrmSession)
+
+        cntr_ec_count = 0
+        cntr_ec_rur_sum = 0
+        cntr_ec_cur_count = 0
+        cntr_et_count = 0
+        cntr_et_rur_sum = 0
+        cntr_et_cur_count = 0
+        cntr_in_count = 0
+        cntr_in_rur_sum = 0
+        cntr_in_cur_count = 0
+        cntr_first_start_date = None
+        cntr_last_end_date = None
           
         contract_ids_stmt = session.query(AggContractParticipant.contract_id).\
             filter(AggContractParticipant.participant_id == id).\
@@ -181,6 +191,85 @@ class EisParticipantService(IEisParticipantService, ServiceBase):
         for done_contr in session.query(AggContract.state, func.count(AggContract.id), func.sum(AggContract.price), AggContract.currency_code, func.min(AggContract.start_date), func.max(AggContract.end_date)).\
             filter(AggContract.id.in_(contract_ids_stmt)).filter(AggContract.state != AggContractState.EXECUTION).\
                 group_by(AggContract.state, AggContract.currency_code):
-            done_contracts.append(SummaryContractsByStateInfo._make((id, *done_contr)))
 
-        return done_contracts
+            cntr_state, cntr_count, cntr_sum, cntr_currency, cntr_first, cntr_last = done_contr
+            if cntr_state == AggContractState.COMPLETED:
+                cntr_ec_count += cntr_count
+                cntr_first_start_date = cntr_first if cntr_first_start_date is None else min(cntr_first_start_date, cntr_first)
+                cntr_last_end_date = cntr_last if cntr_last_end_date is None else max(cntr_last_end_date, cntr_last)
+                if cntr_currency == 'RUB':
+                    cntr_ec_rur_sum += cntr_sum
+                else:
+                    cntr_ec_cur_count += cntr_count
+            elif cntr_state == AggContractState.DISCONTINUED:
+                cntr_et_count += cntr_count
+                cntr_first_start_date = cntr_first if cntr_first_start_date is None else min(cntr_first_start_date, cntr_first)
+                cntr_last_end_date = cntr_last if cntr_last_end_date is None else max(cntr_last_end_date, cntr_last)
+                if cntr_currency == 'RUB':
+                    cntr_et_rur_sum += cntr_sum
+                else:
+                    cntr_et_cur_count += cntr_count
+            elif cntr_state == AggContractState.CANCELED:
+                cntr_in_count += cntr_count
+                cntr_first_start_date = cntr_first if cntr_first_start_date is None else min(cntr_first_start_date, cntr_first)
+                cntr_last_end_date = cntr_last if cntr_last_end_date is None else max(cntr_last_end_date, cntr_last)
+                if cntr_currency == 'RUB':
+                    cntr_in_rur_sum += cntr_sum
+                else:
+                    cntr_in_cur_count += cntr_count
+            else:
+                pass
+
+        experience = ParticipantExperienceInfo(
+            participant_id = id,
+            cntr_ec_count = cntr_ec_count,
+            cntr_ec_rur_sum = cntr_ec_rur_sum,
+            cntr_ec_cur_count = cntr_ec_cur_count,
+            cntr_et_count = cntr_et_count,
+            cntr_et_rur_sum = cntr_et_rur_sum,
+            cntr_et_cur_count = cntr_et_cur_count,
+            cntr_in_count = cntr_in_count,
+            cntr_in_rur_sum = cntr_in_rur_sum,
+            cntr_in_cur_count = cntr_in_cur_count,
+            cntr_first_start_date = cntr_first_start_date,
+            cntr_last_end_date = cntr_last_end_date
+        )
+
+        return experience
+
+    @serialize
+    @try_logged
+    @Sessional
+    def get_experience_report(self, id: int) ->list:
+        assert isinstance(id, int)
+
+        session = Sessional.domain.Session
+        assert isinstance(session, OrmSession)
+          
+        contract_ids_stmt = session.query(AggContractParticipant.contract_id).\
+            filter(AggContractParticipant.participant_id == id).\
+                subquery()
+
+        result = list()
+
+        for exec_contr in session.query(AggContract).\
+            filter(AggContract.id.in_(contract_ids_stmt)).filter(AggContract.state != AggContractState.EXECUTION).\
+                order_by(AggContract.publish_dt):
+            
+            result.append(
+                ContractInfo(
+                    reg_num=exec_contr.reg_num,
+                    state=exec_contr.state.name,
+                    publish_dt=exec_contr.publish_dt,
+                    subject=exec_contr.subject,
+                    price=exec_contr.price,
+                    currency_code=exec_contr.currency_code,
+                    right_to_conclude=exec_contr.right_to_conclude,
+                    start_date=exec_contr.start_date,
+                    end_date=exec_contr.end_date,
+                    supplier_number=exec_contr.supplier_number,
+                    href=exec_contr.href
+                )
+            )
+
+        return result

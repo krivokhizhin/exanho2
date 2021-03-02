@@ -544,6 +544,9 @@ def trade_executed(session:OrmSession, vk_context:VkBotContext, client_context:C
 
     trade.status = TradeStatus.COMPLETED
 
+    if vk_context is None: # For test only !!!
+        return
+
     if payload.event:
         ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Благодарим Вас за использование нашего сервиса!')
     

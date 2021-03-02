@@ -25,3 +25,6 @@ class AccRecord(Base):
         self.dt = dt
         self.cr = cr
         self.amount = amount
+
+    def __str__(self) -> str:
+        return f'{self.id:>6} | dt {self.dt:>6} | cr {self.cr:>6} | {self.amount:18.2f} | {self.created_at}'

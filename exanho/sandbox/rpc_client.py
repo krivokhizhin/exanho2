@@ -9,9 +9,11 @@ def run():
 
     try:
         rpc_client = ServerProxy(uri, allow_none=True, use_builtin_types=True)
-        print(pickle.loads(rpc_client.get_participant_list('151303803109', None, 1, 10)))
+        print(pickle.loads(rpc_client.get_participant_list('0105069779', '010501001', 1, 10)))
+        print(pickle.loads(rpc_client.get_participant(23)))
         # print(pickle.loads(rpc_client.get_current_activity(2573)))
-        # print(pickle.loads(rpc_client.get_experience(2573)))
+        print(pickle.loads(rpc_client.get_experience(23)))
+        print(pickle.loads(rpc_client.get_experience_report(23)))
         # print(pickle.loads(rpc_client.get_summary_contracts('0105069779', '010501001')))
         # print(pickle.loads(rpc_client.get_summary_contracts('*', '*')))
         # print(pickle.loads(rpc_client.get_contracts('0105069779', {'state':'DISCONTINUED'})))#, '010501001', 'DISCONTINUED')))

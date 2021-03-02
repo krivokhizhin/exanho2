@@ -17,3 +17,7 @@ class AccRemain(ExaObjectMixin, Base):
         self.dt = 0
         self.cr = 0
         self.last_payment_id = None
+
+    def __str__(self):
+        balance = self.dt-self.cr
+        return f'{self.account_id:>10} | dt {self.dt:18.2f} | cr {self.cr:18.2f} | dt-cr {balance:18.2f}'

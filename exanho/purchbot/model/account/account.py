@@ -55,3 +55,6 @@ class AccAccount(Base):
         analitic2 = '' if analitic2 is None else str(analitic2).rjust(LEN_ANALITIC, '0')
 
         self.account = '{}{}{}'.format(balance_code.value, analitic1, analitic2)
+
+    def __str__(self) -> str:
+        return f'{self.account:>30} - {self.desc}'

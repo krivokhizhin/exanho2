@@ -25,3 +25,6 @@ class Product(Base):
     tariff = relationship('Tariff', back_populates='product', uselist=False)
     
     trades = relationship('Trade', back_populates='product')
+
+    def __str__(self) -> str:
+        return f'{self.kind.name:>12} | {self.code:>10}'

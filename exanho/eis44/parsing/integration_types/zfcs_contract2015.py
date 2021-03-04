@@ -1,3 +1,5 @@
+from hashlib import blake2b
+
 from exanho.eis44.model.contract.participant import CntrParticipantForeign
 from sqlalchemy.orm import with_polymorphic
 from sqlalchemy.orm.session import Session as OrmSession
@@ -155,9 +157,9 @@ def get_supplier(session, supplier_obj:zfcs_contract2015SupplierType):
     elif supplier_obj.individualPersonForeignState:
         supplier = get_individual_person_fs(session, supplier_obj.individualPersonForeignState)
     elif supplier_obj.individualPersonRFisCulture:
-        supplier = get_individual_culture_person_rf(session, supplier_obj.individualPersonForeignState)
+        supplier = get_individual_culture_person_rf(session, supplier_obj.individualPersonRFisCulture)
     elif supplier_obj.individualPersonForeignStateisCulture:
-        supplier = get_individual_culture_person_fs(session, supplier_obj.individualPersonForeignState)
+        supplier = get_individual_culture_person_fs(session, supplier_obj.individualPersonForeignStateisCulture)
     elif supplier_obj.notPublishedOnEIS:
         supplier = get_not_published_on_eis(session, supplier_obj.notPublishedOnEIS)
     else:
@@ -189,6 +191,8 @@ def get_legal_entity_rf(session, supplier_obj:corr_supplierLegalEntityRF):
 
     inn = supplier_obj.INN
     kpp = supplier_obj.KPP
+    if inn is None:
+        raise Error('inn is None')
     participant = get_participant(session, CntrParticipantKind.RF, inn, kpp)
 
     if supplier_obj.legalForm:
@@ -234,6 +238,10 @@ def get_individual_person_rf(session, supplier_obj:corr_supplierIndividualPerson
     )
 
     inn = supplier_obj.INN
+    if supplier_obj.isIP and inn is None:
+        raise Error('inn is None')
+    if inn is None:
+        inn = hash_str_raw('{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else '')
     participant = get_participant(session, CntrParticipantKind.RF, inn)
 
     if supplier_obj.isIP:
@@ -266,6 +274,8 @@ def get_legal_entity_fs(session, supplier_obj:corr_supplierLegalEntityForeignSta
     if supplier_obj.registerInRFTaxBodies is None and len(str(supplier_obj.taxPayerCode))> 2*INN_LENGTH:
         raise Error(f'len({supplier_obj.taxPayerCode}) is more then {2*INN_LENGTH} symbols')
 
+    if inn is None:
+        raise Error('inn is None')
     participant = get_participant(session, CntrParticipantKind.FS, inn, kpp)
 
     if supplier_obj.fullName: participant.full_name = supplier_obj.fullName
@@ -318,6 +328,8 @@ def get_individual_person_fs(session, supplier_obj:corr_supplierIndividualPerson
     if supplier_obj.registerInRFTaxBodies is None and len(str(supplier_obj.taxPayerCode))> INN_LENGTH:
         raise Error(f'len({supplier_obj.taxPayerCode}) is more then {INN_LENGTH} symbols')
 
+    if inn is None:
+        inn = hash_str_raw('{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else '')
     participant = get_participant(session, CntrParticipantKind.FS, inn)
 
     participant.full_name = '{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
@@ -383,6 +395,8 @@ def get_individual_culture_person_rf(session, supplier_obj:individualPersonRFisC
     )
 
     inn = supplier_obj.INN
+    if inn is None:
+        inn = hash_str_raw('{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else '')
     participant = get_participant(session, CntrParticipantKind.RF, inn)
 
     if supplier_obj.isIP:
@@ -414,6 +428,8 @@ def get_individual_culture_person_fs(session, supplier_obj:individualPersonForei
     if supplier_obj.registerInRFTaxBodies is None and len(str(supplier_obj.taxPayerCode))> INN_LENGTH:
         raise Error(f'len({supplier_obj.taxPayerCode}) is more then {INN_LENGTH} symbols')
 
+    if inn is None:
+        inn = hash_str_raw('{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else '')
     participant = get_participant(session, CntrParticipantKind.FS, inn)
 
     participant.full_name = '{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
@@ -510,3 +526,8 @@ def get_contact(session, last_name:str, first_name:str, middle_name:str) -> Cntr
         # session.add(contact)
 
     return contact
+
+def hash_str_raw(raw:str, lenght:int=6):
+    h = blake2b(digest_size=lenght)
+    h.update(raw.encode(encoding='utf-8'))
+    return h.hexdigest()

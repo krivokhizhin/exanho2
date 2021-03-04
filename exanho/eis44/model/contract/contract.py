@@ -73,7 +73,7 @@ class ZfcsContract2015(Base):
     # qualityGuaranteeInfo
     # guaranteeReturns
 
-    energy_service_info = Column(String(200))
+    energy_service_info = Column(String(500))
 
     # products
     suppliers = relationship('ZfcsContract2015Supplier', back_populates='contract', cascade='all, delete-orphan')

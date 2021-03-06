@@ -67,11 +67,10 @@ class ZfcsContract2015(Base):
     execution_end_date = Column(Date)
     # stages
 
-    # enforcement
-    # subsequentMaintenanceEnforcement
+    enforcements = relationship('ZfcsContract2015Enforcement', back_populates='contract', cascade='all, delete-orphan')
     # st14Info
-    # qualityGuaranteeInfo
-    # guaranteeReturns
+    quality_guarantee = relationship('CntrQualityGuaranteeInfo', uselist=False, back_populates='contract', cascade='all, delete-orphan')
+    guarantee_returns = relationship('ZfcsContract2015BgReturn', back_populates='contract', cascade='all, delete-orphan')
 
     energy_service_info = Column(String(500))
 

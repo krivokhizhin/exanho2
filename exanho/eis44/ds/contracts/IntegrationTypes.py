@@ -11058,13 +11058,15 @@ class bankGuarantee(GeneratedsSuper):
         'docNumberNotPublishedOnEIS': MemberSpec_('docNumberNotPublishedOnEIS', 'xs:boolean', 0, 0, {'fixed': 'true', 'name': 'docNumberNotPublishedOnEIS', 'type': 'xs:boolean'}, 23),
         'currency': MemberSpec_('currency', 'zfcs_currencyRef', 0, 1, {'minOccurs': '0', 'name': 'currency', 'type': 'zfcs_currencyRef'}, None),
         'amount': MemberSpec_('amount', ['moneyPositiveType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'amount', 'type': 'xs:string'}, None),
+        'guaranteeAmount': MemberSpec_('guaranteeAmount', ['moneyPositiveType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'guaranteeAmount', 'type': 'xs:string'}, None),
         'currencyRate': MemberSpec_('currencyRate', 'zfcs_currencyRateContract2015', 0, 1, {'minOccurs': '0', 'name': 'currencyRate', 'type': 'zfcs_currencyRateContract2015'}, None),
         'amountRUR': MemberSpec_('amountRUR', ['moneyPositiveType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'amountRUR', 'type': 'xs:string'}, None),
+        'guaranteeAmountRUR': MemberSpec_('guaranteeAmountRUR', ['moneyPositiveType', 'xs:string'], 0, 1, {'minOccurs': '0', 'name': 'guaranteeAmountRUR', 'type': 'xs:string'}, None),
     }
     __slots__ = GeneratedsSuper.gds_subclass_slots(member_data_items_)
     subclass = None
     superclass = None
-    def __init__(self, regNumber=None, regNumberNotPublishedOnEIS=None, docNumber=None, docNumberNotPublishedOnEIS=None, currency=None, amount=None, currencyRate=None, amountRUR=None, gds_collector_=None, **kwargs_):
+    def __init__(self, regNumber=None, regNumberNotPublishedOnEIS=None, docNumber=None, docNumberNotPublishedOnEIS=None, currency=None, amount=None, guaranteeAmount=None, currencyRate=None, amountRUR=None, guaranteeAmountRUR=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -11085,11 +11087,17 @@ class bankGuarantee(GeneratedsSuper):
         self.amount = amount
         self.validate_moneyPositiveType(self.amount)
         self.amount_nsprefix_ = None
+        self.guaranteeAmount = guaranteeAmount
+        self.validate_moneyPositiveType(self.guaranteeAmount)
+        self.guaranteeAmount_nsprefix_ = None
         self.currencyRate = currencyRate
         self.currencyRate_nsprefix_ = None
         self.amountRUR = amountRUR
         self.validate_moneyPositiveType(self.amountRUR)
         self.amountRUR_nsprefix_ = None
+        self.guaranteeAmountRUR = guaranteeAmountRUR
+        self.validate_moneyPositiveType(self.guaranteeAmountRUR)
+        self.guaranteeAmountRUR_nsprefix_ = None
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -11165,8 +11173,10 @@ class bankGuarantee(GeneratedsSuper):
             self.docNumberNotPublishedOnEIS is not None or
             self.currency is not None or
             self.amount is not None or
+            self.guaranteeAmount is not None or
             self.currencyRate is not None or
-            self.amountRUR is not None
+            self.amountRUR is not None or
+            self.guaranteeAmountRUR is not None
         ):
             return True
         else:
@@ -11226,6 +11236,14 @@ class bankGuarantee(GeneratedsSuper):
             self.amount_nsprefix_ = child_.prefix
             # validate type moneyPositiveType
             self.validate_moneyPositiveType(self.amount)
+        elif nodeName_ == 'guaranteeAmount':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'guaranteeAmount')
+            value_ = self.gds_validate_string(value_, node, 'guaranteeAmount')
+            self.guaranteeAmount = value_
+            self.guaranteeAmount_nsprefix_ = child_.prefix
+            # validate type moneyPositiveType
+            self.validate_moneyPositiveType(self.guaranteeAmount)
         elif nodeName_ == 'currencyRate':
             obj_ = zfcs_currencyRateContract2015.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
@@ -11239,6 +11257,14 @@ class bankGuarantee(GeneratedsSuper):
             self.amountRUR_nsprefix_ = child_.prefix
             # validate type moneyPositiveType
             self.validate_moneyPositiveType(self.amountRUR)
+        elif nodeName_ == 'guaranteeAmountRUR':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'guaranteeAmountRUR')
+            value_ = self.gds_validate_string(value_, node, 'guaranteeAmountRUR')
+            self.guaranteeAmountRUR = value_
+            self.guaranteeAmountRUR_nsprefix_ = child_.prefix
+            # validate type moneyPositiveType
+            self.validate_moneyPositiveType(self.guaranteeAmountRUR)
 # end class bankGuarantee
 
 

@@ -6,6 +6,7 @@ from sqlalchemy.orm.session import Session as OrmSession
 
 from ...ds.contracts.fcsExport import zfcs_contract2015Type
 from ...ds.contracts.IntegrationTypes import suppliers, zfcs_contract2015SupplierType, corr_supplierLegalEntityRF, corr_supplierLegalEntityForeignState, corr_supplierIndividualPersonRF, corr_supplierIndividualPersonForeignState, individualPersonRFisCulture, individualPersonForeignStateisCulture
+from ...ds.contracts.IntegrationTypes import zfcs_contract2015EnforcementType, qualityGuaranteeInfo, zfcs_contract2015BankGuaranteeReturnType, bankGuarantee, cashAccount, guaranteeReturn
 
 from exanho.core.common import Error
 from ...model.contract import *
@@ -129,6 +130,19 @@ def parse(session, contract_obj:zfcs_contract2015Type, update=True, **kwargs):
         contract.sub_contractors_value_rur = contract_obj.subContractorsSum.priceValueRUR
 
     fill_suppliers(session, contract, contract_obj.suppliers)
+
+    contract.enforcements = list()
+    enforcement = get_enforcement(session, contract_obj.enforcement, False)
+    if enforcement:
+        contract.enforcements.append(enforcement)
+    subsequent_maintenance_enforcement = get_enforcement(session, contract_obj.subsequentMaintenanceEnforcement, True)
+    if subsequent_maintenance_enforcement:
+        contract.enforcements.append(subsequent_maintenance_enforcement)
+
+    contract.quality_guarantee = get_quality_guarantee(session, contract_obj.qualityGuaranteeInfo)
+
+    fill_guarantee_returns(session, contract, contract_obj.guaranteeReturns)
+
 
 def fill_suppliers(session, owner:ZfcsContract2015, suppliers_obj:suppliers):
     owner.suppliers = []
@@ -531,3 +545,145 @@ def hash_str_raw(raw:str, lenght:int=6):
     h = blake2b(digest_size=lenght)
     h.update(raw.encode(encoding='utf-8'))
     return h.hexdigest()
+
+def get_enforcement(session:OrmSession, enforcement_obj:zfcs_contract2015EnforcementType, is_maintenance:bool=False) -> ZfcsContract2015Enforcement:
+    enforcement = None
+    if enforcement_obj is None:
+        return enforcement
+
+    if enforcement_obj.bankGuarantee:
+        enforcement = get_bg_enforcement(enforcement_obj.bankGuarantee)
+        enforcement.is_subsequent_maintenance = is_maintenance
+        session.add(enforcement)
+    elif enforcement_obj.cashAccount:
+        enforcement = get_ca_enforcement(enforcement_obj.cashAccount)
+        enforcement.is_subsequent_maintenance = is_maintenance
+        session.add(enforcement)
+    else:
+        pass
+
+    return enforcement
+
+def get_bg_enforcement(bg_enforcement_obj:bankGuarantee) -> ZfcsContract2015Enforcement:
+    if bg_enforcement_obj is None:
+        return None
+
+    amount = bg_enforcement_obj.guaranteeAmount if bg_enforcement_obj.guaranteeAmount else bg_enforcement_obj.amount
+    amount_rur = bg_enforcement_obj.guaranteeAmountRUR if bg_enforcement_obj.guaranteeAmountRUR else bg_enforcement_obj.amountRUR
+
+    return ZfcsContract2015Enforcement(
+        kind = CntrEnsuringKind.BG,
+        currency_code = bg_enforcement_obj.currency.code if bg_enforcement_obj.currency else None,
+        amount = amount,
+        currency_rate = bg_enforcement_obj.currencyRate.rate if bg_enforcement_obj.currencyRate else None,
+        currency_raiting = bg_enforcement_obj.currencyRate.raiting if bg_enforcement_obj.currencyRate else None,
+        amount_rur = amount_rur,
+
+        reg_number = bg_enforcement_obj.regNumber,
+        reg_number_not_published = bg_enforcement_obj.regNumberNotPublishedOnEIS,
+        doc_number = bg_enforcement_obj.docNumber,
+        doc_number_not_published = bg_enforcement_obj.docNumberNotPublishedOnEIS
+    )
+
+def get_ca_enforcement(ca_enforcement_obj:cashAccount) -> ZfcsContract2015Enforcement:
+    if ca_enforcement_obj is None:
+        return None
+
+    return ZfcsContract2015Enforcement(
+        kind = CntrEnsuringKind.CA,
+        currency_code = ca_enforcement_obj.currency.code if ca_enforcement_obj.currency else None,
+        amount = ca_enforcement_obj.amount,
+        currency_rate = ca_enforcement_obj.currencyRate.rate if ca_enforcement_obj.currencyRate else None,
+        currency_raiting = ca_enforcement_obj.currencyRate.raiting if ca_enforcement_obj.currencyRate else None,
+        amount_rur = ca_enforcement_obj.amountRUR
+    )
+
+def get_quality_guarantee(session:OrmSession, quality_guarantee_obj:qualityGuaranteeInfo) -> CntrQualityGuaranteeInfo:
+    quality_guarantee = None
+    if quality_guarantee_obj is None:
+        return quality_guarantee
+
+    quality_guarantee = CntrQualityGuaranteeInfo(
+        warranty_reqs_text = quality_guarantee_obj.warrantyReqsText,
+        manufacturer_warranty_reqs_text = quality_guarantee_obj.manufacturerWarrantyReqsText,
+        isQAEnsuramceRequired = quality_guarantee_obj.isQAEnsuramceRequired
+    )
+
+    if quality_guarantee_obj.providedPeriod:
+        quality_guarantee.from_date = quality_guarantee_obj.providedPeriod.fromDate
+        quality_guarantee.to_date = quality_guarantee_obj.providedPeriod.toDate
+        quality_guarantee.other_period_text = quality_guarantee_obj.providedPeriod.otherPeriodText
+    else:
+        quality_guarantee.period_not_published = quality_guarantee_obj.notPublishedOnEIS
+
+    if quality_guarantee_obj.execObligationsGuaranteeInfo:
+        if quality_guarantee_obj.execObligationsGuaranteeInfo.ensuringWay:
+            ensuring_way = None
+            if quality_guarantee_obj.execObligationsGuaranteeInfo.ensuringWay.bankGuarantee:
+                ensuring_way = get_bg_enforcement(quality_guarantee_obj.execObligationsGuaranteeInfo.ensuringWay.bankGuarantee)
+            elif quality_guarantee_obj.execObligationsGuaranteeInfo.ensuringWay.cashAccount:
+                ensuring_way = get_ca_enforcement(quality_guarantee_obj.execObligationsGuaranteeInfo.ensuringWay.cashAccount)
+
+            if ensuring_way:                
+                session.add(ensuring_way)
+                quality_guarantee.ensuring_way = ensuring_way
+
+        if quality_guarantee_obj.execObligationsGuaranteeInfo.guaranteeReturns:
+            fill_guarantee_returns_for_obligations(session, quality_guarantee, quality_guarantee_obj.execObligationsGuaranteeInfo.guaranteeReturns)
+
+    return quality_guarantee
+
+def fill_guarantee_returns(session:OrmSession, owner:ZfcsContract2015, guarantee_returns_obj:zfcs_contract2015BankGuaranteeReturnType):
+    owner.guarantee_returns = []
+    if guarantee_returns_obj is None:
+        return
+
+    for guarantee_return_obj in guarantee_returns_obj.guaranteeReturn:
+        guarantee_return = get_guarantee_return(session, guarantee_return_obj)
+        if guarantee_return:
+            session.add(guarantee_return)
+            owner.guarantee_returns.append(guarantee_return)
+
+def fill_guarantee_returns_for_obligations(session:OrmSession, owner:CntrQualityGuaranteeInfo, guarantee_returns_obj:zfcs_contract2015BankGuaranteeReturnType):
+    owner.guarantee_returns = []
+    if guarantee_returns_obj is None:
+        return
+
+    for guarantee_return_obj in guarantee_returns_obj.guaranteeReturn:
+        guarantee_return = get_guarantee_return(session, guarantee_return_obj)
+        if guarantee_return:
+            session.add(guarantee_return)
+            owner.guarantee_returns.append(guarantee_return)
+
+def get_guarantee_return(guarantee_return_obj:guaranteeReturn) -> ZfcsContract2015BgReturn:
+    guarantee_return = None
+    if guarantee_return_obj is None:
+        return guarantee_return
+
+    if guarantee_return_obj.bankGuaranteeReturn:
+        guarantee_return = ZfcsContract2015BgReturn(
+            kind = CntrBgReturnKind.RETURN,
+            reg_number = guarantee_return_obj.bankGuaranteeReturn.regNumber,
+            doc_number = guarantee_return_obj.bankGuaranteeReturn.docNumber,
+            date = guarantee_return_obj.bankGuaranteeReturn.returnDate,
+            reason = guarantee_return_obj.bankGuaranteeReturn.returnReason,
+            publish_dt = guarantee_return_obj.bankGuaranteeReturn.returnPublishDate
+        )
+    elif guarantee_return_obj.waiverNotice:
+        guarantee_return = ZfcsContract2015BgReturn(
+            kind = CntrBgReturnKind.WAIVER,
+            reg_number = guarantee_return_obj.waiverNotice.regNumber,
+            doc_number = guarantee_return_obj.waiverNotice.docNumber,
+            date = guarantee_return_obj.waiverNotice.noticeDate,
+            reason = guarantee_return_obj.waiverNotice.noticeReason,
+            publish_dt = guarantee_return_obj.waiverNotice.noticePublishDate,
+            notice_number = guarantee_return_obj.waiverNotice.noticeNumber
+        )
+    elif guarantee_return_obj.notPublishedOnEIS:
+        guarantee_return = ZfcsContract2015BgReturn(
+            kind = CntrBgReturnKind.NOT_PUBLISHED
+        )
+    else:
+        pass
+
+    return guarantee_return

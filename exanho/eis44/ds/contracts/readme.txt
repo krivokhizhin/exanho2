@@ -1,8 +1,8 @@
 1. Copy xsd-files:
-    cp -T /home/kks/git/exanho/exanho/eis44/ds/xsd/11.0.4/fcsExport.xsd /home/kks/git/exanho/exanho/eis44/ds/contracts/fcsExport.py
-    cp -T /home/kks/git/exanho/exanho/eis44/ds/xsd/11.0.4/IntegrationTypes.xsd /home/kks/git/exanho/exanho/eis44/ds/contracts/IntegrationTypes.py
-    cp -T /home/kks/git/exanho/exanho/eis44/ds/xsd/11.0.4/CommonTypes.xsd /home/kks/git/exanho/exanho/eis44/ds/contracts/CommonTypes.py
-    cp -T /home/kks/git/exanho/exanho/eis44/ds/xsd/11.0.4/BaseTypes.xsd /home/kks/git/exanho/exanho/eis44/ds/contracts/BaseTypes.py
+    cp -T /home/kks/git/exanho/exanho/eis44/ds/xsd/11.0.4/fcsExport.xsd /home/kks/git/exanho/exanho/eis44/ds/contracts/fcsExport.xsd
+    cp -T /home/kks/git/exanho/exanho/eis44/ds/xsd/11.0.4/IntegrationTypes.xsd /home/kks/git/exanho/exanho/eis44/ds/contracts/IntegrationTypes.xsd
+    cp -T /home/kks/git/exanho/exanho/eis44/ds/xsd/11.0.4/CommonTypes.xsd /home/kks/git/exanho/exanho/eis44/ds/contracts/CommonTypes.xsd
+    cp -T /home/kks/git/exanho/exanho/eis44/ds/xsd/11.0.4/BaseTypes.xsd /home/kks/git/exanho/exanho/eis44/ds/contracts/BaseTypes.xsd
 
 2. Correct xsd schemas:
 2.1 fcsExport.xsd: remove unnecessary document types
@@ -92,3 +92,11 @@ with
 #
 # Data representation classes.
 #
+
+6. Correct py files
+
+6.1 IntegrationTypes.py
+
+6.1.1 add guaranteeAmount member data item for bankGuarantee with equal parameters as amount
+
+6.1.1 add guaranteeAmountRUR member data item for bankGuarantee with equal parameters as amountRUR

@@ -1,4 +1,4 @@
-from exanho.sandbox import ds_test as mod
+from exanho.sandbox import import_module as mod
 
 if __name__ == '__main__':
     mod.run()

@@ -10,6 +10,8 @@ from exanho.core.common import Error
 from ..model.aggregate import EisTableName, EisContractLog, EisParticipantLog, AggContractState, AggContract
 from ..model.contract import ZfcsContract2015, ZfcsContractCancel2015, ZfcsContractProcedure2015, ZfcsContractProcedureCancel2015
 
+from . import contract_ensuring
+
 log = logging.getLogger(__name__)
 
 def get_contract_state(current_stage:str) -> AggContractState:
@@ -27,12 +29,15 @@ def get_contract_state(current_stage:str) -> AggContractState:
 
 def fill_contract_by_zfcs_contract2015(session:OrmSession, cntr:AggContract, obj:ZfcsContract2015, addition_only:bool):
 
+    price = decimal.Decimal(obj.price) if obj.price else None
+    if price is None: price = decimal.Decimal(obj.price_rur) if obj.price_rur else None
+
     if cntr is None:
         cntr = AggContract(
             publish_dt = obj.publish_dt,
             reg_num = obj.reg_num,
             subject = obj.subject,
-            price = decimal.Decimal(obj.price) if obj.price else None,
+            price = price,
             currency_code = obj.currency_code,
             right_to_conclude = obj.right_to_conclude,
             supplier_number = len(obj.suppliers),
@@ -45,7 +50,7 @@ def fill_contract_by_zfcs_contract2015(session:OrmSession, cntr:AggContract, obj
     elif addition_only:
         if cntr.publish_dt is None: cntr.publish_dt = obj.publish_dt
         if cntr.subject is None: cntr.subject = obj.subject
-        if cntr.price is None: cntr.price = decimal.Decimal(obj.price) if obj.price else None
+        if cntr.price is None: cntr.price = price
         if cntr.currency_code is None: cntr.currency_code = obj.currency_code
         if cntr.right_to_conclude is None: cntr.right_to_conclude = obj.right_to_conclude
         if cntr.supplier_number is None: cntr.supplier_number = len(obj.suppliers)
@@ -56,7 +61,7 @@ def fill_contract_by_zfcs_contract2015(session:OrmSession, cntr:AggContract, obj
     else:
         cntr.publish_dt = obj.publish_dt
         cntr.subject = obj.subject
-        cntr.price = decimal.Decimal(obj.price) if obj.price else None
+        cntr.price = price
         cntr.currency_code = obj.currency_code
         cntr.right_to_conclude = obj.right_to_conclude
         cntr.supplier_number = len(obj.suppliers)
@@ -134,6 +139,8 @@ def handle(session:OrmSession, source:EisTableName, doc_id:int, addition_only:bo
             return
 
         fill_contract_by_zfcs_contract2015(session, cntr, obj, addition_only)
+        if cntr is None:
+            cntr = session.query(AggContract).filter(AggContract.reg_num == reg_num).one()
 
         for supp_obj in obj.suppliers:
             inn = supp_obj.participant.inn
@@ -155,17 +162,16 @@ def handle(session:OrmSession, source:EisTableName, doc_id:int, addition_only:bo
             else:
                 participant_log.handled = False
 
-            # part_dto = EisParticipant(
-            #     name = supp_obj.participant.short_name if supp_obj.participant.short_name else supp_obj.participant.full_name,
-            #     inn = supp_obj.participant.inn,
-            #     kpp = supp_obj.participant.kpp,
-            # )
+        if obj.enforcements:
+            for enforcement in obj.enforcements:
+                contract_ensuring.handle_enforcement(session, cntr, enforcement, addition_only)
 
-            # if supp_obj.participant.kind == CntrParticipantKind.FS:
-            #     part_fs_obj = session.query(CntrParticipantForeign).filter(CntrParticipantForeign.id == supp_obj.participant.id).one()
-            #     part_dto.name_lat = part_fs_obj.full_name_lat
-            #     part_dto.tax_payer_code = part_fs_obj.tax_payer_code
-            #     part_dto.country_full_name = part_fs_obj.country_full_name
+        if obj.quality_guarantee:
+            contract_ensuring.handle_quality_guarantee(session, cntr, obj.quality_guarantee, addition_only)
+
+        if obj.guarantee_returns:
+            for guarantee_return in obj.guarantee_returns:
+                contract_ensuring.handle_guarantee_return(session, cntr, guarantee_return, addition_only)
 
     elif source == EisTableName.zfcs_contract_cancel2015:
         obj = session.query(ZfcsContractCancel2015).get(doc_id)

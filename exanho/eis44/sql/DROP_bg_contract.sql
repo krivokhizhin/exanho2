@@ -1,6 +1,5 @@
-DROP TABLE zfcs_contract2015_bg_return CASCADE;
-DROP TABLE zfcs_contract2015_enforcement CASCADE;
-DROP TABLE cntr_quality_guarantee_info CASCADE;
+DROP TABLE agg_contract_ensuring CASCADE;
 
-DROP TYPE cntrensuringkind;
-DROP TYPE cntrbgreturnkind;
+DROP TYPE cntrensuringway;
+DROP TYPE cntrensuringtype;
+DROP TYPE cntrensuringstatus;

@@ -31,3 +31,5 @@ class AggContract(ExaObjectMixin, Base):
     state = Column(Enum(AggContractState), nullable=False)
     start_date = Column(Date)
     end_date = Column(Date)
+
+    ensuring = relationship('AggContractEnsuring', back_populates='contract', cascade='all, delete-orphan')

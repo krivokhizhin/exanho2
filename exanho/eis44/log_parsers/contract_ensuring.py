@@ -17,7 +17,7 @@ def handle_enforcement(session:OrmSession, contract:AggContract, enforcement_obj
 
     way = CntrEnsuringWay.BG if enforcement_obj.kind == CntrEnsuringKind.BG else CntrEnsuringWay.CA
     amount = decimal.Decimal(enforcement_obj.amount) if enforcement_obj.amount else None
-    if amount is None: amount = decimal.Decimal(enforcement_obj.amount_rur) if enforcement_obj.amount_rur else None
+    if amount is None or amount == 0: amount = decimal.Decimal(enforcement_obj.amount_rur) if enforcement_obj.amount_rur else amount
 
     if not enforcement:
         enforcement = AggContractEnsuring(
@@ -32,7 +32,7 @@ def handle_enforcement(session:OrmSession, contract:AggContract, enforcement_obj
     elif addition_only:
         if enforcement.way is None: enforcement.way = way
         if enforcement.currency_code is None: enforcement.currency_code = enforcement_obj.currency_code
-        if enforcement.amount is None: enforcement.amount = enforcement_obj.amount
+        if enforcement.amount is None or enforcement.amount == 0: enforcement.amount = enforcement_obj.amount
     else:
         enforcement.way = way
         enforcement.currency_code = enforcement_obj.currency_code
@@ -55,7 +55,7 @@ def handle_quality_guarantee(session:OrmSession, contract:AggContract, qg_obj:Cn
 
         way = CntrEnsuringWay.BG if ensuring.kind == CntrEnsuringKind.BG else CntrEnsuringWay.CA
         amount = decimal.Decimal(ensuring.amount) if ensuring.amount else None
-        if amount is None: amount = decimal.Decimal(ensuring.amount_rur) if ensuring.amount_rur else None
+        if amount is None or amount == 0: amount = decimal.Decimal(ensuring.amount_rur) if ensuring.amount_rur else amount
 
         if not quality_guarantee:
             quality_guarantee = AggContractEnsuring(
@@ -70,7 +70,7 @@ def handle_quality_guarantee(session:OrmSession, contract:AggContract, qg_obj:Cn
         elif addition_only:
             if quality_guarantee.way is None: quality_guarantee.way = way
             if quality_guarantee.currency_code is None: quality_guarantee.currency_code = ensuring.currency_code
-            if quality_guarantee.amount is None: quality_guarantee.amount = ensuring.amount
+            if quality_guarantee.amount is None or quality_guarantee.amount == 0: quality_guarantee.amount = ensuring.amount
         else:
             quality_guarantee.way = way
             quality_guarantee.currency_code = ensuring.currency_code

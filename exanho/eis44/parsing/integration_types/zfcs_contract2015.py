@@ -255,23 +255,28 @@ def get_individual_person_rf(session, supplier_obj:corr_supplierIndividualPerson
     inn = supplier_obj.INN
     if supplier_obj.isIP and inn is None:
         raise Error('inn is None')
-    if inn is None:
-        inn = hash_str_raw('{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else '')
-    participant = get_participant(session, CntrParticipantKind.RF, inn)
 
-    if supplier_obj.isIP:
-        participant.full_name = '{0} {1} {2}'.format(IP_FORM, contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
-        participant.short_name = '{0} {1} {2}.'.format(IP_SHORT_FORM, contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
+    if contact:
+        if inn is None:
+            inn = hash_str_raw('{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else '')
+        participant = get_participant(session, CntrParticipantKind.RF, inn)
+
+        if supplier_obj.isIP:
+            participant.full_name = '{0} {1} {2}'.format(IP_FORM, contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
+            participant.short_name = '{0} {1} {2}.'.format(IP_SHORT_FORM, contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
+        else:
+            participant.full_name = '{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
+            participant.short_name = '{0} {1}.'.format(contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
+
+        if supplier_obj.registrationDate: participant.registration_date = supplier_obj.registrationDate
+        if supplier_obj.OKTMO:
+            participant.oktmo_code = supplier_obj.OKTMO.code
+            participant.oktmo_name = supplier_obj.OKTMO.name
+    
+        supplier.participant = participant
     else:
-        participant.full_name = '{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
-        participant.short_name = '{0} {1}.'.format(contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
+        supplier.participant = get_participant(session, CntrParticipantKind.RF, NOT_PUBLISHED_VALUE, NOT_PUBLISHED_VALUE)
 
-    if supplier_obj.registrationDate: participant.registration_date = supplier_obj.registrationDate
-    if supplier_obj.OKTMO:
-        participant.oktmo_code = supplier_obj.OKTMO.code
-        participant.oktmo_name = supplier_obj.OKTMO.name
-
-    supplier.participant = participant
     supplier.contact = contact
 
     return supplier
@@ -343,48 +348,52 @@ def get_individual_person_fs(session, supplier_obj:corr_supplierIndividualPerson
     if supplier_obj.registerInRFTaxBodies is None and len(str(supplier_obj.taxPayerCode))> INN_LENGTH:
         inn = hash_str_raw(str(supplier_obj.taxPayerCode))
 
-    if inn is None:
-        inn = hash_str_raw('{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else '')
-    participant = get_participant(session, CntrParticipantKind.FS, inn)
+    if contact:
+        if inn is None:
+            inn = hash_str_raw('{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else '')
+        participant = get_participant(session, CntrParticipantKind.FS, inn)
 
-    participant.full_name = '{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
-    participant.short_name = '{0} {1}.'.format(contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
+        participant.full_name = '{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
+        participant.short_name = '{0} {1}.'.format(contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
 
-    participant.full_name_lat = '{0}{1}{2}'.format(supplier_obj.lastNameLat if supplier_obj.lastNameLat else '', ' '+supplier_obj.firstNameLat if supplier_obj.firstNameLat else '', ' '+supplier_obj.middleNameLat if supplier_obj.middleNameLat else '').strip()
-    participant.tax_payer_code = supplier_obj.taxPayerCode
+        participant.full_name_lat = '{0}{1}{2}'.format(supplier_obj.lastNameLat if supplier_obj.lastNameLat else '', ' '+supplier_obj.firstNameLat if supplier_obj.firstNameLat else '', ' '+supplier_obj.middleNameLat if supplier_obj.middleNameLat else '').strip()
+        participant.tax_payer_code = supplier_obj.taxPayerCode
 
-    if supplier_obj.registerInRFTaxBodies:
-        if supplier_obj.registerInRFTaxBodies.registrationDate: participant.registration_date = supplier_obj.registerInRFTaxBodies.registrationDate
-        # if supplier_obj.registerInRFTaxBodies.status: supplier.status = supplier_obj.registerInRFTaxBodies.status
-        # if supplier_obj.registerInRFTaxBodies.ERSMSPInclusionDate: supplier.ersmsp_inclusion_date = supplier_obj.registerInRFTaxBodies.ERSMSPInclusionDate
-        # if supplier_obj.registerInRFTaxBodies.isIP: supplier.is_ip = supplier_obj.registerInRFTaxBodies.isIP
-    
-    if supplier_obj.placeOfStayInRegCountry:
-        if supplier_obj.placeOfStayInRegCountry.country:
-            participant.country_code = supplier_obj.placeOfStayInRegCountry.country.countryCode
-            participant.country_full_name = supplier_obj.placeOfStayInRegCountry.country.countryFullName
+        if supplier_obj.registerInRFTaxBodies:
+            if supplier_obj.registerInRFTaxBodies.registrationDate: participant.registration_date = supplier_obj.registerInRFTaxBodies.registrationDate
+            # if supplier_obj.registerInRFTaxBodies.status: supplier.status = supplier_obj.registerInRFTaxBodies.status
+            # if supplier_obj.registerInRFTaxBodies.ERSMSPInclusionDate: supplier.ersmsp_inclusion_date = supplier_obj.registerInRFTaxBodies.ERSMSPInclusionDate
+            # if supplier_obj.registerInRFTaxBodies.isIP: supplier.is_ip = supplier_obj.registerInRFTaxBodies.isIP
+        
+        if supplier_obj.placeOfStayInRegCountry:
+            if supplier_obj.placeOfStayInRegCountry.country:
+                participant.country_code = supplier_obj.placeOfStayInRegCountry.country.countryCode
+                participant.country_full_name = supplier_obj.placeOfStayInRegCountry.country.countryFullName
 
-        if supplier_obj.placeOfStayInRegCountry.address: participant.address = supplier_obj.placeOfStayInRegCountry.address
-        if supplier_obj.placeOfStayInRegCountry.postAddress: participant.post_address = supplier_obj.placeOfStayInRegCountry.postAddress
-        if supplier_obj.placeOfStayInRegCountry.contactEMail: participant.email = supplier_obj.placeOfStayInRegCountry.contactEMail
-        if supplier_obj.placeOfStayInRegCountry.contactPhone: participant.phone = supplier_obj.placeOfStayInRegCountry.contactPhone
+            if supplier_obj.placeOfStayInRegCountry.address: participant.address = supplier_obj.placeOfStayInRegCountry.address
+            if supplier_obj.placeOfStayInRegCountry.postAddress: participant.post_address = supplier_obj.placeOfStayInRegCountry.postAddress
+            if supplier_obj.placeOfStayInRegCountry.contactEMail: participant.email = supplier_obj.placeOfStayInRegCountry.contactEMail
+            if supplier_obj.placeOfStayInRegCountry.contactPhone: participant.phone = supplier_obj.placeOfStayInRegCountry.contactPhone
 
 
-    if supplier_obj.placeOfStayInRF:
-        if supplier_obj.placeOfStayInRF.OKTMO:
-            participant.oktmo_code = supplier_obj.placeOfStayInRF.OKTMO.code
-            participant.oktmo_name = supplier_obj.placeOfStayInRF.OKTMO.name
+        if supplier_obj.placeOfStayInRF:
+            if supplier_obj.placeOfStayInRF.OKTMO:
+                participant.oktmo_code = supplier_obj.placeOfStayInRF.OKTMO.code
+                participant.oktmo_name = supplier_obj.placeOfStayInRF.OKTMO.name
 
-        supplier.address = supplier_obj.placeOfStayInRF.address
-        # supplier.mailing_adress = None if supplier_obj.placeOfStayInRF.postAddressInfo is None else supplier_obj.placeOfStayInRF.postAddressInfo.mailingAdress
-        # supplier.mail_facility_name = None if supplier_obj.placeOfStayInRF.postAddressInfo is None else supplier_obj.placeOfStayInRF.postAddressInfo.mailFacilityName
-        # supplier.post_box_number = None if supplier_obj.placeOfStayInRF.postAddressInfo is None else supplier_obj.placeOfStayInRF.postAddressInfo.postBoxNumber
-        supplier.post_address = supplier_obj.placeOfStayInRF.postAddress
+            supplier.address = supplier_obj.placeOfStayInRF.address
+            # supplier.mailing_adress = None if supplier_obj.placeOfStayInRF.postAddressInfo is None else supplier_obj.placeOfStayInRF.postAddressInfo.mailingAdress
+            # supplier.mail_facility_name = None if supplier_obj.placeOfStayInRF.postAddressInfo is None else supplier_obj.placeOfStayInRF.postAddressInfo.mailFacilityName
+            # supplier.post_box_number = None if supplier_obj.placeOfStayInRF.postAddressInfo is None else supplier_obj.placeOfStayInRF.postAddressInfo.postBoxNumber
+            supplier.post_address = supplier_obj.placeOfStayInRF.postAddress
 
-        supplier.contact_email = supplier_obj.placeOfStayInRF.contactEMail
-        supplier.contact_phone = supplier_obj.placeOfStayInRF.contactPhone
+            supplier.contact_email = supplier_obj.placeOfStayInRF.contactEMail
+            supplier.contact_phone = supplier_obj.placeOfStayInRF.contactPhone
 
-    supplier.participant = participant
+        supplier.participant = participant
+    else:
+        supplier.participant = get_participant(session, CntrParticipantKind.FS, NOT_PUBLISHED_VALUE, NOT_PUBLISHED_VALUE)
+
     supplier.contact = contact
 
     return supplier
@@ -409,24 +418,28 @@ def get_individual_culture_person_rf(session, supplier_obj:individualPersonRFisC
         is_ip = supplier_obj.isIP
     )
 
-    inn = supplier_obj.INN
-    if inn is None:
-        inn = hash_str_raw('{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else '')
-    participant = get_participant(session, CntrParticipantKind.RF, inn)
+    if contact:
+        inn = supplier_obj.INN
+        if inn is None:
+            inn = hash_str_raw('{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else '')
+        participant = get_participant(session, CntrParticipantKind.RF, inn)
 
-    if supplier_obj.isIP:
-        participant.full_name = '{0} {1} {2}'.format(IP_FORM, contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
-        participant.short_name = '{0} {1} {2}.'.format(IP_SHORT_FORM, contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
+        if supplier_obj.isIP:
+            participant.full_name = '{0} {1} {2}'.format(IP_FORM, contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
+            participant.short_name = '{0} {1} {2}.'.format(IP_SHORT_FORM, contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
+        else:
+            participant.full_name = '{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
+            participant.short_name = '{0} {1}.'.format(contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
+
+        if supplier_obj.registrationDate: participant.registration_date = supplier_obj.registrationDate
+        if supplier_obj.OKTMO:
+            participant.oktmo_code = supplier_obj.OKTMO.code
+            participant.oktmo_name = supplier_obj.OKTMO.name
+
+        supplier.participant = participant
     else:
-        participant.full_name = '{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
-        participant.short_name = '{0} {1}.'.format(contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
+        supplier.participant = get_participant(session, CntrParticipantKind.RF, NOT_PUBLISHED_VALUE, NOT_PUBLISHED_VALUE)
 
-    if supplier_obj.registrationDate: participant.registration_date = supplier_obj.registrationDate
-    if supplier_obj.OKTMO:
-        participant.oktmo_code = supplier_obj.OKTMO.code
-        participant.oktmo_name = supplier_obj.OKTMO.name
-
-    supplier.participant = participant
     supplier.contact = contact
 
     return supplier
@@ -443,48 +456,52 @@ def get_individual_culture_person_fs(session, supplier_obj:individualPersonForei
     if supplier_obj.registerInRFTaxBodies is None and len(str(supplier_obj.taxPayerCode))> INN_LENGTH:
         raise Error(f'len({supplier_obj.taxPayerCode}) is more then {INN_LENGTH} symbols')
 
-    if inn is None:
-        inn = hash_str_raw('{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else '')
-    participant = get_participant(session, CntrParticipantKind.FS, inn)
+    if contact:
+        if inn is None:
+            inn = hash_str_raw('{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else '')
+        participant = get_participant(session, CntrParticipantKind.FS, inn)
 
-    participant.full_name = '{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
-    participant.short_name = '{0} {1}.'.format(contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
+        participant.full_name = '{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else ''
+        participant.short_name = '{0} {1}.'.format(contact.last_name, contact.first_name[0]) + '{0}.'.format(contact.middle_name[0]) if contact.middle_name else ''
 
-    participant.full_name_lat = '{0}{1}{2}'.format(supplier_obj.lastNameLat if supplier_obj.lastNameLat else '', ' '+supplier_obj.firstNameLat if supplier_obj.firstNameLat else '', ' '+supplier_obj.middleNameLat if supplier_obj.middleNameLat else '').strip()
-    participant.tax_payer_code = supplier_obj.taxPayerCode
+        participant.full_name_lat = '{0}{1}{2}'.format(supplier_obj.lastNameLat if supplier_obj.lastNameLat else '', ' '+supplier_obj.firstNameLat if supplier_obj.firstNameLat else '', ' '+supplier_obj.middleNameLat if supplier_obj.middleNameLat else '').strip()
+        participant.tax_payer_code = supplier_obj.taxPayerCode
 
-    if supplier_obj.registerInRFTaxBodies:
-        if supplier_obj.registerInRFTaxBodies.registrationDate: participant.registration_date = supplier_obj.registerInRFTaxBodies.registrationDate
-        # if supplier_obj.registerInRFTaxBodies.status: supplier.status = supplier_obj.registerInRFTaxBodies.status
-        # if supplier_obj.registerInRFTaxBodies.ERSMSPInclusionDate: supplier.ersmsp_inclusion_date = supplier_obj.registerInRFTaxBodies.ERSMSPInclusionDate
-        # if supplier_obj.registerInRFTaxBodies.isIP: supplier.is_ip = supplier_obj.registerInRFTaxBodies.isIP
-    
-    if supplier_obj.placeOfStayInRegCountry:
-        if supplier_obj.placeOfStayInRegCountry.country:
-            participant.country_code = supplier_obj.placeOfStayInRegCountry.country.countryCode
-            participant.country_full_name = supplier_obj.placeOfStayInRegCountry.country.countryFullName
+        if supplier_obj.registerInRFTaxBodies:
+            if supplier_obj.registerInRFTaxBodies.registrationDate: participant.registration_date = supplier_obj.registerInRFTaxBodies.registrationDate
+            # if supplier_obj.registerInRFTaxBodies.status: supplier.status = supplier_obj.registerInRFTaxBodies.status
+            # if supplier_obj.registerInRFTaxBodies.ERSMSPInclusionDate: supplier.ersmsp_inclusion_date = supplier_obj.registerInRFTaxBodies.ERSMSPInclusionDate
+            # if supplier_obj.registerInRFTaxBodies.isIP: supplier.is_ip = supplier_obj.registerInRFTaxBodies.isIP
+        
+        if supplier_obj.placeOfStayInRegCountry:
+            if supplier_obj.placeOfStayInRegCountry.country:
+                participant.country_code = supplier_obj.placeOfStayInRegCountry.country.countryCode
+                participant.country_full_name = supplier_obj.placeOfStayInRegCountry.country.countryFullName
 
-        if supplier_obj.placeOfStayInRegCountry.address: participant.address = supplier_obj.placeOfStayInRegCountry.address
-        if supplier_obj.placeOfStayInRegCountry.postAddress: participant.post_address = supplier_obj.placeOfStayInRegCountry.postAddress
-        if supplier_obj.placeOfStayInRegCountry.contactEMail: participant.email = supplier_obj.placeOfStayInRegCountry.contactEMail
-        if supplier_obj.placeOfStayInRegCountry.contactPhone: participant.phone = supplier_obj.placeOfStayInRegCountry.contactPhone
+            if supplier_obj.placeOfStayInRegCountry.address: participant.address = supplier_obj.placeOfStayInRegCountry.address
+            if supplier_obj.placeOfStayInRegCountry.postAddress: participant.post_address = supplier_obj.placeOfStayInRegCountry.postAddress
+            if supplier_obj.placeOfStayInRegCountry.contactEMail: participant.email = supplier_obj.placeOfStayInRegCountry.contactEMail
+            if supplier_obj.placeOfStayInRegCountry.contactPhone: participant.phone = supplier_obj.placeOfStayInRegCountry.contactPhone
 
 
-    if supplier_obj.placeOfStayInRF:
-        if supplier_obj.placeOfStayInRF.OKTMO:
-            participant.oktmo_code = supplier_obj.placeOfStayInRF.OKTMO.code
-            participant.oktmo_name = supplier_obj.placeOfStayInRF.OKTMO.name
+        if supplier_obj.placeOfStayInRF:
+            if supplier_obj.placeOfStayInRF.OKTMO:
+                participant.oktmo_code = supplier_obj.placeOfStayInRF.OKTMO.code
+                participant.oktmo_name = supplier_obj.placeOfStayInRF.OKTMO.name
 
-        supplier.address = supplier_obj.placeOfStayInRF.address
-        # supplier.mailing_adress = None if supplier_obj.placeOfStayInRF.postAddressInfo is None else supplier_obj.placeOfStayInRF.postAddressInfo.mailingAdress
-        # supplier.mail_facility_name = None if supplier_obj.placeOfStayInRF.postAddressInfo is None else supplier_obj.placeOfStayInRF.postAddressInfo.mailFacilityName
-        # supplier.post_box_number = None if supplier_obj.placeOfStayInRF.postAddressInfo is None else supplier_obj.placeOfStayInRF.postAddressInfo.postBoxNumber
-        supplier.post_address = supplier_obj.placeOfStayInRF.postAddress
+            supplier.address = supplier_obj.placeOfStayInRF.address
+            # supplier.mailing_adress = None if supplier_obj.placeOfStayInRF.postAddressInfo is None else supplier_obj.placeOfStayInRF.postAddressInfo.mailingAdress
+            # supplier.mail_facility_name = None if supplier_obj.placeOfStayInRF.postAddressInfo is None else supplier_obj.placeOfStayInRF.postAddressInfo.mailFacilityName
+            # supplier.post_box_number = None if supplier_obj.placeOfStayInRF.postAddressInfo is None else supplier_obj.placeOfStayInRF.postAddressInfo.postBoxNumber
+            supplier.post_address = supplier_obj.placeOfStayInRF.postAddress
 
-        supplier.contact_email = supplier_obj.placeOfStayInRF.contactEMail
-        supplier.contact_phone = supplier_obj.placeOfStayInRF.contactPhone
+            supplier.contact_email = supplier_obj.placeOfStayInRF.contactEMail
+            supplier.contact_phone = supplier_obj.placeOfStayInRF.contactPhone
 
-    supplier.participant = participant
+        supplier.participant = participant
+    else:
+        supplier.participant = get_participant(session, CntrParticipantKind.FS, NOT_PUBLISHED_VALUE, NOT_PUBLISHED_VALUE)
+
     supplier.contact = contact
 
     return supplier
@@ -528,6 +545,9 @@ def get_participant(session:OrmSession, kind:CntrParticipantKind, inn:str, kpp:s
     return participant
 
 def get_contact(session, last_name:str, first_name:str, middle_name:str) -> CntrContact:
+    if last_name is None or first_name is None:
+        return None
+
     last_name = last_name.upper()
     first_name = first_name.upper()
     middle_name = middle_name.upper() if middle_name else None

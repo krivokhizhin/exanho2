@@ -12,6 +12,8 @@ from ..model.aggregate import EisTableName, LogPlaceholder
 
 log = logging.getLogger(__name__)
 
+COUNT_TO_LOGGER = 50000
+
 Context = namedtuple('Context', ['log_parser'])
 
 def initialize(appsettings, exanho_context:ExanhoContext):
@@ -24,6 +26,9 @@ def initialize(appsettings, exanho_context:ExanhoContext):
     return context
 
 def work(context:Context):
+
+    handled_count = 0
+
     with Sessional.domain.session_scope() as session:
         entity = context.log_parser.extract_unit(session)
 
@@ -34,17 +39,24 @@ def work(context:Context):
 
             for source, doc_id, publish_dt in context.log_parser.unhandled_docs(session, *entity):
                 try:
+                    handled_count += 1
                     addition_only = True if publish_dt < last_handled_publish_dt else False
                     context.log_parser.handle(session, source, doc_id, addition_only, *entity)
                     context.log_parser.mark_as_handled(session, source, doc_id, *entity)
                     last_handled_publish_dt = max(last_handled_publish_dt, publish_dt)
                     session.commit()
+
+                    if not (handled_count % COUNT_TO_LOGGER):
+                        log.info(f'Another {COUNT_TO_LOGGER} log records were handled')
                 except Exception as ex:
                     session.rollback()
                     log.exception(f'source={source}, doc_id={doc_id}', ex)
 
             log.debug(f'Log for {entity} entity has been parsed')
             entity = context.log_parser.extract_unit(session)
+
+    if handled_count:
+        log.info(f'All {handled_count} log records have been handled')
 
     return context 
 

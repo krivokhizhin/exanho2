@@ -11,6 +11,8 @@ from ..model.aggregate import EisTableName, LogPlaceholder
 
 log = logging.getLogger(__name__)
 
+COUNT_TO_LOGGER = 50000
+
 Context = namedtuple('Context', ['log_placeholders'])
 
 LogModulePH = namedtuple('LogModulePH', ['module', 'id'])
@@ -46,22 +48,29 @@ def initialize(appsettings, exanho_context:ExanhoContext):
     return context
 
 def work(context:Context):
+
+    add_to_log_count = 0
+
     with Sessional.domain.session_scope() as session:
         for log_placeholder in context.log_placeholders:
-            table_name = log_placeholder.module.get_work_table_name().name
             try:
                 last_id = get_table_last_id(session, log_placeholder.id)
                 current_dto = log_placeholder.module.get_current_dto(session, last_id)
                 while current_dto:
+                    add_to_log_count += 1
                     last_id = log_placeholder.module.add_to_log(session, current_dto)
                     set_table_last_id(session, log_placeholder.id, last_id)
                     session.commit()
 
-                    log.debug(f'The document id={last_id} from {table_name} was placed in a log')
+                    if not (add_to_log_count % COUNT_TO_LOGGER):
+                        log.info(f'Another {COUNT_TO_LOGGER} DTOs were added to log')
                     current_dto = log_placeholder.module.get_current_dto(session, last_id)
             except Exception as ex:
                 session.rollback()
                 log.exception('log_placeholder: ', ex)
+
+    if add_to_log_count:
+        log.info(f'All {add_to_log_count} DTOs have been added to log')
 
     return context 
 

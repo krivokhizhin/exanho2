@@ -10,7 +10,7 @@ type_matching = {
 
     'cntrensuringway': 'VARCHAR(2)',
     'cntrensuringtype':'VARCHAR(11)',
-    'cntrensuringstatus':'VARCHAR(11)',
+    'cntrensuringstatus':'VARCHAR(16)',
 
     'eistablename': 'VARCHAR(34)',
     'aggcontractstate': 'VARCHAR(12)'

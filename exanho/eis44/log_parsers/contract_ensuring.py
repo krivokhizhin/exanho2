@@ -2,14 +2,14 @@ import decimal
 from sqlalchemy.orm.session import Session as OrmSession
 
 from ..model.aggregate import CntrEnsuringWay, CntrEnsuringType, CntrEnsuringStatus, AggContract, AggContractEnsuring
-from ..model.contract import CntrEnsuringKind, ZfcsContract2015Enforcement, CntrQualityGuaranteeInfo, ZfcsContract2015BgReturn
+from ..model.contract import CntrEnsuringKind, ZfcsContract2015Enforcement, CntrQualityGuaranteeInfo, CntrBgReturnKind, ZfcsContract2015BgReturn
 
 def handle_enforcement(session:OrmSession, contract:AggContract, enforcement_obj:ZfcsContract2015Enforcement, addition_only:bool):
     enforcement = None
     kind = CntrEnsuringType.MAINTENANCE if enforcement_obj.is_subsequent_maintenance else CntrEnsuringType.ENFORCEMENT
 
     if contract.ensuring:
-        enforcement = [ensuring for ensuring in contract.ensuring if ensuring.kind == kind and ensuring.status == CntrEnsuringStatus.ACCEPT]
+        enforcement = [ensuring_ for ensuring_ in contract.ensuring if ensuring_.kind == kind and ensuring_.status == CntrEnsuringStatus.ACCEPT]
         if enforcement:
             enforcement = enforcement[0]
     else:
@@ -47,7 +47,7 @@ def handle_quality_guarantee(session:OrmSession, contract:AggContract, qg_obj:Cn
         quality_guarantee = None
 
         if contract.ensuring:
-            quality_guarantee = [ensuring for ensuring in contract.ensuring if ensuring.kind == CntrEnsuringType.QUALITY and ensuring.status == CntrEnsuringStatus.ACCEPT]
+            quality_guarantee = [ensuring_ for ensuring_ in contract.ensuring if ensuring_.kind == CntrEnsuringType.QUALITY and ensuring_.status == CntrEnsuringStatus.ACCEPT]
             if quality_guarantee:
                 quality_guarantee = quality_guarantee[0]
         else:
@@ -80,4 +80,62 @@ def handle_quality_guarantee(session:OrmSession, contract:AggContract, qg_obj:Cn
         pass
 
 def handle_guarantee_return(session:OrmSession, contract:AggContract, qr_obj:ZfcsContract2015BgReturn, addition_only:bool):
-    pass
+    bg_status = None
+    if qr_obj.kind == CntrBgReturnKind.RETURN:
+        bg_status = CntrEnsuringStatus.RETURN
+    elif qr_obj.kind == CntrBgReturnKind.WAIVER:
+        bg_status = CntrEnsuringStatus.WAIVER
+    elif qr_obj.kind == CntrBgReturnKind.NOT_PUBLISHED:
+        bg_status = CntrEnsuringStatus.RETURN_OR_WAIVER
+    else:
+        return
+
+    if qr_obj.contract_id:
+        enforcement = None
+
+        if contract.ensuring:
+            enforcement = [ensuring_ for ensuring_ in contract.ensuring if ensuring_.way == CntrEnsuringWay.BG and ensuring_.kind == CntrEnsuringType.ENFORCEMENT]
+            if enforcement:
+                enforcement = enforcement[0]
+        else:
+            contract.ensuring = list()
+
+        if not enforcement:
+            enforcement = AggContractEnsuring(
+                way = CntrEnsuringWay.BG,
+                kind = CntrEnsuringType.ENFORCEMENT,
+                status = bg_status
+            )
+            contract.ensuring.append(enforcement)
+            session.add(enforcement)
+        elif addition_only:
+            if enforcement.status is None: enforcement.status = bg_status
+        else:
+            enforcement.status = bg_status
+
+
+    elif qr_obj.quality_guarantee_id:
+        quality_guarantee = None
+            
+        if contract.ensuring:
+            quality_guarantee = [ensuring_ for ensuring_ in contract.ensuring if ensuring_.way == CntrEnsuringWay.BG and ensuring_.kind == CntrEnsuringType.QUALITY]
+            if quality_guarantee:
+                quality_guarantee = quality_guarantee[0]
+        else:
+            contract.ensuring = list()
+         
+        if not quality_guarantee:
+            quality_guarantee = AggContractEnsuring(
+                way = CntrEnsuringWay.BG,
+                kind = CntrEnsuringType.QUALITY,
+                status = bg_status
+            )
+            contract.ensuring.append(quality_guarantee)
+            session.add(quality_guarantee)
+        elif addition_only:
+            if quality_guarantee.status is None: quality_guarantee.status = bg_status
+        else:
+            quality_guarantee.status = bg_status
+   
+    else:
+        return

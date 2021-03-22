@@ -139,6 +139,7 @@ def parse(session, contract_obj:zfcs_contract2015Type, update=True, **kwargs):
     if subsequent_maintenance_enforcement:
         contract.enforcements.append(subsequent_maintenance_enforcement)
 
+    contract.guarantee_returns = []
     contract.quality_guarantee = get_quality_guarantee(session, contract_obj.qualityGuaranteeInfo)
 
     fill_guarantee_returns(session, contract, contract_obj.guaranteeReturns)
@@ -633,8 +634,7 @@ def get_quality_guarantee(session:OrmSession, quality_guarantee_obj:qualityGuara
 
     return quality_guarantee
 
-def fill_guarantee_returns(session:OrmSession, owner:ZfcsContract2015, guarantee_returns_obj:zfcs_contract2015BankGuaranteeReturnType):
-    owner.guarantee_returns = []
+def fill_guarantee_returns(session:OrmSession, owner:ZfcsContract2015, guarantee_returns_obj:zfcs_contract2015BankGuaranteeReturnType):    
     if guarantee_returns_obj is None:
         return
 
@@ -645,7 +645,6 @@ def fill_guarantee_returns(session:OrmSession, owner:ZfcsContract2015, guarantee
             owner.guarantee_returns.append(guarantee_return)
 
 def fill_guarantee_returns_for_obligations(session:OrmSession, owner:CntrQualityGuaranteeInfo, guarantee_returns_obj:zfcs_contract2015BankGuaranteeReturnType):
-    owner.guarantee_returns = []
     if guarantee_returns_obj is None:
         return
 

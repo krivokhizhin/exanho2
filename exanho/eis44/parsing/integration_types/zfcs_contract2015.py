@@ -340,7 +340,7 @@ def get_individual_person_fs(session, supplier_obj:corr_supplierIndividualPerson
 
     inn = supplier_obj.registerInRFTaxBodies.INN if supplier_obj.registerInRFTaxBodies else str(supplier_obj.taxPayerCode)[:INN_LENGTH]
     if supplier_obj.registerInRFTaxBodies is None and len(str(supplier_obj.taxPayerCode))> INN_LENGTH:
-        raise Error(f'len({supplier_obj.taxPayerCode}) is more then {INN_LENGTH} symbols')
+        inn = hash_str_raw(str(supplier_obj.taxPayerCode))
 
     if inn is None:
         inn = hash_str_raw('{0} {1}'.format(contact.last_name, contact.first_name) + ' {0}'.format(contact.middle_name) if contact.middle_name else '')
@@ -639,7 +639,7 @@ def fill_guarantee_returns(session:OrmSession, owner:ZfcsContract2015, guarantee
         return
 
     for guarantee_return_obj in guarantee_returns_obj.guaranteeReturn:
-        guarantee_return = get_guarantee_return(session, guarantee_return_obj)
+        guarantee_return = get_guarantee_return(guarantee_return_obj)
         if guarantee_return:
             session.add(guarantee_return)
             owner.guarantee_returns.append(guarantee_return)
@@ -650,7 +650,7 @@ def fill_guarantee_returns_for_obligations(session:OrmSession, owner:CntrQuality
         return
 
     for guarantee_return_obj in guarantee_returns_obj.guaranteeReturn:
-        guarantee_return = get_guarantee_return(session, guarantee_return_obj)
+        guarantee_return = get_guarantee_return(guarantee_return_obj)
         if guarantee_return:
             session.add(guarantee_return)
             owner.guarantee_returns.append(guarantee_return)

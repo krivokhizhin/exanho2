@@ -72,7 +72,7 @@ class ZfcsContract2015(Base):
     quality_guarantee = relationship('CntrQualityGuaranteeInfo', uselist=False, back_populates='contract', cascade='all, delete-orphan')
     guarantee_returns = relationship('ZfcsContract2015BgReturn', back_populates='contract', cascade='all, delete-orphan')
 
-    energy_service_info = Column(String(500))
+    energy_service_info = Column(String(1000))
 
     # products
     suppliers = relationship('ZfcsContract2015Supplier', back_populates='contract', cascade='all, delete-orphan')

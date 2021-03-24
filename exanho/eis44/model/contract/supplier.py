@@ -1,5 +1,5 @@
 import enum
-from sqlalchemy import BigInteger, Boolean, Column, Date, Enum, ForeignKey, Integer, String
+from sqlalchemy import BigInteger, Boolean, Column, Date, Enum, ForeignKey, Index, Integer, String
 from sqlalchemy.orm import relationship
 from exanho.orm.domain import Base
 
@@ -15,14 +15,37 @@ class CntrSupplierType(enum.Enum):
 class ZfcsContract2015Supplier(Base):
     __tablename__ = 'zfcs_contract2015_supplier'
     
+    id = Column(BigInteger, primary_key=True)
     type = Column(Enum(CntrSupplierType), nullable=False)
 
-    contract_id = Column(BigInteger, ForeignKey('zfcs_contract2015.id'), primary_key=True)
-    participant_id = Column(BigInteger, ForeignKey('cntr_participant.id'), primary_key=True)
-    order = Column(Integer, default=1, primary_key=True)
-
+    contract_id = Column(BigInteger, ForeignKey('zfcs_contract2015.id'))
     contract = relationship('ZfcsContract2015', back_populates='suppliers')
-    participant = relationship('CntrParticipant', back_populates='contracts')
+
+    order = Column(Integer, default=1)
+    
+    okopf_code = Column(String(5))
+    okopf_name = Column(String(2000))
+
+    full_name = Column(String(2000))
+    short_name = Column(String(2000))
+    firm_name = Column(String(2000))
+
+    okpo = Column(String(20))
+    inn = Column(String(12))
+    kpp = Column(String(9))
+    registration_date = Column(Date)
+    oktmo_code = Column(String(11))
+    oktmo_name = Column(String(1000))
+
+    full_name_lat = Column(String(2000))
+    tax_payer_code = Column(String(100))
+    country_code = Column(String(3))
+    country_full_name = Column(String(200))
+
+    fs_address = Column(String(1024))
+    fs_post_address = Column(String(1024))
+    fs_email = Column(String(256))
+    fs_phone = Column(String(30))
 
     status = Column(String(2))
     ersmsp_inclusion_date = Column(Date)
@@ -36,11 +59,14 @@ class ZfcsContract2015Supplier(Base):
     post_box_number = Column(String(1024))
     post_address = Column(String(1024))
     
-    contact_id = Column(Integer, ForeignKey('cntr_contact.id'))
-    contact = relationship('CntrContact', back_populates='suppliers')
-
+    contact_last_name = Column(String(250))
+    contact_first_name = Column(String(250))
+    contact_middle_name = Column(String(250))
     contact_email = Column(String(256))
     contact_phone = Column(String(30))
 
     is_ip = Column(Boolean)
     is_culture = Column(Boolean)
+
+Index('ix_zfcs_contract2015_supplier_inn_kpp', ZfcsContract2015Supplier.inn, ZfcsContract2015Supplier.kpp)
+Index('ix_zfcs_contract2015_supplier_tax_payer_code', ZfcsContract2015Supplier.tax_payer_code)

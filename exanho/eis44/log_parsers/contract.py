@@ -1,3 +1,4 @@
+from hashlib import blake2b
 import datetime
 import decimal
 import logging
@@ -8,11 +9,13 @@ from sqlalchemy.orm.session import Session as OrmSession
 from exanho.core.common import Error
 
 from ..model.aggregate import EisTableName, EisContractLog, EisParticipantLog, AggContractState, AggContract
-from ..model.contract import ZfcsContract2015, ZfcsContractCancel2015, ZfcsContractProcedure2015, ZfcsContractProcedureCancel2015
+from ..model.contract import ZfcsContract2015, ZfcsContractCancel2015, ZfcsContractProcedure2015, ZfcsContractProcedureCancel2015, ZfcsContract2015Supplier
 
 from . import contract_ensuring
 
 log = logging.getLogger(__name__)
+
+UNKNOWN_PRCT = '************'
 
 def get_contract_state(current_stage:str) -> AggContractState:
     if current_stage:
@@ -143,8 +146,15 @@ def handle(session:OrmSession, source:EisTableName, doc_id:int, addition_only:bo
             cntr = session.query(AggContract).filter(AggContract.reg_num == reg_num).one()
 
         for supp_obj in obj.suppliers:
-            inn = supp_obj.participant.inn
-            kpp = supp_obj.participant.kpp
+            assert isinstance(supp_obj, ZfcsContract2015Supplier)
+            inn = supp_obj.inn
+            kpp = supp_obj.kpp
+            if inn and len(inn)>12:
+                inn = _hash_str_raw(inn)
+            if not inn and supp_obj.country_code and supp_obj.tax_payer_code:
+                inn = _hash_str_raw(f'{supp_obj.country_code}{supp_obj.tax_payer_code}')
+            if not inn:
+                inn = UNKNOWN_PRCT
             participant_log = session.query(EisParticipantLog).\
                 filter(EisParticipantLog.source == EisTableName.zfcs_contract2015).filter(EisParticipantLog.doc_id == doc_id).\
                     filter(EisParticipantLog.inn == inn).filter(EisParticipantLog.kpp == kpp).\
@@ -206,6 +216,11 @@ def mark_as_handled(session:OrmSession, source:EisTableName, doc_id:int, reg_num
             one()
 
     cntr_log.handled = True
+
+def _hash_str_raw(raw:str, lenght:int=6):
+    h = blake2b(digest_size=lenght)
+    h.update(raw.encode(encoding='utf-8'))
+    return h.hexdigest()
         
 def finalize():
     pass

@@ -11,8 +11,8 @@ class AggParticipant(ExaObjectMixin, Base):
     kpp = Column(String(9))
 
     name_lat = Column(String(2000))
+    country_code = Column(String(3))
     tax_payer_code = Column(String(100))
-    country_full_name = Column(String(200))
 
     contracts = relationship('AggContractParticipant', back_populates='participant', cascade='all, delete-orphan')
 

@@ -1,5 +1,3 @@
-import enum
-
 from sqlalchemy import BigInteger, Boolean, Column, DateTime, Enum, Index, String, UniqueConstraint
 from exanho.orm.domain import Base
 

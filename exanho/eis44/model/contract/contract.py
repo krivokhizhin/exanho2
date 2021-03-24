@@ -93,5 +93,5 @@ class ZfcsContract2015(Base):
     scheme_version = Column(String(20))
     content_id = Column(BigInteger)
 
-Index('idx_zfcs_contract2015_reg_num', ZfcsContract2015.reg_num)
+# Index('idx_zfcs_contract2015_reg_num', ZfcsContract2015.reg_num)
 Index('idx_zfcs_contract2015_doc_id', ZfcsContract2015.doc_id, ZfcsContract2015.external_id, unique=True)

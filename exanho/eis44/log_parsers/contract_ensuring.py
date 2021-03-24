@@ -77,7 +77,8 @@ def handle_quality_guarantee(session:OrmSession, contract:AggContract, qg_obj:Cn
             quality_guarantee.amount = ensuring.amount
 
     if qg_obj.guarantee_returns:
-        pass
+        for guarantee_return in qg_obj.guarantee_returns:
+            handle_guarantee_return(session, contract, guarantee_return, addition_only)
 
 def handle_guarantee_return(session:OrmSession, contract:AggContract, qr_obj:ZfcsContract2015BgReturn, addition_only:bool):
     bg_status = None

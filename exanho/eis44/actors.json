@@ -67,7 +67,7 @@
                     "appsettings":{
                         "parse_module": "exanho.eis44.ds.contracts.fcsExport",
                         "error_attempts": 2,
-                        "update": true
+                        "update": false
                     }
                 }
             ]

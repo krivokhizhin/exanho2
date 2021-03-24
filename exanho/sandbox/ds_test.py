@@ -1,7 +1,7 @@
 def run():
 
     import exanho.orm.domain as domain
-    d = domain.Domain('postgresql+psycopg2://kks:Nata1311@localhost/eis44_test')
+    d = domain.Domain('postgresql+psycopg2://kks:Nata1311@localhost/eis44')
 
     import exanho.eis44.ds.contracts.fcsExport as ds_mod
     f = open('/home/kks/projects/eis44DS/data/contracts/20200601/contract_1380000014018000115_58050142.xml', 'br')

@@ -1,6 +1,7 @@
 from sqlalchemy.orm.session import Session as OrmSession
 
 from ...ds.contracts.fcsExport import zfcs_contract2015Type
+from ...ds.contracts.IntegrationTypes import customer, placer
 from ...ds.contracts.IntegrationTypes import suppliers, zfcs_contract2015SupplierType, corr_supplierLegalEntityRF, corr_supplierLegalEntityForeignState, corr_supplierIndividualPersonRF, corr_supplierIndividualPersonForeignState, individualPersonRFisCulture, individualPersonForeignStateisCulture
 from ...ds.contracts.IntegrationTypes import zfcs_contract2015EnforcementType, qualityGuaranteeInfo, zfcs_contract2015BankGuaranteeReturnType, bankGuarantee, cashAccount, guaranteeReturn
 
@@ -98,6 +99,9 @@ def parse(session, contract_obj:zfcs_contract2015Type, update=True, **kwargs):
 
     contract.content_id = content_id
 
+    contract.customer = get_customer(contract_obj.customer)
+    contract.placer = get_placer(contract_obj.placer)
+
     if contract_obj.priceInfo and contract_obj.priceInfo.rightToConcludeContractPriceInfo is None:
         contract.price = contract_obj.priceInfo.price
         contract.price_type = contract_obj.priceInfo.priceType
@@ -138,6 +142,40 @@ def parse(session, contract_obj:zfcs_contract2015Type, update=True, **kwargs):
 
     fill_guarantee_returns(session, contract, contract_obj.guaranteeReturns)
 
+
+def get_customer(customer_obj:customer):
+    if customer_obj is None:
+        return None
+
+    return CntrCustomer(
+        reg_num = customer_obj.regNum,
+        cons_registry_num = customer_obj.consRegistryNum,
+        full_name = customer_obj.fullName,
+
+        short_name = customer_obj.shortName,
+        registration_date = customer_obj.registrationDate,
+        inn = customer_obj.inn,
+        kpp = customer_obj.kpp,
+            
+        # okopf_code = customer_obj.???,
+        # okopf_name = customer_obj.???,
+
+        okpo = customer_obj.OKPO,
+        customer_code = customer_obj.customerCode
+    )
+
+def get_placer(placer_obj:placer):
+    if placer_obj is None:
+        return None
+
+    return CntrPlacer(
+        reg_num = placer_obj.responsibleOrg.regNum if placer_obj.responsibleOrg else None,
+        cons_registry_num = placer_obj.responsibleOrg.consRegistryNum if placer_obj.responsibleOrg else None,
+        full_name = placer_obj.responsibleOrg.fullName if placer_obj.responsibleOrg else None,
+
+        responsible_role = placer_obj.responsibleRole,
+        placer_change = placer_obj.placerChange
+    )
 
 def fill_suppliers(owner:ZfcsContract2015, suppliers_obj:suppliers):
     owner.suppliers = []

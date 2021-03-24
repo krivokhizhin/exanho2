@@ -10,6 +10,8 @@ DROP TABLE zfcs_contract2015_supplier CASCADE;
 --DROP TABLE cntr_contact CASCADE;
 --DROP TABLE cntr_participant_foreign CASCADE;
 --DROP TABLE cntr_participant CASCADE;
+DROP TABLE cntr_placer CASCADE;
+DROP TABLE cntr_customer CASCADE;
 DROP TABLE zfcs_contract2015 CASCADE;
 
 DROP TYPE cntrensuringkind;

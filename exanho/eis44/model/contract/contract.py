@@ -17,8 +17,8 @@ class ZfcsContract2015(Base):
 
     conclusion_st95_ch17_1 = Column(Boolean)
 
-    # customer
-    # placer
+    customer = relationship('CntrCustomer', uselist=False, back_populates='contract', cascade='all, delete-orphan')
+    placer = relationship('CntrPlacer', uselist=False, back_populates='contract', cascade='all, delete-orphan')
     # finances
 
     protocol_date = Column(Date)

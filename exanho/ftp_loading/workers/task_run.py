@@ -4,6 +4,7 @@ import time
 from collections import defaultdict, namedtuple
 from queue import Queue
 from threading import Thread
+from sqlalchemy.orm.session import Session as OrmSession
 
 from exanho.orm.domain import Sessional
 from exanho.core.manager_context import Context as ExanhoContext
@@ -17,11 +18,13 @@ Context = namedtuple('Context', [
     'ftp_port', 
     'ftp_user', 
     'ftp_password',
+    'ready_minutes',
+    'schedule_minutes',
     'insp_file_queue',
     'w_thread',
     'error_attempts',
     'attemp_count'
-    ], defaults=[None, None, 60, 1])
+    ], defaults=[10, 30, None, None, 60, 1])
     
 InspFile = namedtuple('InspFile', ['task_id', 'name', 'directory', 'date', 'size'])
 
@@ -45,7 +48,8 @@ def work(context:Context):
 
     try:        
         with Sessional.domain.session_scope() as session:
-            now = datetime.datetime.now()
+            assert isinstance(session, OrmSession)
+            now = datetime.datetime.today()
             load_task = session.query(FtpTask).filter(FtpTask.scheduled_date < now).filter(FtpTask.status == FtpTaskStatus.SCHEDULED).first()
 
             if load_task:
@@ -82,8 +86,10 @@ def work(context:Context):
                     log.info(f'FtpTask({load_task.id}): {load_task.status}')
                 
 
+            ready_dt = datetime.datetime.today() - datetime.timedelta(minutes=context.ready_minutes)
             insp_file_statuses = session.query(FtpTask.id, FtpFile.status).\
-                select_from(FtpTask).outerjoin(FtpFile).filter(FtpTask.status == FtpTaskStatus.RUNNING).all()
+                select_from(FtpTask).outerjoin(FtpFile).filter(FtpTask.status == FtpTaskStatus.RUNNING).\
+                    filter(FtpTask.scheduled_date < ready_dt).all()
             statuses_by_task = defaultdict(list)
             for task_id, insp_file_status in insp_file_statuses:
                 if load_task and task_id == load_task.id:
@@ -94,8 +100,13 @@ def work(context:Context):
                 statuses_set = set(statuses)
                 if (len(statuses_set) == 1) and (not {FtpFileStatus.DONE, None}.isdisjoint(statuses_set)):
                     task_done = session.query(FtpTask).get(task_id)
-                    task_done.status = FtpTaskStatus.PERFORMED
                     task_done.err_desc = None
+                    task_done.last_date = task_done.scheduled_date
+                    if task_done.schedule == '*':
+                        task_done.scheduled_date = datetime.datetime.today() + datetime.timedelta(minutes=context.schedule_minutes)
+                        task_done.status = FtpTaskStatus.SCHEDULED
+                    else:
+                        task_done.status = FtpTaskStatus.PERFORMED
                     log.info(f'FtpTask({task_done.id}): {task_done.status}')
                 elif (FtpFileStatus.FAILED in statuses_set) and ({FtpFileStatus.READY, FtpFileStatus.LOADING}.isdisjoint(statuses_set)):
                     task_done = session.query(FtpTask).get(task_id)

@@ -35,7 +35,7 @@ Context = namedtuple('Context', [
     'error_attempts',
     'attemp_count',
     'block_timeout'
-    ], defaults=[[], [], [], 0.8, False, 20, None, 60, 1, 60])
+    ], defaults=[[], [], [], 0.8, False, 20, None, 60, 0, 60])
 
 ContentData = namedtuple('ContentData', ['name', 'crc', 'size', 'last_modify', 'message'])
 ParseContent = namedtuple('ParseContent', ['id', 'archive_date', 'archive_name', 'date', 'name'])
@@ -83,8 +83,13 @@ def initialize(appsettings, exanho_context:ExanhoContext):
     log.info(f'initialize')
     return context
 
-def work(context:Context):
+def work(context:Context) -> Context:
     # log.debug('file_load in work')
+
+    attemp_count:int = context.attemp_count
+    if attemp_count > 0:
+        context = context._replace(attemp_count=attemp_count-1)
+        return context
 
     try:
         while True:
@@ -135,7 +140,7 @@ def work(context:Context):
                         log.info(f'load_file({failed_file.id}): {failed_file.status}')
 
             if futures:
-                wait_for(context, futures)
+                context = wait_for(context, futures)
 
             with Sessional.domain.session_scope() as session:
                 query_ = session.query(FtpFile).filter(FtpFile.status == FtpFileStatus.READY)
@@ -143,8 +148,10 @@ def work(context:Context):
                     query_ = query_.filter(text(context.parse_filters))
 
                 if query_.count() == 0:
-                    if context.attemp_count > 1:
-                        context = context._replace(attemp_count=1)
+                    break
+
+                if context.attemp_count > 0:
+                    log.warning('Waiting for a pause to resume working with the ftp-server')
                     break
     except Exception as ex:
         log.exception(ex)
@@ -214,7 +221,7 @@ def download_extract_zip(ftp_client, zipfilename, ext_file='.xml'):
                         ss = 59
                     yield zipinfo.filename, zipinfo.CRC, zipinfo.file_size, datetime.datetime(yy, mt, dd, hh, mi, ss), message
 
-def wait_for(context:Context, futures):
+def wait_for(context:Context, futures) -> Context:
     ready_to_parse = list()
 
     for future in concurrent.futures.as_completed(futures):
@@ -261,19 +268,19 @@ def wait_for(context:Context, futures):
             with Sessional.domain.session_scope() as session:
                 load_file = session.query(FtpFile).get(load_file_id)
                 if load_file:
-                    if label == ERROR_UNKNOWN_LABEL or context.attemp_count >= context.error_attempts:
+                    if label == ERROR_FTP_LABEL:
+                        load_file.status = FtpFileStatus.READY
+                        context = context._replace(attemp_count=context.error_attempts)
+                    else:
                         load_file.status = FtpFileStatus.FAILED
                         load_file.err_desc = err.message
                         log.error(f'{filename} (id={load_file_id}) error')
-                    else:
-                        load_file.status = FtpFileStatus.READY
-                        context = context._replace(attemp_count=context.attemp_count+1)
         else:
             raise err
 
     sorted_ready_to_parse_by_name = sorted(ready_to_parse, key=lambda content: content.name)
     sorted_ready_to_parse_by_date = sorted(sorted_ready_to_parse_by_name, key=lambda content: content.date)
-    sorted_ready_to_parse_by_archive_name = sorted(ready_to_parse, key=lambda content: content.archive_name)
+    sorted_ready_to_parse_by_archive_name = sorted(sorted_ready_to_parse_by_date, key=lambda content: content.archive_name)
     sorted_ready_to_parse = sorted(sorted_ready_to_parse_by_archive_name, key=lambda content: content.archive_date)
 
     for content in sorted_ready_to_parse:
@@ -288,3 +295,5 @@ def wait_for(context:Context, futures):
                 
                 # log.debug(f'q.put: {content.id}')
                 break
+
+    return context

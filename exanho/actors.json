@@ -29,7 +29,6 @@
                     "queue_name": "contract",
                     "appsettings":{
                         "parse_module": "exanho.eis44.ds.contracts.fcsExport",
-                        "error_attempts": 2,
                         "update": false
                     }
                 }
@@ -46,7 +45,6 @@
                     "queue_name": "contract",
                     "appsettings":{
                         "parse_module": "exanho.eis44.ds.contracts.fcsExport",
-                        "error_attempts": 2,
                         "update": false
                     }
                 }
@@ -63,7 +61,6 @@
                     "queue_name": "contract",
                     "appsettings":{
                         "parse_module": "exanho.eis44.ds.contracts.fcsExport",
-                        "error_attempts": 2,
                         "update": false
                     }
                 }
@@ -80,7 +77,6 @@
                     "queue_name": "contract",
                     "appsettings":{
                         "parse_module": "exanho.eis44.ds.contracts.fcsExport",
-                        "error_attempts": 2,
                         "update": false
                     }
                 }
@@ -125,53 +121,7 @@
                         ],
                         "max_mem_level": 0.8,
                         "with_swap": false,
-                        "max_pool_workers": 1,
-                        "block_timeout": 60
-                    }
-                }
-            ]
-        },
-        {
-            "name": "ContractLogPlaceholder",
-            "kind": "SleepWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.eis44.workers.placeholder",
-                    "db_key": "eis44_test",
-                    "sleep": 5.0,
-                    "appsettings":{
-                        "log_placeholders": ["exanho.eis44.placeholders.zfcs_contract2015", "exanho.eis44.placeholders.zfcs_contract_cancel2015", "exanho.eis44.placeholders.zfcs_contract_procedure2015", "exanho.eis44.placeholders.zfcs_contract_procedure_cancel2015"]
-                    }
-                }
-            ]
-        },
-        {
-            "name": "ParticipantLogParser",
-            "kind": "SleepWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.eis44.workers.log_parser",
-                    "db_key": "eis44_test",
-                    "sleep": 5.0,
-                    "appsettings":{
-                        "log_parser": "exanho.eis44.log_parsers.participant"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "ContractLogParser",
-            "kind": "SleepWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.eis44.workers.log_parser",
-                    "db_key": "eis44_test",
-                    "sleep": 5.0,
-                    "appsettings":{
-                        "log_parser": "exanho.eis44.log_parsers.contract"
+                        "max_pool_workers": 1
                     }
                 }
             ]

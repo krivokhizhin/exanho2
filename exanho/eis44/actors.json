@@ -66,7 +66,6 @@
                     "queue_name": "contract",
                     "appsettings":{
                         "parse_module": "exanho.eis44.ds.contracts.fcsExport",
-                        "error_attempts": 2,
                         "update": false
                     }
                 }
@@ -111,8 +110,7 @@
                         ],
                         "max_mem_level": 0.8,
                         "with_swap": false,
-                        "max_pool_workers": 1,
-                        "block_timeout": 60
+                        "max_pool_workers": 1
                     }
                 }
             ]

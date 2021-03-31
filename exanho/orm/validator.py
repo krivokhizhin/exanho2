@@ -65,5 +65,6 @@ class Validator():
 type_matching = {
     'BIGINT': 'INTEGER',
     'TIMESTAMP WITH TIME ZONE': 'DATETIME',
-    'TIMESTAMP WITHOUT TIME ZONE': 'DATETIME'
+    'TIMESTAMP WITHOUT TIME ZONE': 'DATETIME',
+    'BYTEA': 'BLOB'
 }

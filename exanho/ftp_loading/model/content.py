@@ -18,7 +18,7 @@ class FtpContent(Base):
     __tablename__ = 'ftp_load_content'
 
     id = Column(BigInteger, primary_key=True)
-    file_id = Column(BigInteger, ForeignKey('ftp_load_file.id'))
+    file_id = Column(BigInteger, ForeignKey('ftp_load_file.id'), index=True)
     status = Column(Enum(FtpContentStatus), nullable=False)
     name = Column(String(256), nullable=False, index=True)
     crc = Column(BigInteger)
@@ -27,6 +27,7 @@ class FtpContent(Base):
     message = Column(String(100))
 
     ftp_file = relationship('FtpFile', back_populates='files')
+    error_content = relationship('FtpErrorContent', uselist=False, back_populates='content', cascade='all, delete-orphan')
 
     def __str__(self):
         return 'FtpContent, {0.id}: archive_id={0.archive_id}, status={0.status}, name={0.name}'.format(self)

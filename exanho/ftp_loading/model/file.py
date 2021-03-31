@@ -25,7 +25,7 @@ class FtpFile(Base):
     err_desc = Column(String(500))
 
     task = relationship('FtpTask', back_populates='files')
-    files = relationship('FtpContent', back_populates='ftp_file')
+    files = relationship('FtpContent', back_populates='ftp_file', cascade='all, delete-orphan')
 
     def __str__(self):
         return 'FtpFile, {0.id}: task_id={0.task_id}, status={0.status}, filename={0.filename}'.format(self)

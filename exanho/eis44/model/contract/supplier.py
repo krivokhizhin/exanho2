@@ -68,5 +68,6 @@ class ZfcsContract2015Supplier(Base):
     is_ip = Column(Boolean)
     is_culture = Column(Boolean)
 
+Index('ix_zfcs_contract2015_supplier_contract_id', ZfcsContract2015Supplier.contract_id)
 Index('ix_zfcs_contract2015_supplier_inn_kpp', ZfcsContract2015Supplier.inn, ZfcsContract2015Supplier.kpp)
 Index('ix_zfcs_contract2015_supplier_tax_payer_code', ZfcsContract2015Supplier.tax_payer_code)

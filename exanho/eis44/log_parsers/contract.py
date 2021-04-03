@@ -3,7 +3,7 @@ import datetime
 import decimal
 import logging
 
-from sqlalchemy import func
+from sqlalchemy import distinct, func
 from sqlalchemy.orm.session import Session as OrmSession
 
 from exanho.core.common import Error
@@ -122,6 +122,11 @@ def extract_unit(session:OrmSession):
     return session.query(EisContractLog.reg_num).\
         filter(EisContractLog.handled == False).\
             first()
+
+def extract_units(session:OrmSession, batch_size:int) -> list:
+    return session.query(distinct(EisContractLog.reg_num)).\
+        filter(EisContractLog.handled == False).\
+            limit(batch_size).all()
 
 def get_last_handled_publish_dt(session:OrmSession, reg_num:str) -> datetime.datetime:
     return session.query(func.max(EisContractLog.publish_dt)).\

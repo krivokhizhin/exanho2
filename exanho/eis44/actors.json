@@ -26,6 +26,10 @@
             {
                 "name": "contract",
                 "maxsize": 200
+            },
+            {
+                "name": "contract_log",
+                "maxsize": 200
             }
         ]
     },
@@ -123,7 +127,7 @@
                 {
                     "module": "exanho.eis44.workers.placeholder",
                     "db_key": "eis44_test",
-                    "sleep": 5.0,
+                    "sleep": 60.0,
                     "appsettings":{
                         "log_placeholders": ["exanho.eis44.placeholders.zfcs_contract2015", "exanho.eis44.placeholders.zfcs_contract_cancel2015", "exanho.eis44.placeholders.zfcs_contract_procedure2015", "exanho.eis44.placeholders.zfcs_contract_procedure_cancel2015"]
                     }
@@ -138,7 +142,7 @@
                 {
                     "module": "exanho.eis44.workers.log_parser",
                     "db_key": "eis44_test",
-                    "sleep": 5.0,
+                    "sleep": 60.0,
                     "appsettings":{
                         "log_parser": "exanho.eis44.log_parsers.participant"
                     }
@@ -154,6 +158,23 @@
                     "module": "exanho.eis44.workers.log_parser",
                     "db_key": "eis44_test",
                     "sleep": 5.0,
+                    "appsettings":{
+                        "log_parser": "exanho.eis44.log_parsers.contract",
+                        "log_parser_queue": "contract_log",
+                        "batch_size": 10
+                    }
+                }
+            ]
+        },
+        {
+            "name": "ContractLogConsumer",
+            "kind": "QueueWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.eis44.workers.log_parser_consumer",
+                    "db_key": "eis44_test",
+                    "queue_name": "contract_log",
                     "appsettings":{
                         "log_parser": "exanho.eis44.log_parsers.contract"
                     }

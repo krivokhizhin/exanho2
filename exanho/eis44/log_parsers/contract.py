@@ -8,10 +8,8 @@ from sqlalchemy.orm.session import Session as OrmSession
 
 from exanho.core.common import Error
 
-from ..model.aggregate import EisTableName, EisContractLog, EisParticipantLog, AggContractState, AggContract
+from ..model.aggregate import EisTableName, EisContractLog, EisParticipantLog, EisContractEnsuringLog, AggContractState, AggContract
 from ..model.contract import ZfcsContract2015, ZfcsContractCancel2015, ZfcsContractProcedure2015, ZfcsContractProcedureCancel2015, ZfcsContract2015Supplier
-
-from . import contract_ensuring
 
 log = logging.getLogger(__name__)
 
@@ -177,16 +175,32 @@ def handle(session:OrmSession, source:EisTableName, doc_id:int, addition_only:bo
             else:
                 participant_log.handled = False
 
-        if obj.enforcements:
-            for enforcement in obj.enforcements:
-                contract_ensuring.handle_enforcement(session, cntr, enforcement, addition_only)
+        if obj.enforcements or obj.quality_guarantee or obj.guarantee_returns:
+            ensuring_log = session.query(EisContractEnsuringLog).\
+                filter(EisContractEnsuringLog.source == EisTableName.zfcs_contract2015).filter(EisContractEnsuringLog.doc_id == doc_id).\
+                    one_or_none()
+            if ensuring_log is None:
+                ensuring_log = EisContractEnsuringLog(
+                    reg_num = reg_num,
+                    publish_dt = obj.publish_dt,
+                    source = EisTableName.zfcs_contract2015,
+                    doc_id = doc_id,
+                    handled = False
+                )
+                session.add(ensuring_log)
+            else:
+                ensuring_log.handled = False
 
-        if obj.quality_guarantee:
-            contract_ensuring.handle_quality_guarantee(session, cntr, obj.quality_guarantee, addition_only)
+        # if obj.enforcements:
+        #     for enforcement in obj.enforcements:
+        #         contract_ensuring.handle_enforcement(session, cntr, enforcement, addition_only)
 
-        if obj.guarantee_returns:
-            for guarantee_return in obj.guarantee_returns:
-                contract_ensuring.handle_guarantee_return(session, cntr, guarantee_return, addition_only)
+        # if obj.quality_guarantee:
+        #     contract_ensuring.handle_quality_guarantee(session, cntr, obj.quality_guarantee, addition_only)
+
+        # if obj.guarantee_returns:
+        #     for guarantee_return in obj.guarantee_returns:
+        #         contract_ensuring.handle_guarantee_return(session, cntr, guarantee_return, addition_only)
 
     elif source == EisTableName.zfcs_contract_cancel2015:
         obj = session.query(ZfcsContractCancel2015).get(doc_id)

@@ -13,7 +13,7 @@ class ZfcsContractCancel2015(Base):
     doc_base = Column(String(2000), nullable=False)
     current_stage = Column(String(5))
 
-    contract_number = Column(String(50))
+    contract_number = Column(String(100))
     sign_date = Column(Date)
     # contractPrintFormInfo->customer
     sign_name = Column(String(2000))

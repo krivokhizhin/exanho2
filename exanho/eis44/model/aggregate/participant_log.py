@@ -17,6 +17,7 @@ class EisParticipantLog(Base):
 
     handled = Column(Boolean, default=False, nullable=False)
 
-Index('idx_eis_participant_log_inn_kpp', EisParticipantLog.inn, EisParticipantLog.kpp, EisParticipantLog.publish_dt.asc())
+Index('idx_eis_participant_log_inn_kpp', EisParticipantLog.inn, EisParticipantLog.kpp)
+Index('idx_eis_participant_log_inn_kpp_not_handled', EisParticipantLog.inn, EisParticipantLog.kpp, postgresql_where=EisParticipantLog.handled==False)
 Index('idx_eis_participant_log_source_doc_id', EisParticipantLog.source, EisParticipantLog.doc_id)
 UniqueConstraint(EisParticipantLog.source, EisParticipantLog.doc_id, EisParticipantLog.inn, EisParticipantLog.kpp, name='uix_eis_participant_log')

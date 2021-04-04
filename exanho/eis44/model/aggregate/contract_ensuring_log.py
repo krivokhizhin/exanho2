@@ -16,6 +16,7 @@ class EisContractEnsuringLog(Base):
 
     handled = Column(Boolean, default=False, nullable=False)
 
-Index('idx_eis_contract_ensuring_log_reg_num_publish_dt', EisContractEnsuringLog.reg_num, EisContractEnsuringLog.publish_dt.asc())
+Index('idx_eis_contract_ensuring_log_reg_num', EisContractEnsuringLog.reg_num)
+Index('idx_eis_contract_ensuring_log_reg_num_not_handled', EisContractEnsuringLog.reg_num, postgresql_where=EisContractEnsuringLog.handled==False)
 Index('idx_eis_contract_ensuring_log_source_doc_id', EisContractEnsuringLog.source, EisContractEnsuringLog.doc_id, unique=True)
 UniqueConstraint(EisContractEnsuringLog.source, EisContractEnsuringLog.doc_id, EisContractEnsuringLog.reg_num, name='uix_eis_contract_ensuring_log')

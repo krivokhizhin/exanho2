@@ -16,8 +16,8 @@ from ...utils import eis_service
 from .vk_bot_context import VkBotContext
 from .client_context import ClientContext
 
-from exanho.purchbot.model import ProductKind, Product, VkDialogContent, Tariff, AddInfoCode, AddInfoSettings, LastTradeDetailing, ProductAddInfo, Trade
-from exanho.purchbot.vk.ui import PayloadCommand, Payload, ParticipantList, ProductList, MainMenu, ConfirmTrade, UIElementBuilder, SnackbarNotice
+from exanho.purchbot.model import ProductKind, Product, VkDialogContent, Tariff, AddInfoCode, AddInfoSettings, LastOrderDetailing, ProductAddInfo, Order
+from exanho.purchbot.vk.ui import PayloadCommand, Payload, ParticipantList, ProductList, MainMenu, ConfirmOrder, UIElementBuilder, SnackbarNotice
 from exanho.core.common import Error
 
 log = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ def show_main_menu(session:OrmSession, vk_context:VkBotContext, client_context:C
                 command = PayloadCommand.go_to_page,
                 product = pagination.payload.product,
                 page = pagination.first,
-                trade = pagination.payload.trade,
+                order = pagination.payload.order,
                 add_info = pagination.payload.add_info,
                 par_number = pagination.payload.par_number,
                 par_value = pagination.payload.par_value,
@@ -49,7 +49,7 @@ def show_main_menu(session:OrmSession, vk_context:VkBotContext, client_context:C
             Payload(
                 command = PayloadCommand.go_to_page,
                 page = pagination.prev,
-                trade = pagination.payload.trade,
+                order = pagination.payload.order,
                 add_info = pagination.payload.add_info,
                 par_number = pagination.payload.par_number,
                 par_value = pagination.payload.par_value,
@@ -63,7 +63,7 @@ def show_main_menu(session:OrmSession, vk_context:VkBotContext, client_context:C
             Payload(
                 command = PayloadCommand.go_to_page,
                 page = pagination.next,
-                trade = pagination.payload.trade,
+                order = pagination.payload.order,
                 add_info = pagination.payload.add_info,
                 par_number = pagination.payload.par_number,
                 par_value = pagination.payload.par_value,
@@ -75,7 +75,7 @@ def show_main_menu(session:OrmSession, vk_context:VkBotContext, client_context:C
             Payload(
                 command = PayloadCommand.go_to_page,
                 page = pagination.last,
-                trade = pagination.payload.trade,
+                order = pagination.payload.order,
                 add_info = pagination.payload.add_info,
                 par_number = pagination.payload.par_number,
                 par_value = pagination.payload.par_value,
@@ -194,7 +194,7 @@ def show_products_by_kind(session:OrmSession, vk_context:VkBotContext, client_co
 
     show_main_menu(session, vk_context, client_context, menu_message='?', pagination=pagination)
 
-def show_detailing_trade_message(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, trade_id:int, par_number:int):
+def show_detailing_order_message(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, order_id:int, par_number:int):
 
     message = 'Уточнение'
 
@@ -203,32 +203,32 @@ def show_detailing_trade_message(session:OrmSession, vk_context:VkBotContext, cl
     # builder = UIElementBuilder()
     # builder.build_ui_element(ui_menu.content)
 
-    product_id = session.query(Trade).get(trade_id).product_id
+    product_id = session.query(Order).get(order_id).product_id
     add_info_id = session.query(ProductAddInfo).get((product_id, par_number)).add_info_id
     add_info_code:AddInfoCode = session.query(AddInfoSettings).get(add_info_id).code
     message = session.query(VkDialogContent.content).filter(VkDialogContent.group == AddInfoCode.__name__, VkDialogContent.topic == add_info_code.name).scalar()
 
-    last_trade_detail = session.query(LastTradeDetailing).\
-        filter(LastTradeDetailing.client_id == client_context.client_id).\
+    last_order_detail = session.query(LastOrderDetailing).\
+        filter(LastOrderDetailing.client_id == client_context.client_id).\
             one_or_none()
 
-    if last_trade_detail is None:
-        last_trade_detail = LastTradeDetailing(
+    if last_order_detail is None:
+        last_order_detail = LastOrderDetailing(
             client_id = client_context.client_id,
-            trade_id = trade_id,
+            order_id = order_id,
             par_number = par_number,
             add_info = add_info_code,
             handled = False
         )
-        session.add(last_trade_detail)
+        session.add(last_order_detail)
     else:
-        last_trade_detail.trade_id = trade_id
-        last_trade_detail.par_number = par_number
-        last_trade_detail.add_info = add_info_code
-        last_trade_detail.handled = False
+        last_order_detail.order_id = order_id
+        last_order_detail.par_number = par_number
+        last_order_detail.add_info = add_info_code
+        last_order_detail.handled = False
         
 
-    # payload = Payload(command = PayloadCommand.detailing_product, context=trade_id, page=add_info_code.value)
+    # payload = Payload(command = PayloadCommand.detailing_product, context=order_id, page=add_info_code.value)
 
     send_options = SendOptions(
         user_id=client_context.vk_user_id,
@@ -248,7 +248,7 @@ def show_detailing_trade_message(session:OrmSession, vk_context:VkBotContext, cl
         )
     )
 
-def detailing_trade_by_participant(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, inn:str, kpp:str):
+def detailing_order_by_participant(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, inn:str, kpp:str):
     page:int = payload.page if payload.page else 1
     
     result = None
@@ -312,7 +312,7 @@ def detailing_trade_by_participant(session:OrmSession, vk_context:VkBotContext, 
 
         part_payload = Payload(
             command = PayloadCommand.selection_add_info,
-            trade=payload.trade,
+            order=payload.order,
             add_info=payload.add_info,
             par_number=payload.par_number,
             par_value=participant.id,
@@ -344,14 +344,14 @@ def detailing_trade_by_participant(session:OrmSession, vk_context:VkBotContext, 
     if pagination:
         show_main_menu(session, vk_context, client_context, menu_message='Для выбора нажмите соответствующую кнопку', pagination=pagination)
 
-def show_confirmation_trade(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, trade_id:int):
-    message = get_message_for_confirm(session, vk_context, client_context, trade_id)
+def show_confirmation_order(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, order_id:int):
+    message = get_message_for_confirm(session, vk_context, client_context, order_id)
 
-    ui_confirm_trade = ConfirmTrade()
-    ui_confirm_trade.set_trade(trade_id)
+    ui_confirm_order = ConfirmOrder()
+    ui_confirm_order.set_order(order_id)
 
     builder = UIElementBuilder()
-    builder.build_ui_element(ui_confirm_trade.content)
+    builder.build_ui_element(ui_confirm_order.content)
 
     send_options = SendOptions(
         user_id=client_context.vk_user_id,
@@ -370,11 +370,11 @@ def show_confirmation_trade(session:OrmSession, vk_context:VkBotContext, client_
         )
     )
 
-def get_message_for_confirm(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, trade_id:int) -> str:
+def get_message_for_confirm(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, order_id:int) -> str:
     message = 'Подтвердите заказ:'
     
-    trade = session.query(Trade).get(trade_id)
-    product = session.query(Product).get(trade.product_id)
+    order = session.query(Order).get(order_id)
+    product = session.query(Product).get(order.product_id)
     act:str = session.query(VkDialogContent.content).filter(VkDialogContent.group == product.code, VkDialogContent.topic == 'list_button').scalar()
     if product.kind == ProductKind.REPORT:
         message += f'\n{act.lower()} отчет "{product.name}"'
@@ -382,13 +382,13 @@ def get_message_for_confirm(session:OrmSession, vk_context:VkBotContext, client_
         message += f'\n{act.lower()} "{product.name}"'
 
     if product.code in ('QUE_PAR_ACT', 'QUE_PAR_HIS', 'REP_PAR_ACT', 'REP_PAR_HIS', 'SUB_PAR'):
-        message += get_participant_info_for_confirm(vk_context, client_context, int(trade.parameter1))
+        message += get_participant_info_for_confirm(vk_context, client_context, int(order.parameter1))
     elif product.code == 'REP_PARS_CON':
         pass
     else:
         pass
 
-    tariff = session.query(Tariff.value).filter(Tariff.product_id == trade.product_id).scalar()
+    tariff = session.query(Tariff.value).filter(Tariff.product_id == order.product_id).scalar()
     message += f'\nБудет списано {tariff:.0f}р'
 
     return message
@@ -447,10 +447,10 @@ def show_que_par_act_result(session:OrmSession, vk_context:VkBotContext, client_
     )
 
 def show_rep_par_act_result(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, result:list):
-    trade_id:int = payload.trade
+    order_id:int = payload.order
     shm_name = None
     shm_size = None
-    filename = f'rep_par_act_{trade_id}.csv'
+    filename = f'rep_par_act_{order_id}.csv'
 
     with io.StringIO() as buffer:
         fieldnames = ['N', 'reg_num', 'state', 'publish_dt', 'subject', 'price', 'currency_code', 'right_to_conclude', 'start_date', 'end_date', 'supplier_number', 'href']
@@ -546,10 +546,10 @@ def show_que_par_his_result(session:OrmSession, vk_context:VkBotContext, client_
     )
 
 def show_rep_par_his_result(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, result:list):
-    trade_id:int = payload.trade
+    order_id:int = payload.order
     shm_name = None
     shm_size = None
-    filename = f'rep_par_his_{trade_id}.csv'
+    filename = f'rep_par_his_{order_id}.csv'
 
     with io.StringIO() as buffer:
         fieldnames = ['N', 'reg_num', 'state', 'publish_dt', 'subject', 'price', 'currency_code', 'right_to_conclude', 'start_date', 'end_date', 'supplier_number', 'href']

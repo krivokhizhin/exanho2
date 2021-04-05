@@ -9,4 +9,4 @@ class Client(ExaObjectMixin, Base):
     desc = Column(String(1000))
 
     vk_users = relationship('VkUser', back_populates='client')
-    trades = relationship('Trade', back_populates='client')
+    orders = relationship('Order', back_populates='client')

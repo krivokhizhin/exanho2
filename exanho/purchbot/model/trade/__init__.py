@@ -1,4 +1,4 @@
 from .tariff import Tariff
-from .trade import TradeStatus, Trade
+from .order import OrderStatus, Order
 from .subscription import Subscription
-from .last_trade_detailing import LastTradeDetailing
+from .last_order_detailing import LastOrderDetailing

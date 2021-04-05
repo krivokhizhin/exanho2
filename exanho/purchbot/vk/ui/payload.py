@@ -12,12 +12,12 @@ class PayloadCommand(enum.Enum):
     menu_section_my_subscriptions = 7
     menu_section_history = 8
     request_product = 9
-    detailing_trade = 10
+    detailing_order = 10
     selection_add_info = 11
-    confirm_trade = 12
-    edit_trade = 13
-    cancel_trade = 14
-    trade_executed = 15
+    confirm_order = 12
+    edit_order = 13
+    cancel_order = 14
+    order_executed = 15
 
 class Payload:
 
@@ -25,7 +25,7 @@ class Payload:
         self.command = kwargs.get('command', None)
         self.product = kwargs.get('product', None)
         self.page = kwargs.get('page', None)
-        self.trade = kwargs.get('trade', None)
+        self.order = kwargs.get('order', None)
         self.add_info = kwargs.get('add_info', None)
         self.par_number = kwargs.get('par_number', None)
         self.par_value = kwargs.get('par_value', None)
@@ -49,7 +49,7 @@ class Payload:
 
         self.product = kwargs.get('product', None)
         self.page = kwargs.get('page', None)
-        self.trade = kwargs.get('trade', None)
+        self.order = kwargs.get('order', None)
         self.add_info = kwargs.get('add_info', None)
         self.par_number = kwargs.get('par_number', None)
         self.par_value = kwargs.get('par_value', None)

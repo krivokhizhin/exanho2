@@ -1,4 +1,4 @@
-from exanho.sandbox import ds_test as mod
+from exanho.purchbot.seed import seed as mod
 
 if __name__ == '__main__':
     mod.run()

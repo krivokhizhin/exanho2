@@ -29,10 +29,10 @@ def run():
         print('Остатки на транзитных счетах:')
         show.transit_account_remains(session, show_promo=True)
         print('Незавершенные заказы:')
-        show.during_trades(session)
+        show.during_orders(session)
         # print('Проводки по заказу:')
-        # show.acc_record_by_trade(session, 35, show_promo=True)
+        # show.acc_record_by_order(session, 35, show_promo=True)
 
-        # fix.set_trade_status_wo_conditions(session, 23, TradeStatus.DURING, TradeStatus.COMPLETED)
+        # fix.set_order_status_wo_conditions(session, 23, OrderStatus.DURING, OrderStatus.COMPLETED)
 
-        # fix.manual_trade_executed(session, 35)
+        # fix.manual_order_executed(session, 35)

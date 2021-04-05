@@ -1,7 +1,7 @@
 from ..element_content import ButtonColor, ButtonType, ButtonActionContent, ButtonContent, KeyboardContent
 from ..payload import PayloadCommand, Payload
 
-class ConfirmTrade:
+class ConfirmOrder:
 
     def __init__(self) -> None:
         self.content = KeyboardContent(
@@ -41,7 +41,7 @@ class ConfirmTrade:
             inline = True
         )
 
-    def set_trade(self, trade_id:int):
-        self.content.buttons[1][0].action.payload = Payload(command = PayloadCommand.confirm_trade, trade=trade_id).form()
-        self.content.buttons[1][1].action.payload = Payload(command = PayloadCommand.edit_trade, trade=trade_id).form()
-        self.content.buttons[1][2].action.payload = Payload(command = PayloadCommand.cancel_trade, trade=trade_id).form()
+    def set_order(self, order_id:int):
+        self.content.buttons[1][0].action.payload = Payload(command = PayloadCommand.confirm_order, order=order_id).form()
+        self.content.buttons[1][1].action.payload = Payload(command = PayloadCommand.edit_order, order=order_id).form()
+        self.content.buttons[1][2].action.payload = Payload(command = PayloadCommand.cancel_order, order=order_id).form()

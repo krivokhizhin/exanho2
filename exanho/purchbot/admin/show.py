@@ -24,22 +24,22 @@ def transit_account_remains(session:OrmSession, show_promo=False):
             continue
         print(f'{rem} | {acc}')
 
-def during_trades(session:OrmSession):   
-    for trade in session.query(Trade).filter(Trade.status == TradeStatus.DURING).order_by(Trade.amount.desc(), Trade.id):
-        print(f'{trade.id:>6} | {trade.client_id:>6} | {trade.product} | {trade.amount:18.2f} | {trade.paid:>5}')
+def during_orders(session:OrmSession):   
+    for order in session.query(Order).filter(Order.status == OrderStatus.DURING).order_by(Order.amount.desc(), Order.id):
+        print(f'{order.id:>6} | {order.client_id:>6} | {order.product} | {order.amount:18.2f} | {order.paid:>5}')
 
-def acc_record_by_trade(session:OrmSession, trade_id:int, show_promo=False):
-    assert isinstance(trade_id, int)
+def acc_record_by_order(session:OrmSession, order_id:int, show_promo=False):
+    assert isinstance(order_id, int)
 
-    trade = session.query(Trade).get(trade_id)
-    assert trade is not None
-    print(trade)
+    order = session.query(Order).get(order_id)
+    assert order is not None
+    print(order)
 
     transit_client_account_ids = list()
 
     for ca in session.query(AccAccount).\
-        filter(AccAccount.analitic1 == trade.client_id).\
-            filter(or_(AccAccount.analitic2 == trade_id, AccAccount.analitic2 == None)).\
+        filter(AccAccount.analitic1 == order.client_id).\
+            filter(or_(AccAccount.analitic2 == order_id, AccAccount.analitic2 == None)).\
                 order_by(AccAccount.id):
 
         if not show_promo and _is_promo(ca.balance_code):

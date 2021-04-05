@@ -11,4 +11,4 @@ class Subscription(ExaObjectMixin, Base):
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
     active = Column(Boolean, nullable=False, default=False)
-    trade_id = Column(BigInteger, ForeignKey('trade.id'), nullable=False)
+    order_id = Column(BigInteger, ForeignKey('order.id'), nullable=False)

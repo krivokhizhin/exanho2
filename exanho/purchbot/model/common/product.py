@@ -4,7 +4,6 @@ from sqlalchemy import BigInteger, Column, Enum, String
 from sqlalchemy.orm import relationship
 
 from exanho.orm.domain import Base
-from exanho.orm.mixin import ExaObjectMixin
 
 class ProductKind(enum.Enum):
     QUERY = 0
@@ -24,7 +23,7 @@ class Product(Base):
     add_infos = relationship('ProductAddInfo')
     tariff = relationship('Tariff', back_populates='product', uselist=False)
     
-    trades = relationship('Trade', back_populates='product')
+    orders = relationship('Order', back_populates='product')
 
     def __str__(self) -> str:
         return f'{self.kind.name:>12} | {self.code:>10}'

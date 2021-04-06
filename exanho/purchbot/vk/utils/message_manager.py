@@ -12,10 +12,11 @@ from ..ui import PayloadCommand, Payload
 
 from ...utils import accounts as acc_util
 from ...utils import account_manager as acc_mngr
+from ...utils import order_manager as order_mngr
 from ...utils import eis_service
 from ..utils import ui_manager as ui_mngr
 
-from ...model import ProductKind, Product, Client, VkUser, Tariff, OrderStatus, Order, ProductAddInfo, AddInfoCode, LastOrderDetailing
+from ...model import ProductKind, Product, Client, VkUser, OrderStatus, Order, AddInfoCode, LastOrderDetailing
 
 log = logging.getLogger(__name__)
 
@@ -126,6 +127,12 @@ def match_payload(session:OrmSession, payload:Payload, client_context:ClientCont
 
     if payload.command == PayloadCommand.get_balance:
         log.debug(f'VK user (id={client_context.vk_user_id}) pressed {PayloadCommand.get_balance.name.upper()}')
+    elif payload.command == PayloadCommand.menu_section_queries:
+        ui_mngr.show_products_by_kind(session, context, client_context, ProductKind.QUERY, payload)
+    elif payload.command == PayloadCommand.menu_section_subscriptions:
+        ui_mngr.show_products_by_kind(session, context, client_context, ProductKind.SUBSCRIPTION, payload)
+    elif payload.command == PayloadCommand.menu_section_reports:
+        ui_mngr.show_products_by_kind(session, context, client_context, ProductKind.REPORT, payload)
     elif payload.command == PayloadCommand.go_to_page:
         go_to(session, payload, client_context, context, event_obj)
     elif payload.command == PayloadCommand.request_product:
@@ -142,12 +149,6 @@ def match_payload(session:OrmSession, payload:Payload, client_context:ClientCont
         cancel_order(session, context, client_context, payload)
     elif payload.command == PayloadCommand.order_executed:
         order_executed(session, context, client_context, payload)
-    elif payload.command == PayloadCommand.menu_section_queries:
-        ui_mngr.show_products_by_kind(session, context, client_context, ProductKind.QUERY, payload)
-    elif payload.command == PayloadCommand.menu_section_subscriptions:
-        ui_mngr.show_products_by_kind(session, context, client_context, ProductKind.SUBSCRIPTION, payload)
-    elif payload.command == PayloadCommand.menu_section_reports:
-        ui_mngr.show_products_by_kind(session, context, client_context, ProductKind.REPORT, payload)
     elif payload.command == PayloadCommand.menu_section_my_subscriptions:
         log.debug(f'VK user (id={client_context.vk_user_id}) pressed {PayloadCommand.menu_section_my_subscriptions.name.upper()}')
     elif payload.command == PayloadCommand.menu_section_history:
@@ -204,49 +205,16 @@ def go_to(session:OrmSession, payload:Payload, client_context:ClientContext, con
 
 def request_product(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload):
     product_code:str = payload.product
-    order_id = None
-    par_number = None
 
-    product = session.query(Product).filter(Product.code == product_code).one_or_none()
-    if product is None:
-        return
+    order_id = order_mngr.create_or_get_order(session, product_code, client_context.client_id)
 
-    amount = session.query(Tariff.value).filter(Tariff.product == product).scalar()
-
-    order = session.query(Order).\
-        filter(Order.client_id == client_context.client_id, Order.product_id == product.id, Order.status.in_([OrderStatus.NEW, OrderStatus.FILLING])).\
-            first()
-    if order:
-        order.amount = amount
-    else:
-        order = Order(
-            status = OrderStatus.NEW,
-            client_id = client_context.client_id,
-            product_id = product.id,
-            amount = amount,
-            paid = False
-        )
-        session.add(order)
-        session.flush()
-
-    order_id = order.id
-
-    parameters = [p.par_number for p in session.query(ProductAddInfo).filter(ProductAddInfo.product_id == product.id)]
-
-    if order.parameter1 is None and 1 in parameters:
-        par_number = 1
-    elif order.parameter2 is None and 2 in parameters:
-        par_number = 2
-    elif order.parameter3 is None and 3 in parameters:
-        par_number = 3
-    else:
-        par_number = None
+    par_number = order_mngr.get_first_empty_num_parameter_or_none(session, order_id)
 
     ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Принято')
     if par_number:
         ui_mngr.show_detailing_order_message(session, vk_context, client_context, order_id, par_number)
     else:
-        order.status = OrderStatus.FILLING
+        order_mngr.mark_as_filling(session, order_id)
         ui_mngr.show_confirmation_order(session, vk_context, client_context, order_id)
 
 def detailing_order(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, event_obj:JSONObject):
@@ -290,116 +258,39 @@ def extract_inn_kpp_from_text(text:str):
 def selection_add_info(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload):
     order_id:int = payload.order
     par_number:int = payload.par_number
-    par_value:int = payload.par_value
+    par_value:str = str(payload.par_value)
 
-    order = session.query(Order).get(order_id)
-    if order is None:
-        return
-
-    if order.status not in (OrderStatus.NEW, OrderStatus.FILLING):
-        clone_order = Order(
-            status = OrderStatus.NEW,
-            client_id = order.client_id,
-            product_id = order.product_id,
-            amount = session.query(Tariff.value).filter(Tariff.product_id == order.product_id).scalar(),
-            paid = False,
-            parameter1 = order.parameter1,
-            parameter2 = order.parameter2,
-            parameter3 = order.parameter3
-        )
-        session.add(clone_order)
-        session.flush()
-        order_id = clone_order.id
-        order = clone_order
-
-    if par_number == 1:
-        order.parameter1 = str(par_value)
-    elif par_number == 2:
-        order.parameter2 = str(par_value)
-    elif par_number == 3:
-        order.parameter3 = str(par_value)
-    else:
-        par_number = None
-
-    parameters = [p.par_number for p in session.query(ProductAddInfo).filter(ProductAddInfo.product_id == order.product_id)]
-
-    if order.parameter1 is None and 1 in parameters:
-        par_number = 1
-    elif order.parameter2 is None and 2 in parameters:
-        par_number = 2
-    elif order.parameter3 is None and 3 in parameters:
-        par_number = 3
-    else:
-        par_number = None
+    order_id = order_mngr.check_actual_order(session, order_id)
+    order_mngr.set_patameter_by_number(session, order_id, par_number, par_value)
+    par_number = order_mngr.get_first_empty_num_parameter_or_none(session, order_id)
 
     if par_number:
         ui_mngr.show_detailing_order_message(session, vk_context, client_context, order_id, par_number)
     else:
-        order.status = OrderStatus.FILLING
+        order_mngr.mark_as_filling(session, order_id)
         ui_mngr.show_confirmation_order(session, vk_context, client_context, order_id)
 
 def confirm_order(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload):
     order_id:int = payload.order
 
-    order = session.query(Order).get(order_id)
-    if order is None:
+    if not order_mngr.check_status(session, order_id, OrderStatus.FILLING):
+        ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Подтверждение невозможно. Отредактируйте заказ или оформите услугу заново.')
         return
-
-    if order.status != OrderStatus.FILLING:
-        return ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Подтверждение невозможно. Отредактируйте заказ или оформите услугу заново.')
-
-    ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Принято')
-
-    last_order_detail = session.query(LastOrderDetailing).filter(LastOrderDetailing.client_id == client_context.client_id).\
-        filter(LastOrderDetailing.handled == False).one_or_none()
-    if last_order_detail:
-        last_order_detail.handled = True
-
-    if not order.paid and order.amount > 0:
-        promo_balance = acc_mngr.promo_balance_by_client(session, client_context.client_id)
-        free_balance = acc_mngr.free_balance_by_client(session, client_context.client_id)
-        if promo_balance >= order.amount:
-            acc_util.make_payment(
-                session,
-                acc_mngr.client_promo_payment_acc(session, client_context.client_id, order_id),
-                acc_mngr.promo_by_client_acc(session, client_context.client_id),
-                order.amount
-            )
-        elif promo_balance > 0 and free_balance >= order.amount - promo_balance:
-            acc_util.make_payment(
-                session,
-                acc_mngr.client_promo_payment_acc(session, client_context.client_id, order_id),
-                acc_mngr.promo_by_client_acc(session, client_context.client_id),
-                promo_balance
-            )
-            acc_util.make_payment(
-                session,
-                acc_mngr.client_payment_acc(session, client_context.client_id, order_id),
-                acc_mngr.free_balance_by_client_acc(session, client_context.client_id),
-                order.amount - promo_balance
-            )
-        elif free_balance >= order.amount:
-            acc_util.make_payment(
-                session,
-                acc_mngr.client_payment_acc(session, client_context.client_id, order_id),
-                acc_mngr.free_balance_by_client_acc(session, client_context.client_id),
-                order.amount
-            )
-        else:
-            ui_mngr.show_main_menu(session, vk_context, client_context, 'Недостаточно средств! Пополните, пожалуйста, баланс.')
-            return
-        
-        order.paid = True        
-
-    order.status = OrderStatus.CONFIRMED
+    
+    if order_mngr.check_and_make_payment(session, order_id):
+        ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Принято')
+    else:
+        ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Недостаточно средств! Пополните, пожалуйста, баланс.')
+        return
 
     free_balance = acc_mngr.free_balance_by_client(session, client_context.client_id)
     promo_balance = acc_mngr.promo_balance_by_client(session, client_context.client_id)
 
     client_context = client_context._replace(free_balance=free_balance, promo_balance=promo_balance)
 
-    execute_order(session, vk_context, client_context, payload, order_id)
-    order.status = OrderStatus.DURING
+    execute_order(session, vk_context, client_context, payload, order_id) # TODO: to separeted module
+
+    order_mngr.mark_as_during(session, order_id)
 
 def execute_order(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, order_id:int):
     order = session.query(Order).get(order_id)
@@ -460,24 +351,16 @@ def execute_order(session:OrmSession, vk_context:VkBotContext, client_context:Cl
 
 def edit_order(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload):
     order_id:int = payload.order
-    product_code = None
 
-    order = session.query(Order).get(order_id)
-    if order is None:
+    if not order_mngr.check_status(session, order_id, OrderStatus.DURING, OrderStatus.COMPLETED):
+        ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Редактирование невозможно. Услуга оказана ранее.')
         return
 
-    if order.status in (OrderStatus.DURING, OrderStatus.COMPLETED):
-        return ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Редактирование невозможно. Услуга оказана ранее.')
-
-    order.status = OrderStatus.NEW
-    order.parameter1 = None
-    order.parameter2 = None
-    order.parameter3 = None
-
-    product_code = order.product.code
-
+    order_mngr.reset(session, order_id)
     ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, f'Заказ №{order_id} доступен для редактирования.')
-    request_product(session, vk_context, client_context, product_code)
+
+    payload.product = order_mngr.get_product_code(session, order_id)
+    request_product(session, vk_context, client_context, payload)
 
 def cancel_order(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload):
     order_id:int = payload.order
@@ -486,15 +369,11 @@ def cancel_order(session:OrmSession, vk_context:VkBotContext, client_context:Cli
     if order is None:
         return
 
-    if order.status in (OrderStatus.DURING, OrderStatus.COMPLETED):
-        return ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Отмена невозможна. Услуга оказана ранее.')
+    if not order_mngr.check_status(session, order_id, OrderStatus.DURING, OrderStatus.COMPLETED):
+        ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Отмена невозможна. Услуга оказана ранее.')
+        return
 
-    last_order_detail = session.query(LastOrderDetailing).filter(LastOrderDetailing.client_id == client_context.client_id).\
-        filter(LastOrderDetailing.handled == False).one_or_none()
-    if last_order_detail:
-        last_order_detail.handled = True
-
-    order.status = OrderStatus.REJECTED
+    order_mngr.mark_as_rejected(session, order_id)
 
     ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, f'Заказ №{order_id} отменен')
 

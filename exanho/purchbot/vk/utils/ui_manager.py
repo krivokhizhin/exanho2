@@ -15,8 +15,9 @@ from ..dto.attachments import *
 from ...utils import eis_service
 from .vk_bot_context import VkBotContext
 from .client_context import ClientContext
+from ...utils import order_manager as order_mngr
 
-from exanho.purchbot.model import ProductKind, Product, VkDialogContent, Tariff, AddInfoCode, AddInfoSettings, LastOrderDetailing, ProductAddInfo, Order
+from exanho.purchbot.model import ProductKind, Product, VkDialogContent, Tariff, AddInfoCode, Order
 from exanho.purchbot.vk.ui import PayloadCommand, Payload, ParticipantList, ProductList, MainMenu, ConfirmOrder, UIElementBuilder, SnackbarNotice
 from exanho.core.common import Error
 
@@ -196,39 +197,10 @@ def show_products_by_kind(session:OrmSession, vk_context:VkBotContext, client_co
 
 def show_detailing_order_message(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, order_id:int, par_number:int):
 
-    message = 'Уточнение'
-
-    # ui_menu = MainMenu()
-    # ui_menu.set_label_for_balance(client_context.free_balance, client_context.promo_balance)
-    # builder = UIElementBuilder()
-    # builder.build_ui_element(ui_menu.content)
-
-    product_id = session.query(Order).get(order_id).product_id
-    add_info_id = session.query(ProductAddInfo).get((product_id, par_number)).add_info_id
-    add_info_code:AddInfoCode = session.query(AddInfoSettings).get(add_info_id).code
+    add_info_code = order_mngr.get_add_info_code(session, order_id, par_number)
     message = session.query(VkDialogContent.content).filter(VkDialogContent.group == AddInfoCode.__name__, VkDialogContent.topic == add_info_code.name).scalar()
 
-    last_order_detail = session.query(LastOrderDetailing).\
-        filter(LastOrderDetailing.client_id == client_context.client_id).\
-            one_or_none()
-
-    if last_order_detail is None:
-        last_order_detail = LastOrderDetailing(
-            client_id = client_context.client_id,
-            order_id = order_id,
-            par_number = par_number,
-            add_info = add_info_code,
-            handled = False
-        )
-        session.add(last_order_detail)
-    else:
-        last_order_detail.order_id = order_id
-        last_order_detail.par_number = par_number
-        last_order_detail.add_info = add_info_code
-        last_order_detail.handled = False
-        
-
-    # payload = Payload(command = PayloadCommand.detailing_product, context=order_id, page=add_info_code.value)
+    order_mngr.update_last_order_detailing(session, client_context.client_id, order_id, par_number, add_info_code)
 
     send_options = SendOptions(
         user_id=client_context.vk_user_id,

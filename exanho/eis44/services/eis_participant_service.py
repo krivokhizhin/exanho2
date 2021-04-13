@@ -1,16 +1,15 @@
-from exanho.eis44.model.aggregate import participant
 import logging
-import time
 
 from sqlalchemy.orm.session import Session as OrmSession
 from sqlalchemy import func
 
-from exanho.core.common import try_logged, Timer
+from exanho.core.common import try_logged
 from exanho.core.actors import ServiceBase
 from exanho.orm.domain import Sessional
 
-from ..interfaces import IEisParticipantService, ParticipantInfo, ParticipantCurrentActivityInfo, ContractInfo, ParticipantExperienceInfo, serialize
-from ..model import AggContractState, AggParticipant, AggContract, AggContractParticipant
+from ..interfaces import IEisParticipantService, ParticipantInfo, ParticipantCurrentActivityInfo, ContractInfo, ParticipantExperienceInfo, ParticipantEventInfo, serialize
+from ..model import EisParticipantLog, AggContractState, AggParticipant, AggContract, AggContractParticipant
+from . import utils
 
 class EisParticipantService(IEisParticipantService, ServiceBase):
 
@@ -273,3 +272,56 @@ class EisParticipantService(IEisParticipantService, ServiceBase):
             )
 
         return result
+    
+    @serialize
+    @try_logged
+    @Sessional
+    def get_last_participant_events(self, id:int, last_event_id:int=None) -> list:
+        assert isinstance(id, int)
+        if last_event_id:
+            assert isinstance(last_event_id, int)
+
+        session = Sessional.domain.Session
+        assert isinstance(session, OrmSession)
+
+        result = list()
+
+        participant = session.query(AggParticipant).get(id)
+        if participant:
+
+            if last_event_id is None:
+                last_participant_event = session.query(EisParticipantLog).\
+                    filter(EisParticipantLog.inn == participant.inn, EisParticipantLog.kpp == participant.kpp).\
+                        filter(EisParticipantLog.handled == True).\
+                            order_by(EisParticipantLog.id.desc()).first()
+
+                if last_participant_event:
+                    result.append(
+                        ParticipantEventInfo(
+                            participant_id=id,
+                            event_id=last_participant_event.id,
+                            event_name=utils.get_docstrings_by_doc(last_participant_event.source, last_participant_event.doc_id),
+                            publish_dt=last_participant_event.publish_dt,
+                            href=utils.get_href_by_doc(session, last_participant_event.source, last_participant_event.doc_id)
+                        )
+                    )
+
+            else:
+                for last_participant_event in session.query(EisParticipantLog).\
+                    filter(EisParticipantLog.inn == participant.inn, EisParticipantLog.kpp == participant.kpp).\
+                        filter(EisParticipantLog.id > last_event_id).filter(EisParticipantLog.handled == True).\
+                            order_by(EisParticipantLog.id):
+
+                    result.append(
+                        ParticipantEventInfo(
+                            participant_id=id,
+                            event_id=last_participant_event.id,
+                            event_name=utils.get_docstrings_by_doc(last_participant_event.source, last_participant_event.doc_id),
+                            publish_dt=last_participant_event.publish_dt,
+                            href=utils.get_href_by_doc(session, last_participant_event.source, last_participant_event.doc_id)
+                        )
+                    )
+
+        return result
+
+            

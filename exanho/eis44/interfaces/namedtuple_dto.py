@@ -32,3 +32,11 @@ ParticipantExperienceInfo = namedtuple('ParticipantExperienceInfo',[
     'cntr_first_start_date',
     'cntr_last_end_date'
 ])
+
+ParticipantEventInfo = namedtuple('ParticipantEventInfo',[
+    'participant_id',
+    'event_id',
+    'event_name',
+    'publish_dt',
+    'href'
+])

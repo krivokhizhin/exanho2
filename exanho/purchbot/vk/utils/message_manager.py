@@ -277,7 +277,7 @@ def confirm_order(session:OrmSession, vk_context:VkBotContext, client_context:Cl
         ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Подтверждение невозможно. Отредактируйте заказ или оформите услугу заново.')
         return
     
-    if order_mngr.check_and_make_payment(session, order_id):
+    if order_mngr.hold_fee(session, order_id):
         ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Принято')
     else:
         ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Недостаточно средств! Пополните, пожалуйста, баланс.')
@@ -288,7 +288,7 @@ def confirm_order(session:OrmSession, vk_context:VkBotContext, client_context:Cl
 
     client_context = client_context._replace(free_balance=free_balance, promo_balance=promo_balance)
 
-    execute_order(session, vk_context, client_context, payload, order_id) # TODO: to separeted module
+    execute_order(session, vk_context, client_context, payload, order_id)
 
     order_mngr.mark_as_during(session, order_id)
 
@@ -299,7 +299,7 @@ def execute_order(session:OrmSession, vk_context:VkBotContext, client_context:Cl
     result = None
     ui_method = None
 
-    try:
+    try: # TODO: to separeted module
 
         if product_code == 'QUE_PAR_ACT':
             result = eis_service.get_current_participant_activity(vk_context.participant_service, int(order.parameter1))
@@ -314,7 +314,10 @@ def execute_order(session:OrmSession, vk_context:VkBotContext, client_context:Cl
             ui_method = ui_mngr.show_que_par_his_result
 
         if product_code == 'SUB_PAR':
-            pass
+            result = eis_service.get_last_participant_events(vk_context.participant_service, int(order.parameter1))
+            if isinstance(result, Error):
+                raise result
+            ui_method = ui_mngr.show_sub_par_subscription
 
         if product_code == 'REP_PAR_ACT':
             result = eis_service.get_current_participant_activity_report(vk_context.participant_service, int(order.parameter1))
@@ -380,48 +383,11 @@ def cancel_order(session:OrmSession, vk_context:VkBotContext, client_context:Cli
 def order_executed(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload):
     order_id:int = payload.order
 
-    order = session.query(Order).get(order_id)
-    if order is None or order.status != OrderStatus.DURING:
+    if not order_mngr.check_status(session, order_id, OrderStatus.DURING):
         return
 
-    if order.paid:
-        promo_pay_acc = acc_mngr.client_promo_payment_acc(session, client_context.client_id, order_id)
-        promo_pay_acc_amount = acc_util.get_remain_amount(session, promo_pay_acc)
-
-        pay_acc = acc_mngr.client_payment_acc(session, client_context.client_id, order_id)
-        pay_acc_amount = acc_util.get_remain_amount(session, pay_acc)
-
-        if promo_pay_acc_amount >= order.amount:
-            acc_util.make_payment(
-                session,
-                acc_mngr.product_promo_revenue_acc(session, order_id),
-                promo_pay_acc,
-                order.amount
-            )
-        elif promo_pay_acc_amount > 0 and pay_acc_amount >= order.amount - promo_pay_acc_amount:
-            acc_util.make_payment(
-                session,
-                acc_mngr.product_promo_revenue_acc(session, order_id),
-                promo_pay_acc,
-                promo_pay_acc_amount
-            )
-            acc_util.make_payment(
-                session,
-                acc_mngr.product_revenue_acc(session, order_id),
-                pay_acc,
-                order.amount - promo_pay_acc_amount
-            )
-        elif pay_acc_amount >= order.amount:
-            acc_util.make_payment(
-                session,
-                acc_mngr.product_revenue_acc(session, order_id),
-                pay_acc,
-                order.amount
-            )
-        else:
-            return
-
-    order.status = OrderStatus.COMPLETED
+    if not order_mngr.mark_as_completed(session, order_id):
+        return
 
     if vk_context is None: # For test only !!!
         return

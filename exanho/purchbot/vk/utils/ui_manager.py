@@ -6,7 +6,7 @@ from multiprocessing import JoinableQueue, shared_memory
 
 from sqlalchemy.orm.session import Session as OrmSession
 
-from exanho.eis44.interfaces import ParticipantInfo, ParticipantCurrentActivityInfo, ParticipantExperienceInfo, ContractInfo
+from exanho.eis44.interfaces import ParticipantInfo, ParticipantCurrentActivityInfo, ParticipantExperienceInfo, ContractInfo, ParticipantEventInfo
 
 from ..dto import util as dto_util
 from ..dto.method_call import VkMethodCall
@@ -18,7 +18,7 @@ from .client_context import ClientContext
 from ...utils import order_manager as order_mngr
 
 from exanho.purchbot.model import ProductKind, Product, VkDialogContent, Tariff, AddInfoCode, Order
-from exanho.purchbot.vk.ui import PayloadCommand, Payload, ParticipantList, ProductList, MainMenu, ConfirmOrder, UIElementBuilder, SnackbarNotice
+from exanho.purchbot.vk.ui import PayloadCommand, Payload, ParticipantList, ProductList, MainMenu, ConfirmOrder, UIElementBuilder, SnackbarNotice, ParticipantEvent
 from exanho.core.common import Error
 
 log = logging.getLogger(__name__)
@@ -575,3 +575,56 @@ def show_rep_par_his_result(session:OrmSession, vk_context:VkBotContext, client_
             dto_util.form(send_options, SendAttachmentsOptions)
         )
     )
+
+def show_sub_par_subscription(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, result:list):
+    order_id:int = payload.order
+    message = 'Вы подписались на события по участнику:'
+
+    participant_id, _, _ = order_mngr.get_parameters(session, order_id)
+    participant_info = get_participant_info_for_confirm(vk_context, client_context, int(participant_id))
+    message += participant_info
+    
+    send_options = SendOptions(
+        user_id=client_context.vk_user_id,
+        random_id=0,
+        group_id=vk_context.group_id,
+        message=message
+    )
+
+    call_queue:JoinableQueue = vk_context.call_queue
+    call_queue.put(
+        VkMethodCall(
+            'messages',
+            'send',
+            dto_util.form(send_options, SendOptions)
+        )
+    )
+
+    if result:
+        event_info:ParticipantEventInfo = result[0]
+
+        ui_participant_event = ParticipantEvent()
+        ui_participant_event.fill_event(event_info.href)
+
+        message = 'Последнее событие по участнику:' + participant_info
+        message += f'\nДата события:\n{event_info.publish_dt}'
+        message += '\nТип события:\n'+event_info.event_name
+
+        builder = UIElementBuilder()
+        builder.build_ui_element(ui_participant_event.content)
+
+        send_options = SendOptions(
+            user_id=client_context.vk_user_id,
+            random_id=0,
+            keyboard=builder.form(),
+            group_id=vk_context.group_id,
+            message=message
+        )
+
+        call_queue.put(
+            VkMethodCall(
+                'messages',
+                'send',
+                dto_util.form(send_options, SendOptions)
+            )
+        )

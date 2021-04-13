@@ -38,4 +38,11 @@ def get_participant_experience(eis_service:ServerProxy, participant_id:int) -> P
 @deserialize
 def get_participant_experience_report(eis_service:ServerProxy, participant_id:int) -> list:
     assert isinstance(participant_id, int)
-    return eis_service.get_experience_report(participant_id)
+    return eis_service.get_experience_report(participant_id)  
+
+@deserialize
+def get_last_participant_events(eis_service:ServerProxy, participant_id:int, last_event_id:int=None) -> list:
+    assert isinstance(participant_id, int)
+    if last_event_id:
+        assert isinstance(last_event_id, int)
+    return eis_service.get_last_participant_events(participant_id, last_event_id)

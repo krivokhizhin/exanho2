@@ -18,7 +18,7 @@ class ConfirmOrder:
                     ButtonContent(
                         action = ButtonActionContent(
                             type_ = ButtonType.callback,
-                            label = ' Подтвердить'
+                            label = 'Подтвердить'
                         ),
                         color = ButtonColor.positive
                     ),

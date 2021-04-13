@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from exanho.orm.domain import Base
 
 class ZfcsContract2015(Base):
+    """Информация (проект информации) о заключенном контракте с 01.01.2015"""
     __tablename__ = 'zfcs_contract2015'
     
     id = Column(BigInteger, primary_key=True)

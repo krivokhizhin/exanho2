@@ -147,7 +147,7 @@ def mark_as_rejected(session:OrmSession, order_id:int):
     if order is None:
         raise Error(f'no order with this id={order_id}')
 
-    last_order_detail = session.query(LastOrderDetailing).filter(LastOrderDetailing.client_id == client_context.client_id).\
+    last_order_detail = session.query(LastOrderDetailing).filter(LastOrderDetailing.client_id == order.client_id).\
         filter(LastOrderDetailing.handled == False).one_or_none()
     if last_order_detail:
         last_order_detail.handled = True

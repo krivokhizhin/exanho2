@@ -1,5 +1,5 @@
 from . import JSONObject, MethodResponseBase
-from . import util as dto_util
+from ...utils import json64 as json_util
 
 class VkResponse:
 
@@ -9,7 +9,7 @@ class VkResponse:
     @classmethod
     def create(cls, dto:str, response_cls:type):
         assert issubclass(response_cls, MethodResponseBase)
-        json_obj = dto_util.convert_json_str_to_obj(dto, JSONObject)
+        json_obj = json_util.convert_json_str_to_obj(dto, JSONObject)
         obj = response_cls()
         obj.fill(json_obj)
         return cls(obj)

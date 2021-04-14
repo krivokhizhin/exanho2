@@ -8,7 +8,7 @@ from sqlalchemy.orm.session import Session as OrmSession
 
 from exanho.eis44.interfaces import ParticipantInfo, ParticipantCurrentActivityInfo, ParticipantExperienceInfo, ContractInfo, ParticipantEventInfo
 
-from ..dto import util as dto_util
+from ...utils import json64 as json_util
 from ..dto.method_call import VkMethodCall
 from ..dto.messages import *
 from ..dto.attachments import *
@@ -100,7 +100,7 @@ def show_main_menu(session:OrmSession, vk_context:VkBotContext, client_context:C
         VkMethodCall(
             'messages',
             'send',
-            dto_util.form(send_options, SendOptions)
+            json_util.form(send_options, SendOptions)
         )
     )
 
@@ -125,7 +125,7 @@ def show_snackbar_notice(session:OrmSession, vk_context:VkBotContext, client_con
             VkMethodCall(
                 'messages',
                 'sendMessageEventAnswer',
-                dto_util.form(send_options, SendMessageEventAnswerOptions)
+                json_util.form(send_options, SendMessageEventAnswerOptions)
             )
         )
 
@@ -189,7 +189,7 @@ def show_products_by_kind(session:OrmSession, vk_context:VkBotContext, client_co
         VkMethodCall(
             'messages',
             'send',
-            dto_util.form(send_options, SendOptions)
+            json_util.form(send_options, SendOptions)
         )
     )
 
@@ -216,7 +216,7 @@ def show_detailing_order_message(session:OrmSession, vk_context:VkBotContext, cl
         VkMethodCall(
             'messages',
             'send',
-            dto_util.form(send_options, SendOptions)
+            json_util.form(send_options, SendOptions)
         )
     )
 
@@ -253,7 +253,7 @@ def detailing_order_by_participant(session:OrmSession, vk_context:VkBotContext, 
             VkMethodCall(
                 'messages',
                 'send',
-                dto_util.form(send_options, SendOptions)
+                json_util.form(send_options, SendOptions)
             )
         )
         return
@@ -309,7 +309,7 @@ def detailing_order_by_participant(session:OrmSession, vk_context:VkBotContext, 
         VkMethodCall(
             'messages',
             'send',
-            dto_util.form(send_options, SendOptions)
+            json_util.form(send_options, SendOptions)
         )
     )
 
@@ -338,7 +338,7 @@ def show_confirmation_order(session:OrmSession, vk_context:VkBotContext, client_
         VkMethodCall(
             'messages',
             'send',
-            dto_util.form(send_options, SendOptions)
+            json_util.form(send_options, SendOptions)
         )
     )
 
@@ -414,7 +414,7 @@ def show_que_par_act_result(session:OrmSession, vk_context:VkBotContext, client_
         VkMethodCall(
             'messages',
             'send',
-            dto_util.form(send_options, SendOptions)
+            json_util.form(send_options, SendOptions)
         )
     )
 
@@ -473,7 +473,7 @@ def show_rep_par_act_result(session:OrmSession, vk_context:VkBotContext, client_
         VkMethodCall(
             'attachment',
             'send',
-            dto_util.form(send_options, SendAttachmentsOptions)
+            json_util.form(send_options, SendAttachmentsOptions)
         )
     )
 
@@ -513,7 +513,7 @@ def show_que_par_his_result(session:OrmSession, vk_context:VkBotContext, client_
         VkMethodCall(
             'messages',
             'send',
-            dto_util.form(send_options, SendOptions)
+            json_util.form(send_options, SendOptions)
         )
     )
 
@@ -572,7 +572,7 @@ def show_rep_par_his_result(session:OrmSession, vk_context:VkBotContext, client_
         VkMethodCall(
             'attachment',
             'send',
-            dto_util.form(send_options, SendAttachmentsOptions)
+            json_util.form(send_options, SendAttachmentsOptions)
         )
     )
 
@@ -596,7 +596,7 @@ def show_sub_par_subscription(session:OrmSession, vk_context:VkBotContext, clien
         VkMethodCall(
             'messages',
             'send',
-            dto_util.form(send_options, SendOptions)
+            json_util.form(send_options, SendOptions)
         )
     )
 
@@ -625,6 +625,6 @@ def show_sub_par_subscription(session:OrmSession, vk_context:VkBotContext, clien
             VkMethodCall(
                 'messages',
                 'send',
-                dto_util.form(send_options, SendOptions)
+                json_util.form(send_options, SendOptions)
             )
         )

@@ -7,7 +7,7 @@ from exanho.core.common import Error
 
 from .drivers import IVkDriver
 from .dto import JSONObject, VkResponse, OkResponse, IVkDto
-from .dto import util as dto_util
+from ..utils import json64 as json_util
 from .dto.groups import GetLongPollServerResponse
 from .ui.element_builder import UIElementBuilder
 from .dto.messages import *
@@ -45,7 +45,7 @@ class VkApiSession:
         else:
             assert isinstance(content, str)
 
-            json_obj:JSONObject = dto_util.deform(content, JSONObject)
+            json_obj:JSONObject = json_util.deform(content, JSONObject)
             send_options = SendOptions()
             send_options.fill(json_obj)
 
@@ -62,7 +62,7 @@ class VkApiSession:
     def messages_sendMessageEventAnswer(self, content:str) -> SendResponse:
         assert isinstance(content, str)
 
-        json_obj:JSONObject = dto_util.deform(content, JSONObject)
+        json_obj:JSONObject = json_util.deform(content, JSONObject)
         send_options = SendMessageEventAnswerOptions()
         send_options.fill(json_obj)
 
@@ -89,7 +89,7 @@ class VkApiSession:
         else:
             assert isinstance(content, str)
 
-            json_obj:JSONObject = dto_util.deform(content, JSONObject)
+            json_obj:JSONObject = json_util.deform(content, JSONObject)
             send_options = GetMessagesUploadServerOptions()
             send_options.fill(json_obj)
 
@@ -125,7 +125,7 @@ class VkApiSession:
         else:
             assert isinstance(content, str)
 
-            json_obj:JSONObject = dto_util.deform(content, JSONObject)
+            json_obj:JSONObject = json_util.deform(content, JSONObject)
             send_options = SaveDocsOptions()
             send_options.fill(json_obj)
 
@@ -142,7 +142,7 @@ class VkApiSession:
     def attachment_send(self, content:str):
         assert isinstance(content, str)
 
-        json_obj:JSONObject = dto_util.deform(content, JSONObject)
+        json_obj:JSONObject = json_util.deform(content, JSONObject)
         send_options = SendAttachmentsOptions()
         send_options.fill(json_obj)
 
@@ -156,7 +156,7 @@ class VkApiSession:
             )
             if upload_url_resp.error:
                 raise Error(f'VK docs.getMessagesUploadServer call failed with error: code={upload_url_resp.error.error_code}, msg={upload_url_resp.error.error_msg}')        
-            log.debug(dto_util.convert_obj_to_json_str(upload_url_resp, IVkDto))
+            log.debug(json_util.convert_obj_to_json_str(upload_url_resp, IVkDto))
 
             # upload doc
             upload_file_resp = self.upload_file(
@@ -167,7 +167,7 @@ class VkApiSession:
             )
             if upload_file_resp.error:
                 raise Error(f'VK upload doc call failed with error: code={upload_file_resp.error.error_code}, msg={upload_file_resp.error.error_msg}')
-            log.debug(dto_util.convert_obj_to_json_str(upload_file_resp, IVkDto))
+            log.debug(json_util.convert_obj_to_json_str(upload_file_resp, IVkDto))
 
             # save doc in user vk-storage
             doc_save_resp = self.docs_save(
@@ -177,7 +177,7 @@ class VkApiSession:
             )
             if doc_save_resp.error:
                 raise Error(f'VK upload doc call failed with error: code={doc_save_resp.error.error_code}, msg={doc_save_resp.error.error_msg}')
-            log.debug(dto_util.convert_obj_to_json_str(doc_save_resp, IVkDto))
+            log.debug(json_util.convert_obj_to_json_str(doc_save_resp, IVkDto))
 
             # send message with attachment
             doc_dto:DocDto = doc_save_resp.docs[0]

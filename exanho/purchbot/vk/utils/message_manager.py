@@ -7,10 +7,10 @@ from exanho.core.common import Error
 
 from .vk_bot_context import VkBotContext
 from .client_context import ClientContext
-from ..dto import util, JSONObject
+from ..dto import JSONObject
 from ..ui import PayloadCommand, Payload
 
-from ...utils import accounts as acc_util
+from ...utils import json64 as json_util
 from ...utils import account_manager as acc_mngr
 from ...utils import order_manager as order_mngr
 from ...utils import eis_service
@@ -36,7 +36,7 @@ def handle_message_new(session:OrmSession, context:VkBotContext, message_new:JSO
 
         payload_obj = message_new.message.payload
         if isinstance(payload_obj, str):
-            payload_obj = util.convert_json_str_to_obj(payload_obj.replace('\\"', '"').replace('\"', '"'), JSONObject)
+            payload_obj = json_util.convert_json_str_to_obj(payload_obj.replace('\\"', '"').replace('\"', '"'), JSONObject)
         
         if not hasattr(payload_obj, 'command'):
             ui_mngr.show_main_menu(session, context, client_context)
@@ -68,7 +68,7 @@ def handle_message_event(session:OrmSession, context:VkBotContext, message_event
 
         payload_obj = message_event.payload
         if isinstance(payload_obj, str):
-            payload_obj = util.convert_json_str_to_obj(payload_obj.replace('\\"', '"').replace('\"', '"'), JSONObject)
+            payload_obj = json_util.convert_json_str_to_obj(payload_obj.replace('\\"', '"').replace('\"', '"'), JSONObject)
         
         if not hasattr(payload_obj, 'command'):
             ui_mngr.show_main_menu(session, context, client_context)
@@ -100,7 +100,7 @@ def handle_message_reply(session:OrmSession, context:VkBotContext, message_reply
 
         payload_obj = message_reply.payload
         if isinstance(payload_obj, str):
-            payload_obj = util.convert_json_str_to_obj(payload_obj.replace('\\"', '"').replace('\"', '"'), JSONObject)
+            payload_obj = json_util.convert_json_str_to_obj(payload_obj.replace('\\"', '"').replace('\"', '"'), JSONObject)
         
         if not hasattr(payload_obj, 'command'):
             return

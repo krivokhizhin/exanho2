@@ -10,7 +10,7 @@ from exanho.core.common import Error
 from exanho.purchbot.vk import VkApiSession
 from exanho.purchbot.vk.drivers import RequestsDriver
 from exanho.purchbot.vk.dto import MethodResponseBase, VkMethodCall, IVkDto
-import exanho.purchbot.vk.dto.util as dto_mngr
+import exanho.purchbot.utils.json64 as json_util
 
 log = logging.getLogger(__name__)
 
@@ -98,6 +98,6 @@ def match_method_call(context:VkApiContext, method_call:VkMethodCall):
         if resp.error:
             raise Error(f'VK api_method call failed with error: code={resp.error.error_code}, msg={resp.error.error_msg}')
         else:
-            log.debug(dto_mngr.convert_obj_to_json_str(resp, IVkDto))
+            log.debug(json_util.convert_obj_to_json_str(resp, IVkDto))
     else:
         log.warning(f'{method_call} | Not supported section and/or method')

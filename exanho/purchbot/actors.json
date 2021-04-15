@@ -33,6 +33,14 @@
             {
                 "name": "vk_method_calls",
                 "maxsize": 200
+            },
+            {
+                "name": "vk_default_handle",
+                "maxsize": 200
+            },
+            {
+                "name": "vkpay_handle",
+                "maxsize": 200
             }
         ]
     },
@@ -81,19 +89,38 @@
             ]
         },
         {
+            "name": "VkEventConsumer",
+            "kind": "QueueWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.purchbot.workers.vk_event_consumer",
+                    "db_key": "purchbot_test",
+                    "queue_name": "vk_default_handle",
+                    "appsettings":{
+                        "group_id": 202308925,
+                        "call_queue": "vk_method_calls",
+                        "participant_service": "IEisParticipantService"
+                    }
+                }
+            ]
+        },
+        {
             "name": "VkBotsLongPoll",
             "kind": "SleepWorker",
             "daemon": true,
             "workers": [
                 {
-                    "module": "exanho.purchbot.workers.bots_long_poll",
+                    "module": "exanho.purchbot.workers.vk_bots_long_poll",
                     "db_key": "purchbot_test",
                     "sleep": 1.0,
                     "appsettings":{
                         "access_token": "63aaede189a068baff2e8cb3a0b6700a7243de160c616c0e38908a71cb95db7c9d0cdd33f7959bd8a1183",
                         "group_id": 202308925,
-                        "call_queue": "vk_method_calls",
-                        "participant_service": "IEisParticipantService"
+                        "work_types": ["message_new", "message_reply", "message_event", "vkpay_transaction"],
+                        "default_work_queue": "vk_default_handle",
+                        "vkpay_like": "vkpay_transaction",
+                        "vkpay_work_queue": "vkpay_handle"
                     }
                 }
             ]

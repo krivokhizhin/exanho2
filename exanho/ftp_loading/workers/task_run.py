@@ -50,7 +50,8 @@ def work(context:Context):
         with Sessional.domain.session_scope() as session:
             assert isinstance(session, OrmSession)
             now = datetime.datetime.today()
-            load_task = session.query(FtpTask).filter(FtpTask.scheduled_date < now).filter(FtpTask.status == FtpTaskStatus.SCHEDULED).first()
+            load_task = session.query(FtpTask).filter(FtpTask.scheduled_date < now).filter(FtpTask.status == FtpTaskStatus.SCHEDULED).\
+                order_by(FtpTask.last_date).first()
 
             if load_task:
                 load_task.status = FtpTaskStatus.SCANNING

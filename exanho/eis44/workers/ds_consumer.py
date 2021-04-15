@@ -1,7 +1,5 @@
-from datetime import date
 import importlib
 import logging
-import xml.etree.ElementTree as ET
 
 from collections import namedtuple
 from sqlalchemy.orm.session import Session as OrmSession
@@ -51,12 +49,30 @@ def work(context:Context, message):
             export_obj = None
 
             try:
-                export_obj = context.parse_module.parseString(buffer.tobytes(),silence = True, print_warnings=False)
+
+                export_obj = context.parse_module.parseString(buffer.tobytes(), silence = True, print_warnings=False)
+
             except Exception as ex:
-                content_to_parse.error_content = FtpErrorContent(
-                    data = buffer.tobytes()
-                )
-                raise Error(str(ex.args)[:100], ex)
+                
+                if content_to_parse.error_content and content_to_parse.error_content.origin_data != buffer.tobytes():
+                    content_to_parse.error_content = None
+                    session.flush()
+                
+                if content_to_parse.error_content is None:
+                    content_to_parse.error_content = FtpErrorContent(
+                        origin_data = buffer.tobytes()
+                    )
+
+                if content_to_parse.error_content.correct_data:
+                    try:
+                        export_obj = context.parse_module.parseString(content_to_parse.error_content.correct_data, silence = True, print_warnings=False)
+                    except Exception as inner_ex:
+                        log.exception(inner_ex)
+                        raise Error(str(inner_ex.args)[:100], inner_ex)
+                
+                if export_obj is None:
+                    raise Error(str(ex.args)[:100], ex)
+
 
             for eis_doc_obj in export_obj.get_children():
 
@@ -83,9 +99,7 @@ def work(context:Context, message):
                 shm.close()
                 shm.unlink()
 
-        log.debug(f'load_content({content_id}): {content_to_parse.status}')
-
-    
+        log.debug(f'load_content({content_id}): {content_to_parse.status}')    
 
     return context 
 

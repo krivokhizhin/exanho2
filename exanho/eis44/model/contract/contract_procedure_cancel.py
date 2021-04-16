@@ -12,7 +12,7 @@ class ZfcsContractProcedureCancel2015(Base):
     # placer
 
     cancel_dt = Column(DateTime(timezone=True))
-    reason = Column(String(2000))
+    reason = Column(String(3000))
 
     court_name = Column(String(2000))
     court_doc_name = Column(String(1000))

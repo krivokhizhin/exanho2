@@ -8,6 +8,7 @@ from exanho.core.common import Error
 from exanho.orm.domain import Sessional
 
 import exanho.purchbot.utils.json64 as json_util
+import exanho.purchbot.vk.events.provider as event_provider
 import exanho.purchbot.vk.utils.message_manager as msg_mngr
 from exanho.purchbot.vk.dto import JSONObject
 from exanho.purchbot.vk.dto.bot import GroupEvent
@@ -53,10 +54,10 @@ def finalize(context):
 def _handle_event(session:OrmSession, context:VkBotContext, new_event:GroupEvent):    
 
     if new_event.type == 'message_new':
-        msg_mngr.handle_message_new(session, context, new_event.object)
+        msg_mngr.handle_message_new(session, context, event_provider.get_message_new(new_event.object))
     elif new_event.type == 'message_reply':
-        msg_mngr.handle_message_reply(session, context, new_event.object)
+        msg_mngr.handle_message_reply(session, context, event_provider.get_message_reply(new_event.object))
     elif new_event.type == 'message_event':
-        msg_mngr.handle_message_event(session, context, new_event.object)
+        msg_mngr.handle_message_event(session, context, event_provider.get_message_event(new_event.object))
     elif new_event.type == 'vkpay_transaction':
         pass

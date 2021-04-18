@@ -1,14 +1,9 @@
-from exanho.purchbot.vk.dto.bot.group_event import GroupEvent
 import unittest
-
-from collections import namedtuple
 
 from exanho.purchbot.utils import json64 as json_util
 
 from exanho.purchbot.vk.dto import JSONObject
 from exanho.purchbot.vk.dto.bot import GroupEvent
-
-SingleTestCase = namedtuple('SingleTestCase', ['initial_data', 'expected'])
 
 class TestUtils(unittest.TestCase):
 

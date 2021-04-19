@@ -4,7 +4,8 @@ import decimal
 from ..dto import JSONObject
 from ...utils import json64 as json_util
 
-from .payload import Payload
+# from .payload import Payload, PayloadCommand
+from ..ui.payload import PayloadCommand, Payload
 from .message import PrivateMessage, ClientInfo, MessageNew, MessageReply, MessageEvent
 from .vkpay_transaction import VkpayTransaction
 
@@ -19,7 +20,21 @@ def get_payload(dto) -> Payload:
     return payload
 
 def fill_payload(payload:Payload, dto:JSONObject):
-    pass
+    if hasattr(dto, 'command') and isinstance(dto.command, str):
+        try:
+            payload.command = PayloadCommand[dto.command]
+        except:
+            pass
+
+    if hasattr(dto, 'product') and isinstance(dto.product, str): payload.product = dto.product
+    if hasattr(dto, 'page') and isinstance(dto.page, int): payload.page = dto.page
+    if hasattr(dto, 'order') and isinstance(dto.order, int): payload.order = dto.order
+    if hasattr(dto, 'add_info') and isinstance(dto.add_info, int): payload.add_info = dto.add_info
+    if hasattr(dto, 'par_number') and isinstance(dto.par_number, int): payload.par_number = dto.par_number
+    if hasattr(dto, 'par_value'): payload.par_value = str(dto.par_value)
+    if hasattr(dto, 'content'): payload.content = str(dto.content)
+    if hasattr(dto, 'go_to') and isinstance(dto.go_to, int): payload.go_to = dto.go_to
+    if hasattr(dto, 'event') and isinstance(dto.event, str): payload.event = dto.event
 
 # ---------- end payload ----------------
 
@@ -65,7 +80,7 @@ def fill_private_message(event:PrivateMessage, dto:JSONObject):
     # attachments
     if hasattr(dto, 'important') and isinstance(dto.important, bool): event.important = dto.important
     # geo
-    # payload
+    if hasattr(dto, 'payload'): event.payload = get_payload(dto.payload)
     # keyboard
     if hasattr(dto, 'fwd_messages') and isinstance(dto.fwd_messages, list):
         for fwd_message in dto.fwd_messages:
@@ -103,7 +118,7 @@ def fill_message_event(event:MessageEvent, dto:JSONObject):
     if hasattr(dto, 'user_id') and isinstance(dto.user_id, int): event.user_id = dto.user_id
     if hasattr(dto, 'peer_id') and isinstance(dto.peer_id, int): event.peer_id = dto.peer_id
     if hasattr(dto, 'event_id') and isinstance(dto.event_id, str): event.event_id = dto.event_id
-    # payload
+    if hasattr(dto, 'payload'): event.payload = get_payload(dto.payload)
     if hasattr(dto, 'conversation_message_id') and isinstance(dto.conversation_message_id, int): event.conversation_message_id = dto.conversation_message_id
 
 

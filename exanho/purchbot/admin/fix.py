@@ -30,7 +30,6 @@ def manual_order_executed(session:OrmSession, order_id:int):
     client_context = ClientContext(
         client_id=order.client_id,
         vk_user_id=None,
-        payload=None,
         free_balance=None,
         promo_balance=None
     )

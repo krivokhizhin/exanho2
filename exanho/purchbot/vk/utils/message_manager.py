@@ -16,113 +16,68 @@ from ...utils import order_manager as order_mngr
 from ...utils import eis_service
 from ..utils import ui_manager as ui_mngr
 
+from ..events.message import MessageEvent, MessageReply, PrivateMessage, MessageNew
+
 from ...model import ProductKind, Product, Client, VkUser, OrderStatus, Order, AddInfoCode, LastOrderDetailing
 
 log = logging.getLogger(__name__)
 
-def handle_message_new(session:OrmSession, context:VkBotContext, message_new:JSONObject):
+def handle_message_new(session:OrmSession, context:VkBotContext, message_new:MessageNew):
+    message:PrivateMessage = message_new.message
 
-    if hasattr(message_new, 'message'):
+    client_context = get_client_context(session, message.from_id)
 
-        client_context = get_client_context(session, message_new.message.from_id)
-
-        if not hasattr(message_new.message, 'payload'):
-            
-            if client_context.payload:
-                match_payload(session, client_context.payload, client_context, context, message_new)
-            else:
-                ui_mngr.show_main_menu(session, context, client_context)
-            return
-
-        payload_obj = message_new.message.payload
-        if isinstance(payload_obj, str):
-            payload_obj = json_util.convert_json_str_to_obj(payload_obj.replace('\\"', '"').replace('\"', '"'), JSONObject)
-        
-        if not hasattr(payload_obj, 'command'):
-            ui_mngr.show_main_menu(session, context, client_context)
-            return
-
-        payload = Payload()
-        payload.fill(
-                payload_obj.command,
-                product = payload_obj.product if hasattr(payload_obj, 'product') else None,
-                page = int(payload_obj.page) if hasattr(payload_obj, 'page') else None,
-                order = int(payload_obj.order) if hasattr(payload_obj, 'order') else None,
-                add_info = payload_obj.add_info if hasattr(payload_obj, 'add_info') else None,
-                par_number = int(payload_obj.par_number) if hasattr(payload_obj, 'par_number') else None,
-                par_value = payload_obj.par_value if hasattr(payload_obj, 'par_value') else None,
-                go_to = payload_obj.go_to if hasattr(payload_obj, 'go_to') else None,
-                event = str(payload_obj.event) if hasattr(payload_obj, 'event') else None
+    if message.payload is None:
+        last_order_detail = session.query(LastOrderDetailing).filter(LastOrderDetailing.client_id == client_context.client_id).\
+            filter(LastOrderDetailing.handled == False).one_or_none()
+        if last_order_detail:
+            message.payload = Payload(
+                command = PayloadCommand.detailing_order,
+                page = 1,
+                order = last_order_detail.order_id,
+                par_number = last_order_detail.par_number,
+                add_info = last_order_detail.add_info.value,
+                content = message.text
             )
 
-        match_payload(session, payload, client_context, context, message_new)
-
-    else:
-        raise Error('There is not "message" element in "message_new" event')
-
-def handle_message_event(session:OrmSession, context:VkBotContext, message_event:JSONObject):  
-
-    if hasattr(message_event, 'payload'):
-
-        client_context = get_client_context(session, message_event.user_id)
-
-        payload_obj = message_event.payload
-        if isinstance(payload_obj, str):
-            payload_obj = json_util.convert_json_str_to_obj(payload_obj.replace('\\"', '"').replace('\"', '"'), JSONObject)
-        
-        if not hasattr(payload_obj, 'command'):
-            ui_mngr.show_main_menu(session, context, client_context)
-            return
-
-        payload = Payload()
-        payload.fill(
-                payload_obj.command,
-                product = payload_obj.product if hasattr(payload_obj, 'product') else None,
-                page = int(payload_obj.page) if hasattr(payload_obj, 'page') else None,
-                order = int(payload_obj.order) if hasattr(payload_obj, 'order') else None,
-                add_info = payload_obj.add_info if hasattr(payload_obj, 'add_info') else None,
-                par_number = int(payload_obj.par_number) if hasattr(payload_obj, 'par_number') else None,
-                par_value = payload_obj.par_value if hasattr(payload_obj, 'par_value') else None,
-                go_to = payload_obj.go_to if hasattr(payload_obj, 'go_to') else None,
-                event = str(message_event.event_id) if hasattr(message_event, 'event_id') else None
-            )
-
-        match_payload(session, payload, client_context, context, message_event)
-
-    else:
-        raise Error('There is not "payload" element in "message_event" event')
-
-def handle_message_reply(session:OrmSession, context:VkBotContext, message_reply:JSONObject):
-
-    if hasattr(message_reply, 'payload'):
-
-        client_context = get_client_context(session, message_reply.peer_id)
-
-        payload_obj = message_reply.payload
-        if isinstance(payload_obj, str):
-            payload_obj = json_util.convert_json_str_to_obj(payload_obj.replace('\\"', '"').replace('\"', '"'), JSONObject)
-        
-        if not hasattr(payload_obj, 'command'):
-            return
-
-        payload = Payload()
-        payload.fill(
-                payload_obj.command,
-                product = payload_obj.product if hasattr(payload_obj, 'product') else None,
-                page = int(payload_obj.page) if hasattr(payload_obj, 'page') else None,
-                order = int(payload_obj.order) if hasattr(payload_obj, 'order') else None,
-                add_info = payload_obj.add_info if hasattr(payload_obj, 'add_info') else None,
-                par_number = int(payload_obj.par_number) if hasattr(payload_obj, 'par_number') else None,
-                par_value = payload_obj.par_value if hasattr(payload_obj, 'par_value') else None,
-                go_to = payload_obj.go_to if hasattr(payload_obj, 'go_to') else None,
-                event = str(payload_obj.event) if hasattr(payload_obj, 'event') else None
-            )
-
-        match_payload(session, payload, client_context, context, message_reply)
-
-def match_payload(session:OrmSession, payload:Payload, client_context:ClientContext, context:VkBotContext, event_obj:JSONObject):
-    if payload is None or payload.command is None or payload.command == PayloadCommand.start or payload.command == PayloadCommand.empty:
+    if message.payload is None:
         ui_mngr.show_main_menu(session, context, client_context)
+        return
+
+    match_payload(session, message.payload, client_context, context)
+
+def handle_message_event(session:OrmSession, context:VkBotContext, message_event:MessageEvent):     
+
+    client_context = get_client_context(session, message_event.user_id)
+
+    if message_event.payload is None:
+        last_order_detail = session.query(LastOrderDetailing).filter(LastOrderDetailing.client_id == client_context.client_id).\
+            filter(LastOrderDetailing.handled == False).one_or_none()
+        if last_order_detail:
+            message_event.payload = Payload(
+                command = PayloadCommand.detailing_order,
+                page = 1,
+                order = last_order_detail.order_id,
+                par_number = last_order_detail.par_number,
+                add_info = last_order_detail.add_info.value,
+                event = message_event.event_id
+            )
+
+    if message_event.payload is None:
+        ui_mngr.show_main_menu(session, context, client_context)
+        return
+
+    match_payload(session, message_event.payload, client_context, context)
+
+def handle_message_reply(session:OrmSession, context:VkBotContext, message_reply:MessageReply):
+
+    client_context = get_client_context(session, message_reply.peer_id)
+
+    match_payload(session, message_reply.payload, client_context, context)
+
+
+def match_payload(session:OrmSession, payload:Payload, client_context:ClientContext, context:VkBotContext):
+    if payload is None or payload.command is None or payload.command == PayloadCommand.empty:
         return
 
     if payload.command == PayloadCommand.get_balance:
@@ -134,11 +89,11 @@ def match_payload(session:OrmSession, payload:Payload, client_context:ClientCont
     elif payload.command == PayloadCommand.menu_section_reports:
         ui_mngr.show_products_by_kind(session, context, client_context, ProductKind.REPORT, payload)
     elif payload.command == PayloadCommand.go_to_page:
-        go_to(session, payload, client_context, context, event_obj)
+        go_to(session, payload, client_context, context)
     elif payload.command == PayloadCommand.request_product:
         request_product(session, context, client_context, payload)
     elif payload.command == PayloadCommand.detailing_order:
-        detailing_order(session, context, client_context, payload, event_obj)
+        detailing_order(session, context, client_context, payload)
     elif payload.command == PayloadCommand.selection_add_info:
         selection_add_info(session, context, client_context, payload)
     elif payload.command == PayloadCommand.confirm_order:
@@ -172,19 +127,7 @@ def get_client_context(session:OrmSession, user_id:int) -> ClientContext:
     free_balance = acc_mngr.free_balance_by_client(session, vk_user.client.id)
     promo_balance = acc_mngr.promo_balance_by_client(session, vk_user.client.id)
 
-    payload = None
-    last_order_detail = session.query(LastOrderDetailing).filter(LastOrderDetailing.client_id == vk_user.client.id).\
-        filter(LastOrderDetailing.handled == False).one_or_none()
-    if last_order_detail:
-        payload = Payload(
-            command = PayloadCommand.detailing_order,
-            page = 1,
-            order = last_order_detail.order_id,
-            par_number = last_order_detail.par_number,
-            add_info = last_order_detail.add_info.value
-        )
-
-    return ClientContext(client_id=vk_user.client.id, vk_user_id=user_id, payload=payload, free_balance=free_balance, promo_balance=promo_balance)        
+    return ClientContext(client_id=vk_user.client.id, vk_user_id=user_id, free_balance=free_balance, promo_balance=promo_balance)        
 
 def promo(session:OrmSession, client_id:int):
     PROMO_AMOUNT = Decimal('99.00')
@@ -195,13 +138,13 @@ def promo(session:OrmSession, client_id:int):
 
     acc_mngr.deposit_promo_funds(session, client_id, PROMO_AMOUNT)
 
-def go_to(session:OrmSession, payload:Payload, client_context:ClientContext, context:VkBotContext, event_obj:JSONObject):
+def go_to(session:OrmSession, payload:Payload, client_context:ClientContext, context:VkBotContext):
     try:
         payload.command = PayloadCommand[payload.go_to]
     except:
         return
 
-    match_payload(session, payload, client_context, context, event_obj)
+    match_payload(session, payload, client_context, context)
 
 def request_product(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload):
     product_code:str = payload.product
@@ -217,12 +160,8 @@ def request_product(session:OrmSession, vk_context:VkBotContext, client_context:
         order_mngr.mark_as_filling(session, order_id)
         ui_mngr.show_confirmation_order(session, vk_context, client_context, order_id)
 
-def detailing_order(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, event_obj:JSONObject):
-    text = None
-    if hasattr(event_obj, 'message') and hasattr(event_obj.message, 'text'):
-        text = event_obj.message.text
-    if payload.content:
-        text = payload.content
+def detailing_order(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload):
+    text = payload.content
 
     if text is None:
         return
@@ -261,7 +200,7 @@ def selection_add_info(session:OrmSession, vk_context:VkBotContext, client_conte
     par_value:str = str(payload.par_value)
 
     order_id = order_mngr.check_actual_order(session, order_id)
-    order_mngr.set_patameter_by_number(session, order_id, par_number, par_value)
+    order_mngr.set_parameter_by_number(session, order_id, par_number, par_value)
     par_number = order_mngr.get_first_empty_num_parameter_or_none(session, order_id)
 
     if par_number:

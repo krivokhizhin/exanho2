@@ -110,27 +110,27 @@ def mark_as_completed(session:OrmSession, order_id:int) -> bool:
         if promo_pay_acc_amount >= order.amount:
             acc_util.make_payment(
                 session,
-                acc_mngr.product_promo_revenue_acc(session, order_id),
+                acc_mngr.product_promo_income_acc(session, order_id),
                 promo_pay_acc,
                 order.amount
             )
         elif promo_pay_acc_amount > 0 and pay_acc_amount >= order.amount - promo_pay_acc_amount:
             acc_util.make_payment(
                 session,
-                acc_mngr.product_promo_revenue_acc(session, order_id),
+                acc_mngr.product_promo_income_acc(session, order_id),
                 promo_pay_acc,
                 promo_pay_acc_amount
             )
             acc_util.make_payment(
                 session,
-                acc_mngr.product_revenue_acc(session, order_id),
+                acc_mngr.product_income_acc(session, order_id),
                 pay_acc,
                 order.amount - promo_pay_acc_amount
             )
         elif pay_acc_amount >= order.amount:
             acc_util.make_payment(
                 session,
-                acc_mngr.product_revenue_acc(session, order_id),
+                acc_mngr.product_income_acc(session, order_id),
                 pay_acc,
                 order.amount
             )
@@ -256,7 +256,7 @@ def update_last_order_detailing(session:OrmSession, client_id:int, order_id:int,
         last_order_detail.add_info = add_info_code
         last_order_detail.handled = False
    
-def set_patameter_by_number(session:OrmSession, order_id:int, par_number:int, value:str):
+def set_parameter_by_number(session:OrmSession, order_id:int, par_number:int, value:str):
 
     order = session.query(Order).get(order_id)
     if order is None:

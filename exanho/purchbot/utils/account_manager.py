@@ -41,7 +41,7 @@ def client_payment_acc(session:OrmSession, client_id:int, order_id:int) -> AccAc
     if product_code == 'REP_PARS_CON':
         return util.get_account(session, BalAccCode.C363, client_id, order_id, desc=desc)
 
-def product_revenue_acc(session:OrmSession, order_id:int) -> AccAccount:
+def product_income_acc(session:OrmSession, order_id:int) -> AccAccount:
     order = session.query(Order).get(order_id)
     product_code = session.query(Product.code).filter(Product.id == order.product_id).scalar()
     desc=f'Счет оплат по услуге {product_code}'
@@ -103,7 +103,7 @@ def client_promo_payment_acc(session:OrmSession, client_id:int, order_id:int) ->
     if product_code == 'REP_PARS_CON':
         return util.get_account(session, BalAccCode.C763, client_id, order_id, desc=desc)
 
-def product_promo_revenue_acc(session:OrmSession, order_id:int) -> AccAccount:
+def product_promo_income_acc(session:OrmSession, order_id:int) -> AccAccount:
     order = session.query(Order).get(order_id)
     product_code = session.query(Product.code).filter(Product.id == order.product_id).scalar()
     desc=f'Промо-счет оплат по услуге {product_code}'

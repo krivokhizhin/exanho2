@@ -32,6 +32,8 @@ class Order(ExaObjectMixin, Base):
     parameter2 = Column(String(100))
     parameter3 = Column(String(100))
 
+    subscription = relationship('EventSubscription', uselist=False, back_populates='order', cascade='all, delete-orphan')
+
     def __str__(self):
         return f'{self.id:>6}: client {self.client_id:>6} | status {self.status.name:<10} | {self.amount:18.2f} | paid={self.paid} | {self.product}'
 

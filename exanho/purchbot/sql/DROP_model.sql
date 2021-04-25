@@ -2,7 +2,7 @@ DROP TABLE vk_dialog_content CASCADE;
 DROP TABLE vk_user CASCADE;
 
 DROP TABLE last_order_detailing CASCADE;
-DROP TABLE subscription CASCADE;
+DROP TABLE event_subscription CASCADE;
 DROP TABLE order CASCADE;
 DROP TABLE tariff CASCADE;
 

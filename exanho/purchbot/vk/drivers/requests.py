@@ -1,9 +1,12 @@
+import logging
 import requests
 
 from io import BufferedIOBase
 from uuid import uuid4
 
 from .i_vk_driver import IVkDriver
+
+log = logging.getLogger(__name__)
 
 class RequestsDriver(IVkDriver):
 
@@ -34,4 +37,5 @@ class RequestsDriver(IVkDriver):
 
         files = {'file': (filename, file_obj, content_type)}
         resp = requests.post(upload_url, files=files)
+        # log.debug(resp.request.body.decode('cp1251'))
         return resp.text

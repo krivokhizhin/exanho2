@@ -3,7 +3,7 @@ DROP TABLE vk_user CASCADE;
 
 DROP TABLE last_order_detailing CASCADE;
 DROP TABLE event_subscription CASCADE;
-DROP TABLE order CASCADE;
+DROP TABLE "order" CASCADE;
 DROP TABLE tariff CASCADE;
 
 DROP TABLE acc_remain CASCADE;

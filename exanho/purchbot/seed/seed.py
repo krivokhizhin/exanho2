@@ -19,9 +19,9 @@ def run():
 
         que_par_act.seed(session)
         que_par_his.seed(session)
-        sub_par.seed(session)
+        # sub_par.seed(session)
         rep_par_act.seed(session)
         rep_par_his.seed(session)
-        rep_pars_con.seed(session)
+        # rep_pars_con.seed(session)
 
         vk_content.seed(session)

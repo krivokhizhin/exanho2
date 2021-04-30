@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from sqlalchemy.orm.session import Session as OrmSession
 
@@ -14,6 +15,14 @@ def free_balance_by_client(session:OrmSession, client_id:int) -> Decimal:
 
 def free_balance_by_client_acc(session:OrmSession, client_id:int) -> AccAccount:
     return util.get_account(session, BalAccCode.C101, client_id)
+
+def deposit_funds_by_vkpay(session:OrmSession, client_id:int, amount:Decimal, dt:datetime=None, desc:str=None):
+    if amount > 0:
+        dt_account = util.get_account(session, BalAccCode.C101, client_id, desc=f'Свободный остаток клиента id={client_id}')
+        cr_account = util.get_account(session, BalAccCode.C951, desc='Счет оператора в ВК')
+        record = util.make_payment(session, dt_account, cr_account, amount, True)
+        record.date = dt
+        if desc and isinstance(desc, str): record.desc = desc[:500]
 
 
 # *********** product ***************************************

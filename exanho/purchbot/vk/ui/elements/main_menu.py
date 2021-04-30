@@ -60,14 +60,14 @@ class MainMenu:
                         ),
                         color = ButtonColor.primary
                     ),
-                    ButtonContent(
-                        action = ButtonActionContent(
-                            type_ = ButtonType.text,
-                            label = 'Подписки',
-                            payload = Payload(command = PayloadCommand.menu_section_subscriptions).form()
-                        ),
-                        color = ButtonColor.primary
-                    ),
+                    # ButtonContent(
+                    #     action = ButtonActionContent(
+                    #         type_ = ButtonType.text,
+                    #         label = 'Подписки',
+                    #         payload = Payload(command = PayloadCommand.menu_section_subscriptions).form()
+                    #     ),
+                    #     color = ButtonColor.primary
+                    # ),
                     ButtonContent(
                         action = ButtonActionContent(
                             type_ = ButtonType.text,
@@ -86,14 +86,14 @@ class MainMenu:
                         ),
                         color = ButtonColor.secondary
                     ),
-                    ButtonContent(
-                        action = ButtonActionContent(
-                            type_ = ButtonType.text,
-                            label = 'Мои подписки',
-                            payload = '{\"command\":\"menu_section_my_subscriptions\"}'
-                        ),
-                        color = ButtonColor.secondary
-                    ),
+                    # ButtonContent(
+                    #     action = ButtonActionContent(
+                    #         type_ = ButtonType.text,
+                    #         label = 'Мои подписки',
+                    #         payload = '{\"command\":\"menu_section_my_subscriptions\"}'
+                    #     ),
+                    #     color = ButtonColor.secondary
+                    # ),
                     ButtonContent(
                         action = ButtonActionContent(
                             type_ = ButtonType.text,
@@ -107,6 +107,7 @@ class MainMenu:
                     ButtonContent(
                         action = ButtonActionContent(
                             type_ = ButtonType.vkpay,
+                            # hash = 'action=transfer-to-user&user_id=326596496&aid=10'
                             hash = 'action=transfer-to-group&group_id=202308925&aid=10'
                         )
                     )

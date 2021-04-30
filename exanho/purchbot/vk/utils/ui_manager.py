@@ -1,7 +1,9 @@
 import csv
+from datetime import datetime
 import io
 import logging
-from collections import namedtuple
+from collections import defaultdict, namedtuple
+from decimal import Decimal
 from multiprocessing import JoinableQueue, shared_memory
 
 from sqlalchemy.orm.session import Session as OrmSession
@@ -23,11 +25,14 @@ from exanho.core.common import Error
 
 log = logging.getLogger(__name__)
 
+csv.register_dialect('vk_excel', delimiter=';', quoting=csv.QUOTE_MINIMAL)
+
 NUMBER_ELEMENTS_PER_PAGE = 10
+CSV_ENCODING = '1251'
 
 VkMenuPagination = namedtuple('VkMenuPagination', 'first prev page next last payload')
 
-def show_main_menu(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, menu_message:str='Меню (см. клавиатуру под строкой ввода)', pagination:VkMenuPagination=None):    
+def show_main_menu(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, menu_message:str='\ud83d\ude0e', pagination:VkMenuPagination=None):    
 
     ui_menu = MainMenu()
     ui_menu.set_label_for_balance(client_context.free_balance, client_context.promo_balance)
@@ -119,6 +124,8 @@ def show_snackbar_notice(session:OrmSession, vk_context:VkBotContext, client_con
             peer_id=client_context.vk_user_id,
             event_data=builder.form()
         )
+
+        log.debug(f'{event_id}: {send_options.event_data}')
 
         call_queue:JoinableQueue = vk_context.call_queue
         call_queue.put(
@@ -524,8 +531,8 @@ def show_rep_par_his_result(session:OrmSession, vk_context:VkBotContext, client_
     filename = f'rep_par_his_{order_id}.csv'
 
     with io.StringIO() as buffer:
-        fieldnames = ['N', 'reg_num', 'state', 'publish_dt', 'subject', 'price', 'currency_code', 'right_to_conclude', 'start_date', 'end_date', 'supplier_number', 'href']
-        writer = csv.DictWriter(buffer, fieldnames=fieldnames,  dialect=csv.excel)
+        fieldnames = ['N', 'regnum', 'Состояние', 'Опубликовано', 'Предмет', 'Цена', 'Валюта', 'Право на заключение', 'Начало', 'Конец', 'Кол-во поставщиков', 'href']
+        writer = csv.DictWriter(buffer, fieldnames=fieldnames, dialect='vk_excel')
         writer.writeheader()
 
         sort_number = 0
@@ -535,20 +542,20 @@ def show_rep_par_his_result(session:OrmSession, vk_context:VkBotContext, client_
             sort_number += 1
             writer.writerow({
                 'N': sort_number,
-                'reg_num': f'\'{exec_cntr.reg_num}',
-                'state': exec_cntr.state,
-                'publish_dt': exec_cntr.publish_dt,
-                'subject': exec_cntr.subject,
-                'price': exec_cntr.price,
-                'currency_code': exec_cntr.currency_code,
-                'right_to_conclude': exec_cntr.right_to_conclude,
-                'start_date': exec_cntr.start_date,
-                'end_date': exec_cntr.end_date,
-                'supplier_number': exec_cntr.supplier_number,
+                'regnum': f'\'{exec_cntr.reg_num}',
+                'Состояние': exec_cntr.state,
+                'Опубликовано': exec_cntr.publish_dt,
+                'Предмет': exec_cntr.subject,
+                'Цена': exec_cntr.price,
+                'Валюта': exec_cntr.currency_code,
+                'Право на заключение': exec_cntr.right_to_conclude,
+                'Начало': exec_cntr.start_date,
+                'Конец': exec_cntr.end_date,
+                'Кол-во поставщиков': exec_cntr.supplier_number,
                 'href': exec_cntr.href
             })
 
-        content = buffer.getvalue().encode(encoding='utf-8')
+        content = buffer.getvalue().encode(encoding=CSV_ENCODING)
         shm_size = len(content)
 
         shm_a = shared_memory.SharedMemory(create=True, size=shm_size)
@@ -628,3 +635,126 @@ def show_sub_par_subscription(session:OrmSession, vk_context:VkBotContext, clien
                 json_util.form(send_options, SendOptions)
             )
         )
+
+def show_history(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext):
+    
+    shm_name = None
+    shm_size = None
+    orders = dict()
+    tmst = datetime.today().strftime('%Y%m%d%H%M%S')
+    filename = f'history_{tmst}.csv'
+
+    with io.StringIO() as buffer:
+        fieldnames = ['N', 'ID', 'Дата', 'Продукт', 'Стоимость', 'Контекст']
+        writer = csv.DictWriter(buffer, fieldnames=fieldnames, dialect='vk_excel')
+        writer.writeheader()
+
+        sort_number = 0
+
+        for order_id, order_updated_at, order_product, order_amount in order_mngr.get_orders_by_client(session, client_context.client_id):
+            sort_number += 1
+            writer.writerow({
+                'N': sort_number,
+                'ID': order_id,
+                'Дата': order_updated_at,
+                'Продукт': order_product,
+                'Стоимость': order_amount,
+                'Контекст': '<пусто>'
+            })
+
+            cnt, sum_amount = orders.get(order_product, (0, 0))
+            orders[order_product] = (cnt+1, sum_amount+order_amount)
+
+        content = buffer.getvalue().encode(encoding=CSV_ENCODING)
+        shm_size = len(content)
+
+        log.debug(f'{shm_size}: {content}')
+
+        shm_in = shared_memory.SharedMemory(create=True, size=shm_size)
+        shm_name = shm_in.name
+        shm_in.buf[:shm_size] = content
+        shm_in.close()
+    
+    if orders:
+
+        history_message = '\n'.join([f'- {prdt}: {tot_by_prdt[0]} раз на сумму {tot_by_prdt[1]} р.' for prdt, tot_by_prdt in orders.items()])
+        history_message += 'Перечень во вложении'
+
+        send_options = SendOptions(
+            user_id=client_context.vk_user_id,
+            random_id=0,
+            group_id=vk_context.group_id,
+            message=history_message
+        )
+
+        call_queue:JoinableQueue = vk_context.call_queue
+        call_queue.put(
+            VkMethodCall(
+                'messages',
+                'send',
+                json_util.form(send_options, SendOptions)
+            )
+        )
+
+        send_options = SendAttachmentsOptions(
+            shm_name = shm_name,
+            shm_size = shm_size,
+            filename = filename,
+            peer_id = client_context.vk_user_id,
+            type = 'doc',
+            group_id = vk_context.group_id,
+            random_id = 0,
+            payload = Payload.empty()
+        )
+
+        call_queue:JoinableQueue = vk_context.call_queue
+        call_queue.put(
+            VkMethodCall(
+                'attachment',
+                'send',
+                json_util.form(send_options, SendAttachmentsOptions)
+            )
+        )
+
+    else:
+        shm_out = shared_memory.SharedMemory(shm_name)
+        shm_out.close()
+        shm_out.unlink()
+
+        send_options = SendOptions(
+            user_id=client_context.vk_user_id,
+            random_id=0,
+            group_id=vk_context.group_id,
+            message='Вы пока не воспользовались сервисами'
+        )
+
+        call_queue:JoinableQueue = vk_context.call_queue
+        call_queue.put(
+            VkMethodCall(
+                'messages',
+                'send',
+                json_util.form(send_options, SendOptions)
+            )
+        )
+
+def show_balance(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext):
+
+    balance_message = f'Свободный остаток на счете: {client_context.free_balance} р.'
+    if client_context.promo_balance and client_context.promo_balance > 0:
+        balance_message += f'\nСвободный остаток на промо-счете: {client_context.promo_balance} р.'
+ 
+    send_options = SendOptions(
+        user_id=client_context.vk_user_id,
+        random_id=0,
+        group_id=vk_context.group_id,
+        message=balance_message
+    )
+
+    call_queue:JoinableQueue = vk_context.call_queue
+    call_queue.put(
+        VkMethodCall(
+            'messages',
+            'send',
+            json_util.form(send_options, SendOptions)
+        )
+    )

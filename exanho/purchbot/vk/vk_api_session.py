@@ -74,6 +74,7 @@ class VkApiSession:
         url = '{}{}'.format(URL_VK_API, 'messages.sendMessageEventAnswer')
         resp_obj = self.driver.post(url, params=options_dict)
         resp:VkResponse = VkResponse.create(resp_obj, SendResponse)
+        log.debug(f'{send_options.event_data}: {json_util.convert_obj_to_json_str(resp.response, IVkDto)}')
         return resp.response
         
     def groups_getLongPollServer(self, group_id:int) -> GetLongPollServerResponse:

@@ -21,6 +21,10 @@ class PayloadCommand(enum.Enum):
 
 class Payload:
 
+    @staticmethod
+    def empty():
+        return '{\"command\": \"empty\"}'
+
     def __init__(self, **kwargs) -> None:
         self.command = kwargs.get('command', None)
         self.product = kwargs.get('product', None)

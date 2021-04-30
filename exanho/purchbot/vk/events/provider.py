@@ -136,6 +136,6 @@ def fill_vkpay_transaction(event:VkpayTransaction, dto:JSONObject):
     if hasattr(dto, 'from_id') and isinstance(dto.from_id, int): event.from_id = dto.from_id
     if hasattr(dto, 'amount'): event.amount = decimal.Decimal(str(dto.amount))
     if hasattr(dto, 'description') and isinstance(dto.description, str): event.description = dto.description
-    if hasattr(dto, 'date') and isinstance(dto.date, int): event.date = datetime.date.fromtimestamp(dto.date)
+    if hasattr(dto, 'date') and isinstance(dto.date, int): event.date = datetime.datetime.fromtimestamp(dto.date)
 
 # ---------- end vkpay_transaction event ----------------

@@ -14,6 +14,7 @@ from ...utils import json64 as json_util
 from ...utils import account_manager as acc_mngr
 from ...utils import order_manager as order_mngr
 from ...utils import eis_service
+from ..utils import client as clt_eng
 from ..utils import ui_manager as ui_mngr
 
 from ..events.message import MessageEvent, MessageReply, PrivateMessage, MessageNew
@@ -25,7 +26,7 @@ log = logging.getLogger(__name__)
 def handle_message_new(session:OrmSession, context:VkBotContext, message_new:MessageNew):
     message:PrivateMessage = message_new.message
 
-    client_context = get_client_context(session, message.from_id)
+    client_context = clt_eng.get_client_context(session, message.from_id, promo=True)
 
     if message.payload is None:
         last_order_detail = session.query(LastOrderDetailing).filter(LastOrderDetailing.client_id == client_context.client_id).\
@@ -41,14 +42,14 @@ def handle_message_new(session:OrmSession, context:VkBotContext, message_new:Mes
             )
 
     if message.payload is None:
-        ui_mngr.show_main_menu(session, context, client_context)
+        ui_mngr.show_main_menu(session, context, client_context, 'Меню (см. клавиатуру под строкой ввода)')
         return
 
     match_payload(session, message.payload, client_context, context)
 
 def handle_message_event(session:OrmSession, context:VkBotContext, message_event:MessageEvent):     
 
-    client_context = get_client_context(session, message_event.user_id)
+    client_context = clt_eng.get_client_context(session, message_event.user_id, promo=True)
 
     if message_event.payload is None:
         last_order_detail = session.query(LastOrderDetailing).filter(LastOrderDetailing.client_id == client_context.client_id).\
@@ -67,11 +68,13 @@ def handle_message_event(session:OrmSession, context:VkBotContext, message_event
         ui_mngr.show_main_menu(session, context, client_context)
         return
 
+    message_event.payload.event = message_event.event_id
+
     match_payload(session, message_event.payload, client_context, context)
 
 def handle_message_reply(session:OrmSession, context:VkBotContext, message_reply:MessageReply):
 
-    client_context = get_client_context(session, message_reply.peer_id)
+    client_context = clt_eng.get_client_context(session, message_reply.peer_id, promo=True)
 
     match_payload(session, message_reply.payload, client_context, context)
 
@@ -81,7 +84,7 @@ def match_payload(session:OrmSession, payload:Payload, client_context:ClientCont
         return
 
     if payload.command == PayloadCommand.get_balance:
-        log.debug(f'VK user (id={client_context.vk_user_id}) pressed {PayloadCommand.get_balance.name.upper()}')
+        ui_mngr.show_balance(session, context, client_context)
     elif payload.command == PayloadCommand.menu_section_queries:
         ui_mngr.show_products_by_kind(session, context, client_context, ProductKind.QUERY, payload)
     elif payload.command == PayloadCommand.menu_section_subscriptions:
@@ -107,36 +110,9 @@ def match_payload(session:OrmSession, payload:Payload, client_context:ClientCont
     elif payload.command == PayloadCommand.menu_section_my_subscriptions:
         log.debug(f'VK user (id={client_context.vk_user_id}) pressed {PayloadCommand.menu_section_my_subscriptions.name.upper()}')
     elif payload.command == PayloadCommand.menu_section_history:
-        log.debug(f'VK user (id={client_context.vk_user_id}) pressed {PayloadCommand.menu_section_history.name.upper()}')
+        ui_mngr.show_history(session, context, client_context)
     else:
         ui_mngr.show_main_menu(session, context, client_context)
-
-def get_client_context(session:OrmSession, user_id:int) -> ClientContext:
-
-    vk_user = session.query(VkUser).filter(VkUser.user_id == user_id).one_or_none()
-
-    if vk_user is None:
-        client = Client()
-        vk_user = VkUser(user_id = user_id)
-        vk_user.client = client
-        session.add_all([client, vk_user])
-        session.flush()
-
-        promo(session, client.id)
-
-    free_balance = acc_mngr.free_balance_by_client(session, vk_user.client.id)
-    promo_balance = acc_mngr.promo_balance_by_client(session, vk_user.client.id)
-
-    return ClientContext(client_id=vk_user.client.id, vk_user_id=user_id, free_balance=free_balance, promo_balance=promo_balance)        
-
-def promo(session:OrmSession, client_id:int):
-    PROMO_AMOUNT = Decimal('99.00')
-    promo_remain = acc_mngr.promo_balance_by_client(session, client_id)
-
-    if promo_remain > 0:
-        return
-
-    acc_mngr.deposit_promo_funds(session, client_id, PROMO_AMOUNT)
 
 def go_to(session:OrmSession, payload:Payload, client_context:ClientContext, context:VkBotContext):
     try:
@@ -217,6 +193,7 @@ def confirm_order(session:OrmSession, vk_context:VkBotContext, client_context:Cl
         return
     
     if order_mngr.hold_fee(session, order_id):
+        log.debug(f'order_mngr.hold_fee, event: {payload.event}')
         ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Принято')
     else:
         ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Недостаточно средств! Пополните, пожалуйста, баланс.')

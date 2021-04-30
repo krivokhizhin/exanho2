@@ -98,6 +98,6 @@ def match_method_call(context:VkApiContext, method_call:VkMethodCall):
         if resp.error:
             raise Error(f'VK api_method call failed with error: code={resp.error.error_code}, msg={resp.error.error_msg}')
         else:
-            log.debug(json_util.convert_obj_to_json_str(resp, IVkDto))
+            log.debug(f'{vk_api_method_name}: {json_util.convert_obj_to_json_str(resp, IVkDto)}')
     else:
         log.warning(f'{method_call} | Not supported section and/or method')

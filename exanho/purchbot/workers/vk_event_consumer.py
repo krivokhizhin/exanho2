@@ -1,4 +1,3 @@
-from exanho.purchbot.vk.dto.json_object import JSONObject
 import logging
 from xmlrpc.client import ServerProxy
 from sqlalchemy.orm.session import Session as OrmSession

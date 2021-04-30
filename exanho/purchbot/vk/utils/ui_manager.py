@@ -739,9 +739,9 @@ def show_history(session:OrmSession, vk_context:VkBotContext, client_context:Cli
 
 def show_balance(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext):
 
-    balance_message = f'Свободный остаток на счете: {client_context.free_balance} р.'
+    balance_message = 'Свободный остаток на счете: {:.0f} р.'.format(client_context.free_balance)
     if client_context.promo_balance and client_context.promo_balance > 0:
-        balance_message += f'\nСвободный остаток на промо-счете: {client_context.promo_balance} р.'
+        balance_message += '\nСвободный остаток на промо-счете: {:.0f} р.'.format(client_context.promo_balance)
  
     send_options = SendOptions(
         user_id=client_context.vk_user_id,

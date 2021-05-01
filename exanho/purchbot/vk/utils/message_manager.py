@@ -271,7 +271,7 @@ def execute_order(session:OrmSession, vk_context:VkBotContext, client_context:Cl
 def edit_order(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload):
     order_id:int = payload.order
 
-    if not order_mngr.check_status(session, order_id, OrderStatus.DURING, OrderStatus.COMPLETED):
+    if order_mngr.check_status(session, order_id, OrderStatus.DURING, OrderStatus.COMPLETED):
         ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Редактирование невозможно. Услуга оказана ранее.')
         return
 

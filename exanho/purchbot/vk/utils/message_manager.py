@@ -288,7 +288,7 @@ def cancel_order(session:OrmSession, vk_context:VkBotContext, client_context:Cli
     if order is None:
         return
 
-    if not order_mngr.check_status(session, order_id, OrderStatus.DURING, OrderStatus.COMPLETED):
+    if order_mngr.check_status(session, order_id, OrderStatus.DURING, OrderStatus.COMPLETED):
         ui_mngr.show_snackbar_notice(session, vk_context, client_context, payload.event, 'Отмена невозможна. Услуга оказана ранее.')
         return
 

@@ -8,120 +8,136 @@
                     "exanho.ftp_loading.model.__init__",
                     "exanho.eis44.model.__init__"
                 ]
+            },
+            {
+                "name": "purchbot_test",
+                "url": "postgresql+psycopg2://kks:Nata1311@localhost/purchbot_test",
+                "models": [
+                    "exanho.purchbot.model.__init__"
+                ]
+            }
+        ],
+        "service_endpoints": [
+            {
+                "interface": "IEisParticipantService",
+                "host": "",
+                "port": 3120
+            },
+            {
+                "interface": "IEisContractService",
+                "host": "",
+                "port": 3121
             }
         ],
         "joinable_queues": [
             {
-                "name": "contract",
-                "maxsize": 400
+                "name": "vk_method_calls",
+                "maxsize": 200
+            },
+            {
+                "name": "vk_default_handle",
+                "maxsize": 200
+            },
+            {
+                "name": "vkpay_handle",
+                "maxsize": 200
             }
         ]
     },
     "exanho_actors": [
         {
-            "name": "ContractQHWorker1",
-            "kind": "QueueWorker",
+            "name": "EisService",
+            "kind": "XmlRpcServer",
             "daemon": true,
-            "workers": [
+            "services":[
                 {
-                    "module": "exanho.eis44.workers.ds_consumer",
-                    "db_key": "eis44_test",
-                    "queue_name": "contract",
-                    "appsettings":{
-                        "parse_module": "exanho.eis44.ds.contracts.fcsExport",
-                        "update": false
-                    }
+                    "handler_module": "exanho.eis44.services.eis_participant_service",
+                    "interface": "IEisParticipantService",
+                    "concurrency": {
+                        "degree": 2,
+                        "kind": "process"
+                    },
+                    "db_key": "eis44_test"
+                },
+                {
+                    "handler_module": "exanho.eis44.services.eis_contract_service",
+                    "interface": "IEisContractService",
+                    "concurrency": {
+                        "degree": 2,
+                        "kind": "process"
+                    },
+                    "db_key": "eis44_test"
                 }
-            ]
+            ]            
         },
         {
-            "name": "ContractQHWorker2",
-            "kind": "QueueWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.eis44.workers.ds_consumer",
-                    "db_key": "eis44_test",
-                    "queue_name": "contract",
-                    "appsettings":{
-                        "parse_module": "exanho.eis44.ds.contracts.fcsExport",
-                        "update": false
-                    }
-                }
-            ]
-        },
-        {
-            "name": "ContractQHWorker3",
-            "kind": "QueueWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.eis44.workers.ds_consumer",
-                    "db_key": "eis44_test",
-                    "queue_name": "contract",
-                    "appsettings":{
-                        "parse_module": "exanho.eis44.ds.contracts.fcsExport",
-                        "update": false
-                    }
-                }
-            ]
-        },
-        {
-            "name": "ContractQHWorker4",
-            "kind": "QueueWorker",
-            "daemon": true,
-            "workers": [
-                {
-                    "module": "exanho.eis44.workers.ds_consumer",
-                    "db_key": "eis44_test",
-                    "queue_name": "contract",
-                    "appsettings":{
-                        "parse_module": "exanho.eis44.ds.contracts.fcsExport",
-                        "update": false
-                    }
-                }
-            ]
-        },
-        {
-            "name": "RunFtpTaskWorker",
+            "name": "VkApiCalls",
             "kind": "SleepWorker",
             "daemon": true,
             "workers": [
                 {
-                    "module": "exanho.ftp_loading.workers.task_run",
-                    "db_key": "eis44_test",
-                    "sleep": 5.0,
+                    "module": "exanho.purchbot.workers.vk_api_calls",
+                    "sleep": 1.0,
                     "appsettings":{
-                        "ftp_host": "ftp.zakupki.gov.ru",
-                        "ftp_port": 21,
-                        "ftp_user": "free",
-                        "ftp_password": "free"
+                        "access_token": "577d996dec270aead0ba9a3b144bba3cabbcbbae3e0d12ccecd1316a46b167368cb1f470bfd77c1a12c31",
+                        "group_id": 204338407,
+                        "call_queue": "vk_method_calls",
+                        "max_calls": 20,
+                        "timeout": 1
                     }
                 }
             ]
         },
         {
-            "name": "LoadFtpFileWorker",
+            "name": "VkEventConsumer",
+            "kind": "QueueWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.purchbot.workers.vk_event_consumer",
+                    "db_key": "purchbot_test",
+                    "queue_name": "vk_default_handle",
+                    "appsettings":{
+                        "group_id": 204338407,
+                        "call_queue": "vk_method_calls",
+                        "participant_service": "IEisParticipantService"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "VkPayConsumer",
+            "kind": "QueueWorker",
+            "daemon": true,
+            "workers": [
+                {
+                    "module": "exanho.purchbot.workers.vkpay_transaction_consumer",
+                    "db_key": "purchbot_test",
+                    "queue_name": "vkpay_handle",
+                    "appsettings":{
+                        "group_id": 204338407,
+                        "call_queue": "vk_method_calls",
+                        "participant_service": "IEisParticipantService"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "VkBotsLongPoll",
             "kind": "SleepWorker",
             "daemon": true,
             "workers": [
                 {
-                    "module": "exanho.ftp_loading.workers.file_load",
-                    "db_key": "eis44_test",
-                    "sleep": 5.0,
+                    "module": "exanho.purchbot.workers.vk_bots_long_poll",
+                    "db_key": "purchbot_test",
+                    "sleep": 1.0,
                     "appsettings":{
-                        "ftp_host": "ftp.zakupki.gov.ru",
-                        "ftp_port": 21,
-                        "ftp_user": "free",
-                        "ftp_password": "free",
-                        "parse_queues":["contract"],
-                        "queue_by_filter":[1],
-                        "parse_filters":[
-                            "contract_"
-                        ],
-                        "max_mem_level": 0.8,
-                        "with_swap": false,
-                        "max_pool_workers": 1
+                        "access_token": "ce75d88456dc1158bfd8fc538614d1287488ca6b7b8f16041ec089aadc8590c93b0118ea964468b2017ad",
+                        "group_id": 204338407,
+                        "work_types": ["message_new", "message_reply", "message_event", "vkpay_transaction"],
+                        "default_work_queue": "vk_default_handle",
+                        "vkpay_like": "vkpay_transaction",
+                        "vkpay_work_queue": "vkpay_handle"
                     }
                 }
             ]

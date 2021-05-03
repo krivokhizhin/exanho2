@@ -74,9 +74,10 @@ def check_actual_order(session:OrmSession, order_id:int) -> int:
     return order_id
 
 def get_orders_by_client(session:OrmSession, client_id:int):
-    yield from session.query(Order.id, Order.updated_at, Product.name, Order.amount).\
+    yield from session.query(Order.id, Order.updated_at, Product.kind, Product.name, Order.amount).\
         join(Product).filter(Order.client_id == client_id).\
-            filter(Order.status.in_([OrderStatus.CONFIRMED, OrderStatus.DURING, OrderStatus.COMPLETED]))
+            filter(Order.status.in_([OrderStatus.CONFIRMED, OrderStatus.DURING, OrderStatus.COMPLETED])).\
+                order_by(Product.kind, Product.name, Order.id)
 
 def mark_as_filling(session:OrmSession, order_id:int):
 

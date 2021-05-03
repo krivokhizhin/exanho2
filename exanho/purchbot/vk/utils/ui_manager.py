@@ -138,11 +138,11 @@ def show_snackbar_notice(session:OrmSession, vk_context:VkBotContext, client_con
 
 def get_title_by_product_kind(product_kind:ProductKind) -> str:
     if product_kind == ProductKind.QUERY:
-        return 'Запросы:'
+        return 'Запрос'
     if product_kind == ProductKind.SUBSCRIPTION:
-        return 'Подписки:'
+        return 'Подписка'
     if product_kind == ProductKind.REPORT:
-        return 'Отчеты:'
+        return 'Отчет'
     raise Error(f'Unknown product kind: {product_kind}')
 
 def show_products_by_kind(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, product_kind:ProductKind, payload:Payload):
@@ -188,7 +188,7 @@ def show_products_by_kind(session:OrmSession, vk_context:VkBotContext, client_co
         random_id=0,
         template=builder.form(),
         group_id=vk_context.group_id,
-        message='Для выбора нажмите соответствующую кнопку' #get_title_by_product_kind(product_kind)
+        message='Для выбора нажмите соответствующую кнопку'
     )
 
     call_queue:JoinableQueue = vk_context.call_queue
@@ -394,6 +394,18 @@ def get_participant_info_for_confirm(vk_context:VkBotContext, client_context:Cli
     else:
         return f'\n{participant.name}\nИНН: {participant.inn}'
 
+def get_name_by_contract_state(contract_state:str) -> str:
+    if contract_state == 'EXECUTION':
+        return 'Исполнение'
+    if contract_state == 'DISCONTINUED':
+        return 'Исполнение прекращено'
+    if contract_state == 'COMPLETED':
+        return 'Исполнение завершено'
+    if contract_state == 'CANCELED':
+        return 'Aннулировано'
+        
+    return 'не определено'
+
 def show_que_par_act_result(session:OrmSession, vk_context:VkBotContext, client_context:ClientContext, payload:Payload, result:ParticipantCurrentActivityInfo):
     answer = 'В данный момент участник:\n'
     if result.cntr_count > 0:
@@ -432,7 +444,7 @@ def show_rep_par_act_result(session:OrmSession, vk_context:VkBotContext, client_
     filename = f'rep_par_act_{order_id}.csv'
 
     with io.StringIO() as buffer:
-        fieldnames = ['N', 'reg_num', 'state', 'publish_dt', 'subject', 'price', 'currency_code', 'right_to_conclude', 'start_date', 'end_date', 'supplier_number', 'href']
+        fieldnames = ['N', 'regnum', 'Состояние', 'Опубликовано', 'Предмет', 'Цена', 'Валюта', 'Право на заключение', 'Начало', 'Конец', 'Кол-во поставщиков', 'href']
         writer = csv.DictWriter(buffer, fieldnames=fieldnames,  dialect=csv.excel)
         writer.writeheader()
 
@@ -443,20 +455,20 @@ def show_rep_par_act_result(session:OrmSession, vk_context:VkBotContext, client_
             sort_number += 1
             writer.writerow({
                 'N': sort_number,
-                'reg_num': f'\'{exec_cntr.reg_num}',
-                'state': exec_cntr.state,
-                'publish_dt': exec_cntr.publish_dt,
-                'subject': exec_cntr.subject,
-                'price': exec_cntr.price,
-                'currency_code': exec_cntr.currency_code,
-                'right_to_conclude': exec_cntr.right_to_conclude,
-                'start_date': exec_cntr.start_date,
-                'end_date': exec_cntr.end_date,
-                'supplier_number': exec_cntr.supplier_number,
+                'regnum': f'\'{exec_cntr.reg_num}',
+                'Состояние': get_name_by_contract_state(exec_cntr.state),
+                'Опубликовано': exec_cntr.publish_dt,
+                'Предмет': exec_cntr.subject,
+                'Цена': exec_cntr.price,
+                'Валюта': exec_cntr.currency_code,
+                'Право на заключение': 'Да' if exec_cntr.right_to_conclude else 'Нет',
+                'Начало': exec_cntr.start_date,
+                'Конец': exec_cntr.end_date,
+                'Кол-во поставщиков': exec_cntr.supplier_number,
                 'href': exec_cntr.href
             })
 
-        content = buffer.getvalue().encode(encoding='utf-8')
+        content = buffer.getvalue().encode(encoding=CSV_ENCODING)
         shm_size = len(content)
 
         shm_a = shared_memory.SharedMemory(create=True, size=shm_size)
@@ -543,12 +555,12 @@ def show_rep_par_his_result(session:OrmSession, vk_context:VkBotContext, client_
             writer.writerow({
                 'N': sort_number,
                 'regnum': f'\'{exec_cntr.reg_num}',
-                'Состояние': exec_cntr.state,
+                'Состояние': get_name_by_contract_state(exec_cntr.state),
                 'Опубликовано': exec_cntr.publish_dt,
                 'Предмет': exec_cntr.subject,
                 'Цена': exec_cntr.price,
                 'Валюта': exec_cntr.currency_code,
-                'Право на заключение': exec_cntr.right_to_conclude,
+                'Право на заключение': 'Да' if exec_cntr.right_to_conclude else 'Нет',
                 'Начало': exec_cntr.start_date,
                 'Конец': exec_cntr.end_date,
                 'Кол-во поставщиков': exec_cntr.supplier_number,
@@ -645,21 +657,22 @@ def show_history(session:OrmSession, vk_context:VkBotContext, client_context:Cli
     filename = f'history_{tmst}.csv'
 
     with io.StringIO() as buffer:
-        fieldnames = ['N', 'ID', 'Дата', 'Продукт', 'Стоимость', 'Контекст']
+        fieldnames = ['N', 'ID', 'Дата', 'Вид продукта', 'Продукт', 'Стоимость'] # , 'Контекст']
         writer = csv.DictWriter(buffer, fieldnames=fieldnames, dialect='vk_excel')
         writer.writeheader()
 
         sort_number = 0
 
-        for order_id, order_updated_at, order_product, order_amount in order_mngr.get_orders_by_client(session, client_context.client_id):
+        for order_id, order_updated_at, product_kind, order_product, order_amount in order_mngr.get_orders_by_client(session, client_context.client_id):
             sort_number += 1
             writer.writerow({
                 'N': sort_number,
                 'ID': order_id,
-                'Дата': order_updated_at,
+                'Дата': order_updated_at.strftime('%H:%M %d.%m.%y'),
+                'Вид продукта': get_title_by_product_kind(product_kind),
                 'Продукт': order_product,
                 'Стоимость': order_amount,
-                'Контекст': '<пусто>'
+                # 'Контекст': '<пусто>'
             })
 
             cnt, sum_amount = orders.get(order_product, (0, 0))
@@ -677,7 +690,7 @@ def show_history(session:OrmSession, vk_context:VkBotContext, client_context:Cli
     
     if orders:
 
-        history_message = '\n'.join([f'- {prdt}: {tot_by_prdt[0]} раз на сумму {tot_by_prdt[1]} р.' for prdt, tot_by_prdt in orders.items()])
+        history_message = '\n'.join([f'- {prdt}: {tot_by_prdt[0]} заказ(-а, -ов) на сумму {tot_by_prdt[1]} р.' for prdt, tot_by_prdt in orders.items()])
         history_message += 'Перечень во вложении'
 
         send_options = SendOptions(

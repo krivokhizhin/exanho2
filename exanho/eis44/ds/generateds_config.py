@@ -1,3 +1,0 @@
-NameTable = {
-    'self': 'self_',
-    }

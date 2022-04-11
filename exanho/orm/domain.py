@@ -2,52 +2,33 @@ import types
 
 from contextlib import contextmanager
 from functools import wraps
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, scoped_session
 
-Base = declarative_base()
+Base = None
 
 class Domain:
 
     def __init__(self, url):
-        self._engine = create_engine(url)
-        self._session = scoped_session(sessionmaker(bind=self._engine))
+        self._engine = None
+        self._session = None
 
     def dispose(self):
-        self._engine.dispose()
+        pass
 
     def validate(self, model_modules):
-        self.dispose()
-        self._load_models(model_modules)
-
-        from sqlalchemy import inspect
-        from exanho.orm.validator import Validator
-
-        inspector = inspect(self._engine)
-        
-        validator = Validator(Base.metadata, inspector)
-        validator.validate()
-
-        return validator.is_valid, validator.error_messages, validator.warning_messages
+        return True, [], []
 
     @property
     def Session(self):
-        return self._session()
+        return None
 
     def sessional(self, func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            session = self.Session
             result = None
             try:
                 result = func(*args, **kwargs)
-                session.commit()
             except:
-                session.rollback()
                 raise
-            finally:
-                session.close()
             return result
         return wrapper
 
@@ -57,14 +38,10 @@ class Domain:
         session = self.Session
         try:
             yield session
-            session.commit()
         except:
-            session.rollback()
             raise
-        finally:
-            session.close()
 
-Session = sessionmaker()
+Session = None
 
 def load_models(model_modules):
     if not isinstance(model_modules, list):
@@ -79,62 +56,18 @@ def load_models(model_modules):
             type_matching.update(mod.type_matching)
 
 def configure(url):
-    engine = create_engine(url)
-    Session.configure(bind=engine)
+    engine = None
 
 def recreate(url:str, models:list):
     load_models(models)
 
-    engine = create_engine(url)
-    Base.metadata.create_all(engine)
+    engine = None
 
 def validate(url:str, models:list):
-    load_models(models)
-
-    from sqlalchemy import inspect
-    from exanho.orm.validator import Validator
-
-    engine = create_engine(url)
-    inspector = inspect(engine)
-    
-    validator = Validator(Base.metadata, inspector)
-    validator.validate()
-
-    return validator.is_valid, validator.error_messages, validator.warning_messages
+    return True, [], []
     
 def upgrade(self):
     pass
-
-# def sessional(func):
-#     @wraps(func)
-#     def wrapper(*args, **kwargs):
-#         session = Session()
-#         self, *_ = args
-#         self.session = session
-#         result = None
-#         try:
-#             result = func(*args, **kwargs)
-#             session.commit()
-#         except:
-#             session.rollback()
-#             raise
-#         finally:
-#             session.close()
-#         return result
-#     return wrapper
-
-# @contextmanager
-# def session_scope():
-#     """Provide a transactional scope around a series of operations."""
-#     session = Session()
-#     try:
-#         yield session
-#         session.commit()
-#     except:
-#         session.rollback()
-#         raise
-#     finally:
-#         session.close()
 
 @contextmanager
 def session_scope(domain):
@@ -142,12 +75,8 @@ def session_scope(domain):
     session = domain.Session
     try:
         yield session
-        session.commit()
     except:
-        session.rollback()
         raise
-    finally:
-        session.close()
 
 class Sessional:
 

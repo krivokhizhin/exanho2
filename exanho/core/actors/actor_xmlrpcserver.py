@@ -17,8 +17,12 @@ class XmlRpcServer(Actor):
         self._processes = list()
 
         for service_config in config.services:
-
-            mod = importlib.import_module(service_config.handler_module)  
+            
+            try:
+                mod = importlib.import_module(service_config.handler_module)  
+            except Exception as ex:
+                log.exception(ex)
+                raise
             interface_key = service_config.interface
 
             hosting_service = None   

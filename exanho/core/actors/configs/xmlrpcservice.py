@@ -1,4 +1,4 @@
-from ...common.descriptors import String
+from ...common.descriptors import String, List
 from . import ConfigBase, ConfigBaseDerived, Concurrency
 
 class XmlRpcService(ConfigBase):
@@ -6,3 +6,4 @@ class XmlRpcService(ConfigBase):
     interface = String()
     concurrency = ConfigBaseDerived(Concurrency)
     db_key = String()
+    sys_paths = List()

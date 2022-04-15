@@ -17,9 +17,23 @@ class XmlRpcServer(Actor):
         self._processes = list()
 
         for service_config in config.services:
-            
+
             try:
-                mod = importlib.import_module(service_config.handler_module)  
+                mod = importlib.import_module(service_config.handler_module)
+                raise ModuleNotFoundError           
+            except ModuleNotFoundError:
+                if service_config.sys_paths:
+                    import sys
+                    for sys_path in service_config.sys_paths:
+                        sys.path.append(sys_path)
+                        log.warning(sys_path)
+
+                try:
+                    mod = importlib.import_module(service_config.handler_module)
+                except Exception as ex:
+                    log.exception(ex)
+                    raise
+
             except Exception as ex:
                 log.exception(ex)
                 raise

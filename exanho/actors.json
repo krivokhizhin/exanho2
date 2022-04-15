@@ -25,7 +25,10 @@
                     "concurrency": {
                         "degree": 2,
                         "kind": "process"
-                    }
+                    },
+                    "sys_paths": [
+                        "/home/kks/Загрузки/pycades_0.1.22769"
+                    ]
                 }
             ]            
         },

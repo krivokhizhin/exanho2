@@ -129,6 +129,7 @@ def _fill_cert_info(dto:dict, cert):
     if not _inn: _inn = parsed_subject_name_pairs.get('OID.1.2.643.3.131.1.1', None)
 
     _innle = parsed_subject_name_pairs.get('INNLE', None)
+    if not _innle: _innle = parsed_subject_name_pairs.get('ИНН ЮЛ', None)
     if not _innle: _innle = parsed_subject_name_pairs.get('OID.1.2.643.100.4', None)
     if not _innle: _innle = parsed_subject_name_pairs.get('1.2.643.100.4', None)
     if _innle and _innle.startswith('#'): _innle = ''.join(char for char in bytes.fromhex(_innle[1:]).decode('utf-8') if char.isdigit())

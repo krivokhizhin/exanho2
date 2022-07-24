@@ -4,7 +4,7 @@ from exanho.core.common import try_logged
 from exanho.core.actors import ServiceBase
 from exanho.interfaces import IPycadesHelperService
 
-from ..utilities import hash_gost_2012_512, hash_gost_2012_256, hash_gost_3411
+import exanho.pycades.utilities as util
 
 class PycadesHelperService(IPycadesHelperService, ServiceBase):
 
@@ -12,12 +12,20 @@ class PycadesHelperService(IPycadesHelperService, ServiceBase):
     
     @try_logged
     def hash_gost_2012_512(self, data:bytes):
-        return hash_gost_2012_512(data)
+        return util.hash_gost_2012_512(data)
     
     @try_logged
     def hash_gost_2012_256(self, data:bytes):
-        return hash_gost_2012_256(data)
+        return util.hash_gost_2012_256(data)
     
     @try_logged
     def hash_gost_3411(self, data:bytes):
-        return hash_gost_3411(data)
+        return util.hash_gost_3411(data)
+
+    @try_logged
+    def sign(self, content: str, thumbprint: str, encoding_type:str, detached=True):
+        return util.sign(content, thumbprint, encoding_type, detached)
+
+    @try_logged
+    def sign_hash(self, hash: str, thumbprint: str, hash_alg:int):
+        return util.sign_hash(hash, thumbprint, hash_alg)

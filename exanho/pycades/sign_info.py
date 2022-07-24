@@ -4,24 +4,10 @@ import logging
 import pycades
 import re
 
-from .utilities import build_hashed_data
 
-logger = logging.getLogger(__name__)
-    
-AVAILABLE_HASH_ALGORITHM_DICT = {
-    100:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256,
-    101:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256,
-    102:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256,
-    110:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_HMAC,
-    111:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256,
-    112:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256
-}
+from .utilities import AVAILABLE_HASH_ALGORITHM_DICT, AVAILABLE_ENCODE_DICT, build_hashed_data
 
-AVAILABLE_ENCODE_DICT = {
-    'BASE64':pycades.CAPICOM_ENCODE_BASE64,
-    'BINARY':pycades.CADESCOM_BASE64_TO_BINARY,
-    'ANY':pycades.CAPICOM_ENCODE_ANY
-}
+logger = logging.getLogger(__name__)    
 
 def by_content_sign(content:str, sign:str, encoding_type:str):
     signed_data = pycades.SignedData()

@@ -3,12 +3,12 @@
         "service_endpoints": [
             {
                 "interface": "ISignInfoService",
-                "host": "192.168.0.55",
+                "host": "192.168.0.52",
                 "port": 3120
             },
             {
                 "interface": "IPycadesHelperService",
-                "host": "192.168.0.55",
+                "host": "192.168.0.52",
                 "port": 3121
             }
         ]

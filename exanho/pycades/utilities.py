@@ -3,12 +3,12 @@ import base64
 import pycades
 
 AVAILABLE_HASH_ALGORITHM_DICT = {
-    100:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256,
+    100:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411,
     101:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256,
-    102:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256,
+    102:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_512,
     110:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_HMAC,
-    111:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256,
-    112:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256
+    111:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256_HMAC,
+    112:pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_512_HMAC
 }
 
 AVAILABLE_ENCODE_DICT = {
@@ -17,7 +17,7 @@ AVAILABLE_ENCODE_DICT = {
     'ANY':pycades.CAPICOM_ENCODE_ANY
 }
 
-def build_hashed_data(data:bytes, algorithm=pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_512):
+def build_hashed_data(data:bytes, algorithm=pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256):
     data_b64str = base64.b64encode(data).decode(encoding="utf-8", errors="strict")
 
     hashed_data = pycades.HashedData()
@@ -28,7 +28,7 @@ def build_hashed_data(data:bytes, algorithm=pycades.CADESCOM_HASH_ALGORITHM_CP_G
     return hashed_data
 
 
-def _compute_hash(data:bytes, algorithm=pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_512):
+def _compute_hash(data:bytes, algorithm=pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256):
     hashed_data = build_hashed_data(data, algorithm)
     return hashed_data.Value
 
